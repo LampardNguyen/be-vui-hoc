@@ -1,6 +1,6 @@
 import { h, topBar, dotArray } from '../ui/widgets.js';
 import { TABLES, ISLANDS, TIPS, DIV_TIP, mul, div, NS, family } from '../facts.js';
-import { sayFact, speakList, factWords } from '../speech.js';
+import { sayFact, speakFacts } from '../speech.js';
 import { play } from '../sound.js';
 
 export function learnScreen(param) {
@@ -56,7 +56,7 @@ export function learnScreen(param) {
 
   function readAll() {
     const fs = facts();
-    speakList(fs.map((f) => factWords(f)), (i) => show(fs[i], false));
+    speakFacts(fs, (i) => show(fs[i], false));
   }
 
   renderList();

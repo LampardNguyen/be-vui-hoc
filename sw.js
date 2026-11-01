@@ -1,8 +1,10 @@
 // Cho phép mở trang khi không có mạng. Đổi VERSION mỗi lần cập nhật để máy tải bản mới.
-const VERSION = 'v5';
+const VERSION = 'v7';
 const CACHE = `cuu-chuong-${VERSION}`;
 const FILES = [
   './',
+  // Giọng đọc ghi sẵn: số 0–100 và "nhân", "chia", "bằng".
+  ...[...Array(101).keys(), 'nhan', 'chia', 'bang'].map((k) => `./audio/vi/${k}.m4a`),
   './css/style.css',
   './icons/icon-180.png',
   './icons/icon-192.png',

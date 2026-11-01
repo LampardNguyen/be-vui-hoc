@@ -3,6 +3,13 @@ import { state } from './storage.js';
 
 let ctx;
 
+// Dùng chung với giọng đọc ghi sẵn (speech.js).
+export function audioCtx() {
+  ctx ||= new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
 function tone(freq, at, dur, type = 'sine', vol = 0.2) {
   const o = ctx.createOscillator();
   const g = ctx.createGain();
@@ -17,10 +24,7 @@ function tone(freq, at, dur, type = 'sine', vol = 0.2) {
 
 export function play(name) {
   if (!state.settings.sound) return;
-  try {
-    ctx ||= new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
-  } catch { return; }
+  try { audioCtx(); } catch { return; }
   const t = ctx.currentTime;
   switch (name) {
     case 'good': tone(660, t, 0.12); tone(990, t + 0.1, 0.2); break;

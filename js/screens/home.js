@@ -4,6 +4,26 @@ import { tableProgress, isMastered } from '../leitner.js';
 import { currentStreak } from '../storage.js';
 import { pet, earnedStickers, STICKERS, takeNewStickers, newStickerPopup } from './rewards.js';
 
+// Chạm chữ "Bé Vui Học" 3 lần liền → xoá bản offline và tải lại bản mới nhất.
+let taps = [];
+
+async function refreshApp() {
+  if (!confirm('Tải lại bản mới nhất của app?')) return;
+  try {
+    const regs = await navigator.serviceWorker?.getRegistrations() || [];
+    await Promise.all(regs.map((r) => r.unregister()));
+    const keys = await caches?.keys() || [];
+    await Promise.all(keys.map((k) => caches.delete(k)));
+  } catch {}
+  location.reload();
+}
+
+function logoTap() {
+  const now = Date.now();
+  taps = [...taps.filter((t) => now - t < 1500), now];
+  if (taps.length >= 3) { taps = []; refreshApp(); }
+}
+
 export function homeScreen() {
   const progress = TABLES.map((t) => ({ t, ...tableProgress(t) }));
   const totalStars = progress.reduce((s, p) => s + p.stars, 0);
@@ -15,7 +35,7 @@ export function homeScreen() {
 
   return h('div', { class: 'screen home' },
     h('header', { class: 'home-head' },
-      h('h1', { class: 'logo' }, 'Bé ', h('span', {}, 'Vui'), ' Học'),
+      h('h1', { class: 'logo', onclick: logoTap }, 'Bé ', h('span', {}, 'Vui'), ' Học'),
       h('div', { class: 'chips' },
         h('span', { class: 'chip' }, `🔥 ${streak} ngày`),
         h('span', { class: 'chip' }, `⭐ ${totalStars}/24`),
