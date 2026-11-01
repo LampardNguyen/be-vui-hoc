@@ -1,6 +1,6 @@
 # Lưu trữ (state)
 
-File: `js/storage.js`. Khóa localStorage: `bang-cuu-chuong-v1`.
+File: `js/storage.js`. Khóa localStorage: `be-vui-hoc-v1` (theo tên app, dùng chung cho mọi loại bài học sau này). `load()` gặp khóa cũ `bang-cuu-chuong-v1` thì chép sang khóa mới rồi xoá khóa cũ.
 
 ## Cấu trúc `state`
 - `facts`: id phép → `{ box, seen, right, wrong, ms, last }` (xem [[leitner]]).

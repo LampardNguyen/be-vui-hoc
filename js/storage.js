@@ -1,5 +1,7 @@
 // Lưu toàn bộ tiến độ của bé trong localStorage của chính máy.
-const KEY = 'bang-cuu-chuong-v1';
+// Khóa đặt theo tên app để sau này thêm loại bài học khác vẫn dùng chung.
+const KEY = 'be-vui-hoc-v1';
+const OLD_KEY = 'bang-cuu-chuong-v1';   // khóa cũ, chỉ đọc để chuyển dữ liệu
 
 function defaults() {
   return {
@@ -22,6 +24,14 @@ function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) return merge(JSON.parse(raw));
+    // Máy đang dùng khóa cũ: chuyển sang khóa mới để bé không mất tiến độ.
+    const old = localStorage.getItem(OLD_KEY);
+    if (old) {
+      const data = merge(JSON.parse(old));
+      localStorage.setItem(KEY, JSON.stringify(data));
+      localStorage.removeItem(OLD_KEY);
+      return data;
+    }
   } catch { /* trình duyệt chặn lưu trữ: chạy với dữ liệu tạm */ }
   return defaults();
 }

@@ -1,5 +1,5 @@
 // Cho phép mở trang khi không có mạng. Đổi VERSION mỗi lần cập nhật để máy tải bản mới.
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE = `cuu-chuong-${VERSION}`;
 const FILES = [
   './',

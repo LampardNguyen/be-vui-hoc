@@ -10,7 +10,7 @@
 ## 2. Kỹ thuật
 
 - HTML/CSS/JS thuần, ES modules, **không build, không thư viện, không npm**. Giữ nguyên như vậy.
-- Không backend, không analytics; tiến độ chỉ lưu `localStorage` (khóa `bang-cuu-chuong-v1`).
+- Không backend, không analytics; tiến độ chỉ lưu `localStorage` (khóa `be-vui-hoc-v1`; khóa cũ `bang-cuu-chuong-v1` tự chuyển sang khi mở app).
   Đổi cấu trúc `state` → giữ tương thích dữ liệu cũ qua `merge()` trong `js/storage.js`, không đổi khóa.
 - Tạo DOM bằng `h()` trong `js/ui/widgets.js`; timer/listener của màn hình phải dọn bằng `onLeave()`.
 - Chuỗi giao diện và comment code: **tiếng Việt**, giọng thân thiện với trẻ em ("con", emoji vừa phải).
@@ -31,6 +31,9 @@
 4. **Trước khi push bất kỳ thay đổi nào**: tăng `VERSION` trong `sw.js` (vd `v2` → `v3`).
    Thêm/xoá/đổi tên file JS/CSS/ảnh → cập nhật mảng `FILES` trong `sw.js`.
 5. Commit tiếng Việt, ngắn gọn. Chỉ push khi người dùng yêu cầu deploy.
+6. **Mỗi task đều ghi vào `CHANGELOG.md`** (gốc repo, tạo nếu chưa có): thêm mục mới lên đầu file
+   dạng `## YYYY-MM-DD — <tên task>` + gạch đầu dòng thay đổi chính (tiếng Việt), commit cùng thay đổi.
+   `CHANGELOG.md` không nằm trong `FILES` của `sw.js`.
 
 ## 5. Thêm nội dung thường gặp
 
