@@ -30,7 +30,7 @@ function render() {
   leave();
   stopSpeaking();
   const [name = '', param] = location.hash.replace(/^#\/?/, '').split('/');
-  const screen = routes[name] || homeScreen;
+  const screen = Object.prototype.hasOwnProperty.call(routes, name) ? routes[name] : homeScreen;
   document.getElementById('app').replaceChildren(screen(param));
   window.scrollTo(0, 0);
 }
