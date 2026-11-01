@@ -4,6 +4,7 @@ import { pick, poolFor, answer, FAST_MS } from '../leitner.js';
 import { state, save } from '../storage.js';
 import { sayFact } from '../speech.js';
 import { play } from '../sound.js';
+import { randomGameHash } from '../games/index.js';
 
 const PRAISE = ['Giỏi quá!', 'Tuyệt vời!', 'Chính xác!', 'Siêu đỉnh!', 'Hay lắm!'];
 const QUESTIONS = 15;
@@ -99,7 +100,8 @@ export function practiceScreen(key = 'mix') {
       h('p', {}, `Đúng ngay lần đầu: `, h('b', {}, `${firstTry}/${total}`)),
       h('p', {}, `Trả lời siêu nhanh ⚡: `, h('b', {}, fast)),
       h('div', { class: 'result-actions' },
-        h('button', { class: 'btn-primary', onclick: () => { leave(); root.replaceWith(practiceScreen(key)); } }, '🔁 Luyện tiếp'),
+        h('a', { class: 'btn-primary', href: randomGameHash(key) }, '🎁 Chơi trò thưởng'),
+        h('button', { class: 'btn-secondary', onclick: () => { leave(); root.replaceWith(practiceScreen(key)); } }, '🔁 Luyện tiếp'),
         h('a', { class: 'btn-secondary', href: back }, '🗺️ Quay về'),
       ),
     ));

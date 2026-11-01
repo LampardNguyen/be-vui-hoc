@@ -1,17 +1,15 @@
 // Trò Bắn bóng bay: bóng mang đáp án bay lên, chạm đúng quả có kết quả đúng trước khi nó bay mất.
-import { h, topBar, confetti, wait, onLeave, leave } from '../ui/widgets.js';
+import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
 import { pick, poolFor, answer } from '../leitner.js';
 import { distractors, shuffle } from '../facts.js';
-import { state, save } from '../storage.js';
 import { play } from '../sound.js';
+import { backFor, saveBest, gameResult } from './common.js';
 
 const ROUNDS = 12;
 const LIVES = 3;
 const COLORS = ['#ef476f', '#ffd166', '#06d6a0', '#4cc9f0', '#c77dff', '#f8961e'];
 
 export function balloonScreen(key = 'mix') {
-  const back = key === 'mix' ? '#/' : `#/table/${parseInt(key, 10)}`;
-  const bestKey = `balloon-${key}`;
   const queue = pick(poolFor(key), ROUNDS);
   let round = 0, score = 0, lives = LIVES, q, start, missedThisRound, balloons = [], raf, last, over = false;
 
@@ -20,7 +18,7 @@ export function balloonScreen(key = 'mix') {
   const question = h('div', { class: 'sky-question' });
   const sky = h('div', { class: 'sky' });
   const root = h('div', { class: 'screen game' },
-    topBar('🎈 Bắn bóng bay', back),
+    topBar('🎈 Bắn bóng bay', backFor(key)),
     h('div', { class: 'hud' }, scoreEl, livesEl),
     question,
     sky,
@@ -120,22 +118,15 @@ export function balloonScreen(key = 'mix') {
     cancelAnimationFrame(raf);
     if (over) return;
     over = true;
-    const best = state.best[bestKey] || 0;
-    const record = score > best;
-    if (record) { state.best[bestKey] = score; }
-    state.played[bestKey] = (state.played[bestKey] || 0) + 1;
-    save();
+    const { best, record } = saveBest('balloon', key, score);
     play('win');
     if (record || lives > 0) confetti();
-    sky.replaceChildren(h('div', { class: 'result' },
-      h('div', { class: 'result-stars' }, lives > 0 ? '🎈🎈🎈' : '💥'),
-      h('h2', {}, record ? `Kỷ lục mới: ${score} điểm! 🏆` : `Được ${score} điểm!`),
-      h('p', {}, `Kỷ lục của con: `, h('b', {}, Math.max(best, score))),
-      h('div', { class: 'result-actions' },
-        h('button', { class: 'btn-primary', onclick: () => { leave(); root.replaceWith(balloonScreen(key)); } }, '🔁 Chơi lại'),
-        h('a', { class: 'btn-secondary', href: back }, '🗺️ Quay về'),
-      ),
-    ));
+    sky.replaceChildren(gameResult({
+      icon: lives > 0 ? '🎈🎈🎈' : '💥',
+      title: record ? `Kỷ lục mới: ${score} điểm! 🏆` : `Được ${score} điểm!`,
+      lines: [['Kỷ lục của con', Math.max(best, score)]],
+      root, replay: () => balloonScreen(key), gameId: 'balloon', key,
+    }));
     question.textContent = lives > 0 ? 'Hoàn thành! 🎉' : 'Hết lượt rồi!';
   }
 

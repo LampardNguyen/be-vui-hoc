@@ -2,12 +2,16 @@ import { h, topBar, starsText } from '../ui/widgets.js';
 import { TABLES, ISLANDS, factsOf } from '../facts.js';
 import { tableProgress, isMastered } from '../leitner.js';
 import { currentStreak } from '../storage.js';
+import { pet, earnedStickers, STICKERS, takeNewStickers, newStickerPopup } from './rewards.js';
 
 export function homeScreen() {
   const progress = TABLES.map((t) => ({ t, ...tableProgress(t) }));
   const totalStars = progress.reduce((s, p) => s + p.stars, 0);
   const mastered = factsOf(TABLES).filter(isMastered).length;
   const streak = currentStreak();
+  const myPet = pet();
+  const fresh = takeNewStickers();
+  if (fresh.length) setTimeout(() => newStickerPopup(fresh), 500);
 
   return h('div', { class: 'screen home' },
     h('header', { class: 'home-head' },
@@ -21,8 +25,14 @@ export function homeScreen() {
     h('div', { class: 'big-actions' },
       h('a', { class: 'big-btn btn-practice', href: '#/practice/mix' },
         h('span', { class: 'big-emoji' }, '🎯'), h('b', {}, 'Luyện hôm nay'), h('small', {}, '15 câu, khoảng 5 phút')),
-      h('a', { class: 'big-btn btn-game', href: '#/balloon/mix' },
-        h('span', { class: 'big-emoji' }, '🎈'), h('b', {}, 'Bắn bóng bay'), h('small', {}, 'Thử phản xạ siêu nhanh')),
+      h('a', { class: 'big-btn btn-game', href: '#/games/mix' },
+        h('span', { class: 'big-emoji' }, '🎮'), h('b', {}, 'Trò chơi'), h('small', {}, '4 trò rèn phản xạ')),
+    ),
+    h('a', { class: 'pet-strip', href: '#/rewards' },
+      h('span', { class: 'pet-emoji small' }, myPet.emoji),
+      h('span', { class: 'pet-info' }, h('b', {}, myPet.name),
+        h('span', { class: 'bar' }, h('i', { style: `width:${Math.round(myPet.ratio * 100)}%` }))),
+      h('span', { class: 'chip' }, `🎁 ${earnedStickers().length}/${STICKERS.length}`),
     ),
     h('h2', { class: 'section-title' }, '🗺️ Chọn hòn đảo'),
     h('div', { class: 'islands' },
@@ -63,7 +73,7 @@ export function tableScreen(param) {
       act(`#/learn/${t}`, '📖', `Học bảng ${t}`, 'Xem, nghe và mẹo nhớ'),
       act(`#/practice/${t}m`, '✖️', 'Luyện nhân', `${t} × ? = ?`),
       act(`#/practice/${t}d`, '➗', 'Luyện chia', `? : ${t} = ?`),
-      act(`#/balloon/${t}`, '🎈', 'Bắn bóng bay', `Nhân & chia bảng ${t}`),
+      act(`#/games/${t}`, '🎮', 'Trò chơi', `Chọn trò hoặc 🎲 ngẫu nhiên`),
     ),
   );
 }

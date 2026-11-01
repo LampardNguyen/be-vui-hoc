@@ -6,7 +6,8 @@ function defaults() {
     facts: {},                       // id phép tính -> { box, seen, right, wrong, ms, last }
     played: {},                      // số lượt đã hoàn thành theo từng chế độ
     best: {},                        // kỷ lục trò chơi
-    streak: { count: 0, last: null },
+    streak: { count: 0, last: null, best: 0 },
+    seenStickers: [],                // sticker bé đã được thông báo
     days: {},                        // 'YYYY-MM-DD' -> { ms, answers }
     settings: { voice: true, sound: true, tables: [2, 3, 4, 5, 6, 7, 8, 9] },
   };
@@ -53,6 +54,7 @@ export function markStudied(ms) {
   if (state.streak.last !== today) {
     state.streak.count = state.streak.last === yesterdayKey() ? state.streak.count + 1 : 1;
     state.streak.last = today;
+    state.streak.best = Math.max(state.streak.best || 0, state.streak.count);
   }
   save();
 }
