@@ -15,7 +15,7 @@ export function homeScreen() {
 
   return h('div', { class: 'screen home' },
     h('header', { class: 'home-head' },
-      h('h1', { class: 'logo' }, 'Bảng Cửu Chương ', h('span', {}, 'Vui')),
+      h('h1', { class: 'logo' }, 'Bé ', h('span', {}, 'Vui'), ' Học'),
       h('div', { class: 'chips' },
         h('span', { class: 'chip' }, `🔥 ${streak} ngày`),
         h('span', { class: 'chip' }, `⭐ ${totalStars}/24`),

@@ -1,7 +1,7 @@
 {
-  "name": "Bảng Cửu Chương Vui",
-  "short_name": "Cửu Chương",
-  "description": "Vừa học vừa chơi bảng nhân, bảng chia 2–9",
+  "name": "Bé Vui Học",
+  "short_name": "Bé Vui Học",
+  "description": "Vừa học vừa chơi cùng bé",
   "lang": "vi",
   "start_url": "./",
   "scope": "./",
