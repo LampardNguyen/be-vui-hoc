@@ -32,6 +32,8 @@ if (supported) {
 }
 
 function utter(text, onstart) {
+  // iPad thường trả danh sách giọng rỗng lúc tải trang → chọn lại khi đọc.
+  if (!voice) pickVoice();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'vi-VN';
   if (voice) u.voice = voice;
