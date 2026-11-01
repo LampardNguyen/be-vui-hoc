@@ -5,11 +5,10 @@ import { shuffle } from '../facts.js';
 import { markStudied } from '../storage.js';
 import { sayFact } from '../speech.js';
 import { play } from '../sound.js';
-import { backFor, saveBest, gameResult } from './common.js';
-
-const PAIRS = 6;
+import { backFor, saveBest, gameResult, level } from './common.js';
 
 export function memoryScreen(key = 'mix') {
+  const PAIRS = { easy: 4, normal: 6, hard: 8 }[level()];
   // Chọn các phép có kết quả khác nhau để mỗi thẻ kết quả chỉ ghép được với 1 phép.
   const facts = [];
   const used = new Set();

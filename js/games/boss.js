@@ -4,11 +4,10 @@ import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
 import { pick, poolFor, answer, FAST_MS } from '../leitner.js';
 import { distractors, shuffle } from '../facts.js';
 import { play } from '../sound.js';
-import { backFor, saveBest, gameResult } from './common.js';
+import { backFor, saveBest, gameResult, level } from './common.js';
 
 const BOSS_HP = 10;
 const LIVES = 3;
-const TURN_MS = 8000;
 const MONSTERS = [
   { emoji: '👾', name: 'Quái Vật Không Gian' },
   { emoji: '👹', name: 'Yêu Tinh Đỏ' },
@@ -19,20 +18,24 @@ const MONSTERS = [
 ];
 
 export function bossScreen(key = 'mix') {
+  // Thời gian câu đầu theo độ khó; mỗi câu sau ít hơn 0,2 giây, ít nhất 2,4 giây.
+  const FIRST_MS = { easy: 12000, normal: 8000, hard: 4000 }[level()];
   const pool = poolFor(key);
-  const monster = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
-  let hp = BOSS_HP, lives = LIVES, q, start, queue = [], turnTimer, over = false, hits = 0, crits = 0;
+  const randomMonster = () => MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
+  let monster = randomMonster();
+  let hp = BOSS_HP, lives = LIVES, q, start, queue = [], turnTimer, over = false, hits = 0, crits = 0, turns = 0, beaten = 0, turnMs = FIRST_MS;
 
   const hpBar = h('i');
   const hpText = h('span', { class: 'hp-text' });
   const livesEl = h('span', { class: 'chip' });
   const monsterEl = h('div', { class: 'monster' }, monster.emoji);
+  const nameEl = h('div', { class: 'boss-name' }, monster.name);
   const fx = h('div', { class: 'fx' });
   const turnBar = h('i');
   const question = h('div', { class: 'boss-question' });
   const choices = h('div', { class: 'choices' });
   const arena = h('div', { class: 'arena' },
-    h('div', { class: 'boss-name' }, monster.name),
+    nameEl,
     h('div', { class: 'hp' }, h('span', { class: 'bar hp-bar' }, hpBar), hpText),
     h('div', { class: 'monster-wrap' }, monsterEl, fx),
   );
@@ -60,6 +63,8 @@ export function bossScreen(key = 'mix') {
     if (over) return;
     if (!queue.length) queue = pick(pool, 20);
     q = queue.shift();
+    turnMs = Math.max(2400, FIRST_MS - turns * 200);
+    turns++;
     question.textContent = `${q.text} = ?`;
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
     choices.replaceChildren(...shuffle([q.answer, ...distractors(q, 3)]).map((v) =>
@@ -68,10 +73,10 @@ export function bossScreen(key = 'mix') {
     turnBar.style.transition = 'none';
     turnBar.style.width = '100%';
     void turnBar.offsetWidth;
-    turnBar.style.transition = `width ${TURN_MS}ms linear`;
+    turnBar.style.transition = `width ${turnMs}ms linear`;
     turnBar.style.width = '0%';
     clearTimeout(turnTimer);
-    turnTimer = setTimeout(() => bossAttack(null), TURN_MS);
+    turnTimer = setTimeout(() => bossAttack(null), turnMs);
     start = performance.now();
   }
 
@@ -98,13 +103,27 @@ export function bossScreen(key = 'mix') {
     showFx(crit ? `💥 -${dmg} Chí mạng!` : `⚔️ -${dmg}`, 'dmg');
     hud();
     await wait(700);
-    if (hp === 0) return finish(true);
+    if (hp === 0) {
+      // Hạ được quái vật → con quái mới xuất hiện, chơi tiếp tới khi hết mạng.
+      beaten++;
+      play('win'); confetti(30);
+      monsterEl.classList.add('defeated');
+      showFx(`🏆 Hạ ${monster.name}!`, 'dmg');
+      await wait(1200);
+      if (over) return;
+      monster = randomMonster();
+      hp = BOSS_HP;
+      monsterEl.className = 'monster';
+      monsterEl.textContent = monster.emoji;
+      nameEl.textContent = monster.name;
+      hud();
+    }
     next();
   }
 
   async function bossAttack(wrongBtn) {
     if (over) return;
-    if (!wrongBtn) answer(q, false, TURN_MS);   // hết giờ
+    if (!wrongBtn) answer(q, false, turnMs);   // hết giờ
     lock();
     choices.querySelectorAll('button').forEach((b) => { if (+b.textContent === q.answer) b.classList.add('right'); });
     play('bad');
@@ -115,24 +134,23 @@ export function bossScreen(key = 'mix') {
     queue.splice(2, 0, q);
     hud();
     await wait(1300);
-    if (lives === 0) return finish(false);
+    if (lives === 0) return finish();
     next();
   }
 
-  function finish(win) {
+  function finish() {
     if (over) return;
     over = true;
     clearTimeout(turnTimer);
-    const score = win ? 100 + lives * 30 + crits * 5 : hits * 5;
+    const score = beaten * 100 + hits * 5 + crits * 5;
     const { best, record } = saveBest('boss', key, score);
-    if (win) { play('win'); confetti(); monsterEl.classList.add('defeated'); }
+    if (record) { play('win'); confetti(); }
     panel.replaceChildren(gameResult({
-      icon: win ? '🏆' : '💪',
-      title: win ? `Con đã hạ ${monster.name}!` : 'Quái vật mạnh quá, thử lại nhé!',
+      icon: beaten ? '🏆' : '💪',
+      title: beaten ? `Con đã hạ ${beaten} quái vật!` : 'Quái vật mạnh quá, thử lại nhé!',
       lines: [['Đòn chí mạng ⚡', crits], ['Điểm', score], ['Kỷ lục của con', Math.max(best, score)]],
       root, replay: () => bossScreen(key), gameId: 'boss', key,
     }));
-    if (record && !win) confetti(20);
   }
 
   onLeave(() => { over = true; clearTimeout(turnTimer); });

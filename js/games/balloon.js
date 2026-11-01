@@ -3,15 +3,15 @@ import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
 import { pick, poolFor, answer } from '../leitner.js';
 import { distractors, shuffle } from '../facts.js';
 import { play } from '../sound.js';
-import { backFor, saveBest, gameResult } from './common.js';
+import { backFor, saveBest, gameResult, level } from './common.js';
 
-const ROUNDS = 12;
-const LIVES = 3;
 const COLORS = ['#ef476f', '#ffd166', '#06d6a0', '#4cc9f0', '#c77dff', '#f8961e'];
 
 export function balloonScreen(key = 'mix') {
-  const queue = pick(poolFor(key), ROUNDS);
-  let round = 0, score = 0, lives = LIVES, q, start, missedThisRound, balloons = [], raf, last, over = false;
+  // Độ khó: số mạng và thời gian bóng bay hết màn hình ở vòng đầu (giây).
+  const { LIVES, SLOW } = { easy: { LIVES: 5, SLOW: 12 }, normal: { LIVES: 3, SLOW: 8 }, hard: { LIVES: 3, SLOW: 4 } }[level()];
+  const pool = poolFor(key);
+  let queue = [], round = 0, score = 0, lives = LIVES, q, start, missedThisRound, balloons = [], raf, last, over = false;
 
   const scoreEl = h('span', { class: 'chip' });
   const livesEl = h('span', { class: 'chip' });
@@ -30,8 +30,9 @@ export function balloonScreen(key = 'mix') {
   };
 
   function startRound() {
-    if (round >= queue.length || lives <= 0) return finish();
-    q = queue[round];
+    if (lives <= 0) return finish();
+    if (!queue.length) queue = pick(pool, 20);
+    q = queue.shift();
     missedThisRound = false;
     question.textContent = `${q.text} = ?`;
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
@@ -39,8 +40,8 @@ export function balloonScreen(key = 'mix') {
     const H = sky.clientHeight, W = sky.clientWidth;
     const options = shuffle([q.answer, ...distractors(q, 3)]);
     const lane = W / options.length;
-    // Tốc độ tăng dần theo từng vòng: từ ~7 giây xuống ~3,5 giây để bay hết màn hình.
-    const speed = H / Math.max(3.5, 7 - round * 0.35);
+    // Mỗi vòng nhanh hơn 0,2 giây, nhanh nhất 2,4 giây để bay hết màn hình.
+    const speed = H / Math.max(2.4, SLOW - round * 0.2);
     sky.replaceChildren();
     balloons = options.map((value, idx) => {
       const el = h('button', {
@@ -120,14 +121,14 @@ export function balloonScreen(key = 'mix') {
     over = true;
     const { best, record } = saveBest('balloon', key, score);
     play('win');
-    if (record || lives > 0) confetti();
+    if (record) confetti();
     sky.replaceChildren(gameResult({
-      icon: lives > 0 ? '🎈🎈🎈' : '💥',
+      icon: '🎈🎈🎈',
       title: record ? `Kỷ lục mới: ${score} điểm! 🏆` : `Được ${score} điểm!`,
-      lines: [['Kỷ lục của con', Math.max(best, score)]],
+      lines: [['Số câu đã chơi', round], ['Kỷ lục của con', Math.max(best, score)]],
       root, replay: () => balloonScreen(key), gameId: 'balloon', key,
     }));
-    question.textContent = lives > 0 ? 'Hoàn thành! 🎉' : 'Hết lượt rồi!';
+    question.textContent = 'Con giỏi lắm! 🎉';
   }
 
   onLeave(() => cancelAnimationFrame(raf));

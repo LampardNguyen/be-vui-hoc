@@ -9,7 +9,7 @@ function defaults() {
     streak: { count: 0, last: null, best: 0 },
     seenStickers: [],                // sticker bé đã được thông báo
     days: {},                        // 'YYYY-MM-DD' -> { ms, answers }
-    settings: { voice: true, sound: true, tables: [2, 3, 4, 5, 6, 7, 8, 9] },
+    settings: { voice: true, sound: true, tables: [2, 3, 4, 5, 6, 7, 8, 9], level: 'normal' },
   };
 }
 

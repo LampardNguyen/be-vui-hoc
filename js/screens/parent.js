@@ -133,6 +133,14 @@ function settingsCard() {
       },
     }), `Bảng ${t}`)));
 
+  const levelBtns = h('div', { class: 'tabs' });
+  const LEVELS = [['easy', '🐢 Dễ'], ['normal', '🙂 Vừa'], ['hard', '🚀 Khó']];
+  const renderLevel = () => levelBtns.replaceChildren(...LEVELS.map(([id, label]) => h('button', {
+    class: `tab${(state.settings.level || 'normal') === id ? ' on' : ''}`,
+    onclick: () => { state.settings.level = id; save(); renderLevel(); },
+  }, label)));
+  renderLevel();
+
   const exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     const a = h('a', { href: URL.createObjectURL(blob), download: `cuu-chuong-${dateKey()}.json` });
@@ -160,6 +168,8 @@ function settingsCard() {
     toggle('sound', '🎵 Hiệu ứng âm thanh'),
     h('p', { class: 'muted' }, 'Các bảng dùng cho "Luyện hôm nay" và "Bắn bóng bay" ở trang chủ:'),
     tableChecks,
+    h('p', { class: 'muted' }, 'Độ khó trò chơi (thời gian, tốc độ, số mạng, số thẻ):'),
+    levelBtns,
     h('div', { class: 'row-btns' },
       h('button', { class: 'btn-secondary', onclick: exportData }, '💾 Sao lưu'),
       h('button', { class: 'btn-secondary', onclick: () => fileInput.click() }, '📂 Khôi phục'),

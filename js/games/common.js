@@ -3,6 +3,11 @@ import { h, leave } from '../ui/widgets.js';
 import { randomGameHash } from './index.js';
 import { state, save } from '../storage.js';
 
+// Độ khó trò chơi do bố mẹ chọn: 'easy' | 'normal' | 'hard'.
+export function level() {
+  return state.settings.level || 'normal';
+}
+
 export function backFor(key) {
   return `#/games/${key}`;
 }

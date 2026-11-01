@@ -34,6 +34,11 @@
 
 ## 5. Thêm nội dung thường gặp
 
+- **Nguyên tắc nội dung (bắt buộc)**: trò chơi/bài học phải mang tính giáo dục là chủ yếu.
+  Không cổ xúy hay tạo cảm xúc tiêu cực cho học sinh: không bạo lực, không chế giễu/phạt nặng khi sai,
+  không so sánh hạ thấp, không cờ bạc/may rủi ăn tiền, không gây áp lực hay sợ hãi.
+  Khi bé sai → động viên, gợi ý đáp án đúng; phần thưởng khuyến khích sự cố gắng và tiến bộ.
+
 - **Trò chơi mới**: tạo `js/games/<id>.js` (dùng `gameResult`, `saveBest`, `backFor` trong `common.js`),
   thêm vào `GAMES` (`js/games/index.js`), route trong `js/app.js`, `FILES` trong `sw.js`,
   sticker kỷ lục trong `js/screens/rewards.js` nếu cần. Xem [[games]] trong graphify.
