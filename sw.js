@@ -1,5 +1,5 @@
 // Cho phép mở trang khi không có mạng. Đổi VERSION mỗi lần cập nhật để máy tải bản mới.
-const VERSION = 'v10';
+const VERSION = 'v11';
 const CACHE = `cuu-chuong-${VERSION}`;
 const FILES = [
   './',
@@ -15,8 +15,10 @@ const FILES = [
   './js/games/balloon.js',
   './js/games/boss.js',
   './js/games/common.js',
+  './js/games/frog.js',
   './js/games/index.js',
   './js/games/memory.js',
+  './js/games/race.js',
   './js/games/sprint.js',
   './js/leitner.js',
   './js/screens/games.js',

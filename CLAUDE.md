@@ -22,6 +22,8 @@
 
 ## 4. Quy trình sửa code
 
+- **Việc liên quan UI** (màn hình, bố cục, màu sắc, hiệu ứng, trò chơi mới…): **trình bày ý tưởng UI trước**
+   (mô tả bố cục/luồng, có thể kèm phác thảo), **chờ người dùng duyệt rồi mới code**.
 1. Thay đổi tối thiểu, theo style hiện có (2 dấu cách, nháy đơn, dấu `;`).
 2. Chạy thử: `python3 -m http.server 8765` rồi mở http://localhost:8765 trong browser pane,
    kiểm tra ở cỡ **tablet (768×1024)** và **mobile (375×812)**, không có lỗi console.

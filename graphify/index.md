@@ -12,7 +12,7 @@
 - [[practice-learn]] — Màn Học (bảng, lưới chấm, mẹo) và Luyện 15 câu (sai → hỏi lại)
 
 ## Vui chơi
-- [[games]] — 4 trò chơi, bộ chọn/ngẫu nhiên, helper chung, cách thêm trò mới
+- [[games]] — 6 trò chơi, bộ chọn/ngẫu nhiên, helper chung, cách thêm trò mới
 - [[rewards]] — Sticker theo mốc, thú cưng tiến hóa
 
 ## Khác

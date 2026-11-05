@@ -202,6 +202,137 @@ a { text-decoration: none; }
 .balloon.wrong { animation: shake .35s, fade-out .6s .3s forwards; }
 .balloon.fade { animation: fade-out .4s forwards; }
 
+/* ---------- Đua xe ba làn ---------- */
+.road {
+  position: relative; height: calc(100vh - 290px); height: calc(100dvh - 290px); min-height: 360px;
+  border-radius: var(--radius); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;
+  background:
+    linear-gradient(90deg, transparent calc(33.33% - 3px), rgba(255, 255, 255, .85) calc(33.33% - 3px) calc(33.33% + 3px), transparent calc(33.33% + 3px) calc(66.66% - 3px), rgba(255, 255, 255, .85) calc(66.66% - 3px) calc(66.66% + 3px), transparent calc(66.66% + 3px)) 0 0 / 100% 60px,
+    #5c6378;
+  box-shadow: inset 10px 0 0 #7bd389, inset -10px 0 0 #7bd389;
+}
+.road::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(180deg, #5c6378 0 30px, transparent 30px 60px);
+  background-size: 100% 60px; background-position: inherit; mix-blend-mode: normal;
+}
+.road .result { position: relative; margin: 40px 16px; }
+.race-gates { position: absolute; left: 10px; right: 10px; top: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 6px; will-change: transform; pointer-events: none; }
+.race-gate {
+  text-align: center; font-size: clamp(30px, 6vw, 44px); font-weight: 800; color: #22305a;
+  background: #ffd166; border-radius: 16px; padding: 10px 0; box-shadow: 0 6px 0 #e0a92e;
+}
+.race-gates.passed .race-gate { opacity: .45; }
+.race-gates.passed .race-gate.ok { opacity: 1; background: #06d6a0; color: #fff; box-shadow: 0 6px 0 #04a57b; }
+.race-gates.passed .race-gate.wrong { animation: shake .35s; }
+.race-car {
+  position: absolute; bottom: 24px; translate: -50% 0; width: clamp(54px, 10vw, 76px);
+  transition: left .18s ease-out, rotate .18s; pointer-events: none;
+  filter: drop-shadow(0 8px 4px rgba(0, 0, 0, .35));
+}
+.race-car svg { display: block; width: 100%; height: auto; }
+.race-car::after {
+  content: ''; position: absolute; left: 50%; top: 96%; translate: -50% 0; width: 40%; height: 0;
+  border-radius: 0 0 50% 50%; background: linear-gradient(#ffd166, #f8961e 60%, transparent); opacity: 0;
+}
+.race-car.boost::after { animation: flame .9s; }
+/* Hai vệt bụi mờ sau bánh sau, phụt theo nhịp. */
+.race-car::before {
+  content: ''; position: absolute; left: -4%; right: -4%; top: 88%; height: 34%; opacity: .55;
+  background: radial-gradient(circle at 18% 30%, #c9cedd 0 22%, transparent 24%), radial-gradient(circle at 82% 30%, #c9cedd 0 22%, transparent 24%);
+  animation: dust .35s linear infinite;
+}
+@keyframes dust { from { translate: 0 -4px; scale: .7; opacity: .7; } to { translate: 0 10px; scale: 1.2; opacity: 0; } }
+@keyframes flame { 0% { height: 0; opacity: 0; } 20%, 70% { height: 60%; opacity: 1; } 100% { height: 0; opacity: 0; } }
+.race-car.slow { animation: shake .35s; }
+.race-tip { text-align: center; margin: 6px 0 0; color: #6b7390; font-size: 18px; }
+
+/* ---------- Ếch nhảy lá sen ---------- */
+.river {
+  position: relative; height: calc(100vh - 250px); height: calc(100dvh - 250px); min-height: 360px;
+  border-radius: var(--radius); overflow: hidden; user-select: none; -webkit-user-select: none;
+  background:
+    radial-gradient(ellipse 40px 6px at 20% 30%, rgba(255, 255, 255, .35) 60%, transparent 62%),
+    radial-gradient(ellipse 50px 7px at 75% 60%, rgba(255, 255, 255, .3) 60%, transparent 62%),
+    radial-gradient(ellipse 36px 5px at 35% 78%, rgba(255, 255, 255, .3) 60%, transparent 62%),
+    linear-gradient(180deg, #3bb4e5, #4cc9f0 50%, #3bb4e5);
+}
+.river .result { position: relative; z-index: 6; margin: 40px 16px; }
+.scene { position: absolute; inset: 0; }
+.base-pad, .deco-pad { position: absolute; pointer-events: none; }
+.base-pad svg, .deco-pad svg, .pad-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Lá dưới chân ếch chìm dần theo thời gian (--p: 0 → 1). */
+.base-pad { scale: calc(1 - var(--p, 0) * .35); opacity: calc(1 - var(--p, 0) * .5); }
+.base-pad::after {
+  content: ''; position: absolute; inset: -8%; border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, calc(var(--p, 0) * .9)); box-shadow: 0 0 0 6px rgba(255, 255, 255, calc(var(--p, 0) * .35));
+}
+.base-pad.sunk { opacity: 0; scale: .3; transition: opacity .4s, scale .4s; }
+.deco-lane { position: absolute; left: 0; right: 0; top: 13%; height: 90px; opacity: .75; pointer-events: none; }
+.deco-pad { top: 50%; left: 0; will-change: transform; }
+.pad-lane { position: absolute; left: 0; right: 0; top: 40%; height: 120px; }
+.pad-lane.enter, .deco-lane.enter { animation: lane-in .45s ease-out; }
+@keyframes lane-in { from { translate: 0 -80px; opacity: 0; } }
+.reach {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 130px; height: 130px; border-radius: 50%;
+  border: 4px dashed rgba(255, 255, 255, .9);
+  background: conic-gradient(rgba(255, 255, 255, .3) var(--left, 360deg), transparent 0);
+}
+.pad {
+  position: absolute; top: 50%; left: 0; padding: 0; border: 0; background: none;
+  will-change: transform; touch-action: none; filter: drop-shadow(0 4px 2px rgba(0, 40, 80, .25));
+}
+.pad-num {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%; min-width: 44%; padding: 0 4px; aspect-ratio: 1; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, .92);
+  color: #1d3b12; font-size: clamp(22px, 4.4vw, 30px); font-weight: 800; box-shadow: 0 2px 0 rgba(0, 0, 0, .12);
+}
+.lotus { position: absolute; right: -4px; bottom: -2px; font-size: 24px; pointer-events: none; }
+.pad.near { filter: brightness(1.12) drop-shadow(0 0 10px #fff); }
+.pad.hint { animation: blink .6s 4; }
+.pad.wrong { animation: shake .35s; }
+.pad.sink { opacity: .3; transition: opacity .3s; }
+.frog {
+  position: absolute; bottom: 5%; left: 50%; width: clamp(76px, 14vw, 100px); margin-left: calc(clamp(76px, 14vw, 100px) / -2);
+  z-index: 3; pointer-events: none; transition: translate .45s cubic-bezier(.3, .7, .4, 1);
+  filter: drop-shadow(0 6px 3px rgba(0, 40, 80, .3));
+}
+.frog svg { display: block; width: 100%; height: auto; }
+.frog .legs-leap { display: none; }
+.frog.leap .legs-leap { display: inline; }
+.frog.leap .legs-sit { display: none; }
+.frog.leap { animation: hop .45s ease-out; }
+@keyframes hop { 50% { scale: 1.35; filter: drop-shadow(0 22px 6px rgba(0, 40, 80, .25)); } }
+.frog.nope { animation: shake .35s; }
+.frog .sweat { position: absolute; right: -2px; top: -4px; font-size: 22px; display: none; }
+.frog.nervous .sweat { display: block; animation: bob .5s infinite; }
+.frog.nervous svg { animation: shiver .12s infinite; }
+@keyframes shiver { 50% { translate: 2px 0; } }
+.frog.splash { animation: splash 1.6s forwards; }
+@keyframes splash { 25%, 75% { scale: .3; opacity: 0; } 100% { scale: 1; opacity: 1; } }
+.frog-tip {
+  position: absolute; left: 50%; bottom: 24%; translate: -50% 0; width: 90%; z-index: 4; text-align: center;
+  font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); opacity: 0; pointer-events: none;
+}
+.frog-tip.show { animation: fade-in .2s forwards, fade-out .5s 2s forwards; }
+
+/* ---------- Hộp quà trong trò chơi ---------- */
+.hud { flex-wrap: wrap; gap: 6px; }
+.chip.power { background: #fff3c4; }
+.race-gate { position: relative; }
+.gift-badge { position: absolute; font-size: 30px; line-height: 1; animation: bob 1s infinite; pointer-events: none; }
+.race-gate .gift-badge { top: -22px; right: 6px; }
+.pad .gift-badge { bottom: 6%; left: 50%; margin-left: -15px; font-size: 26px; }
+.gift-pop {
+  position: absolute; left: 50%; top: 30%; translate: -50% 0; z-index: 5; width: min(320px, 86%);
+  padding: 14px 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center;
+  animation: pop .3s; pointer-events: none;
+}
+.gift-pop .gift-emoji { font-size: 44px; }
+.gift-pop b { display: block; font-size: 22px; margin-top: 4px; }
+.gift-pop p { margin: 6px 0 0; font-size: 18px; color: #6b7390; }
+.race-car.shielded, .frog.shielded { filter: drop-shadow(0 0 8px #4cc9f0) drop-shadow(0 0 14px #4cc9f0); }
+
 /* ---------- Phụ huynh ---------- */
 .card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
 .card h3 { margin: 0 0 8px; font-size: 22px; }

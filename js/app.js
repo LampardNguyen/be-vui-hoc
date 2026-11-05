@@ -10,6 +10,8 @@ import { balloonScreen } from './games/balloon.js';
 import { sprintScreen } from './games/sprint.js';
 import { memoryScreen } from './games/memory.js';
 import { bossScreen } from './games/boss.js';
+import { raceScreen } from './games/race.js';
+import { frogScreen } from './games/frog.js';
 
 // Điều hướng bằng #hash: #/table/3, #/learn/3, #/practice/mix, #/games/3, #/balloon/3, #/rewards, #/parent
 const routes = {
@@ -23,6 +25,8 @@ const routes = {
   sprint: sprintScreen,
   memory: memoryScreen,
   boss: bossScreen,
+  race: raceScreen,
+  frog: frogScreen,
   parent: parentScreen,
 };
 

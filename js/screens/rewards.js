@@ -26,6 +26,8 @@ export const STICKERS = [
   { id: 'sprint', emoji: '⚡', name: 'Tia chớp', how: 'Đua 60 giây đúng 20 câu', ok: () => bestOf('sprint') >= 20 },
   { id: 'memory', emoji: '🧠', name: 'Trí nhớ siêu phàm', how: 'Lật thẻ đạt 150 điểm', ok: () => bestOf('memory') >= 150 },
   { id: 'boss', emoji: '🗡️', name: 'Dũng sĩ', how: 'Hạ một con quái vật', ok: () => bestOf('boss') >= 100 },
+  { id: 'race', emoji: '🏁', name: 'Tay lái lụa', how: 'Đua xe ba làn đạt 200 điểm', ok: () => bestOf('race') >= 200 },
+  { id: 'frog', emoji: '🪷', name: 'Ếch vô địch', how: 'Ếch nhảy lá sen đạt 200 điểm', ok: () => bestOf('frog') >= 200 },
   ...TABLES.map((t) => ({
     id: `table${t}`, emoji: ISLANDS[t].emoji, name: `Chủ ${ISLANDS[t].name}`, how: `Đạt 3 sao bảng ${t}`,
     ok: () => tableProgress(t).stars === 3,
