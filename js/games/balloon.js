@@ -1,7 +1,7 @@
 // Trò Bắn bóng bay: bóng mang đáp án bay lên, chạm đúng quả có kết quả đúng trước khi nó bay mất.
 import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
-import { pick, poolFor, answer } from '../leitner.js';
-import { distractors, shuffle } from '../facts.js';
+import { source } from './source.js';
+import { shuffle } from '../facts.js';
 import { play } from '../sound.js';
 import { backFor, saveBest, gameResult, level } from './common.js';
 
@@ -10,7 +10,7 @@ const COLORS = ['#ef476f', '#ffd166', '#06d6a0', '#4cc9f0', '#c77dff', '#f8961e'
 export function balloonScreen(key = 'mix') {
   // Độ khó: số mạng và thời gian bóng bay hết màn hình ở vòng đầu (giây).
   const { LIVES, SLOW } = { easy: { LIVES: 5, SLOW: 12 }, normal: { LIVES: 3, SLOW: 8 }, hard: { LIVES: 3, SLOW: 4 } }[level()];
-  const pool = poolFor(key);
+  const src = source(key);
   let queue = [], round = 0, score = 0, lives = LIVES, q, start, missedThisRound, balloons = [], raf, last, over = false;
 
   const scoreEl = h('span', { class: 'chip' });
@@ -31,14 +31,14 @@ export function balloonScreen(key = 'mix') {
 
   function startRound() {
     if (lives <= 0) return finish();
-    if (!queue.length) queue = pick(pool, 20);
+    if (!queue.length) queue = src.draw(20);
     q = queue.shift();
     missedThisRound = false;
-    question.textContent = `${q.text} = ?`;
+    question.textContent = src.ask(q);
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
 
     const H = sky.clientHeight, W = sky.clientWidth;
-    const options = shuffle([q.answer, ...distractors(q, 3)]);
+    const options = shuffle([q.answer, ...src.distractors(q, 3)]);
     const lane = W / options.length;
     // Mỗi vòng nhanh hơn 0,2 giây, nhanh nhất 2,4 giây để bay hết màn hình.
     const speed = H / Math.max(2.4, SLOW - round * 0.2);
@@ -79,7 +79,7 @@ export function balloonScreen(key = 'mix') {
     if (b.value === q.answer) {
       cancelAnimationFrame(raf);
       const ms = performance.now() - start;
-      if (!missedThisRound) answer(q, true, ms);
+      if (!missedThisRound) src.record(q, true, ms);
       score += 10 + Math.max(0, Math.round((5000 - ms) / 500));
       b.alive = false;
       b.el.classList.add('popped');
@@ -93,7 +93,7 @@ export function balloonScreen(key = 'mix') {
       play('bad');
       b.alive = false;
       b.el.classList.add('wrong');
-      if (!missedThisRound) { missedThisRound = true; answer(q, false, performance.now() - start); }
+      if (!missedThisRound) { missedThisRound = true; src.record(q, false, performance.now() - start); }
       loseLife();
     }
   }
@@ -101,8 +101,8 @@ export function balloonScreen(key = 'mix') {
   async function escaped() {
     cancelAnimationFrame(raf);
     play('bad');
-    if (!missedThisRound) answer(q, false, performance.now() - start);
-    question.textContent = `${q.text} = ${q.answer}`;
+    if (!missedThisRound) src.record(q, false, performance.now() - start);
+    question.textContent = src.reveal(q);
     loseLife();
     round++;
     await wait(1200);

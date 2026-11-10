@@ -1,25 +1,24 @@
-// Màn một chương: Kiến thức + mẹo, rồi luyện 10 câu (chọn đáp án hoặc bàn phím số).
+// Màn một chương: Con cần nhớ + Luyện tập + Trò chơi. Luyện 10 câu nhiều dạng bài (js/ui/kinds.js).
 import { h, topBar, confetti, starsText, wait, leave } from '../ui/widgets.js';
 import { numpad } from '../ui/numpad.js';
+import { renderKind, picture } from '../ui/kinds.js';
 import { state, save } from '../storage.js';
 import { play } from '../sound.js';
 import { TOPICS } from '../topics/index.js';
+import { randomGameHash } from '../games/index.js';
 
-const PRAISE = ['Giỏi quá!', 'Tuyệt vời!', 'Chính xác!', 'Siêu đỉnh!', 'Hay lắm!'];
+const PRAISE = ['Giỏi quá!', 'Tuyệt vời!', 'Chính xác!', 'Siêu đỉnh!', 'Hay lắm!', 'Con thông minh quá!'];
+const RUNNERS = ['🐰', '🐢', '🦊', '🐼', '🐥', '🦄'];
 const QUESTIONS = 10;
 const BACK = '#/subject/toan3';
 
 export function topicStars(id) { return state.topics?.[id]?.best || 0; }
 
-// Hình vẽ SVG do chính app tạo (không có dữ liệu người dùng) nên gán innerHTML an toàn.
-function picture(svgText) {
-  const el = h('div', { class: 'topic-pic' });
-  el.innerHTML = svgText;
-  return el;
-}
-
 export function topicScreen(id) {
   const t = TOPICS[id];
+  const act = (href, emoji, title, sub) =>
+    h('a', { class: 'act-btn', href }, h('span', { class: 'act-emoji' }, emoji), h('b', {}, title), h('small', {}, sub));
+  const ex = t.example?.();
   return h('div', { class: 'screen', style: '--c:#ff8c42' },
     topBar(`${t.emoji} ${t.title}`, BACK),
     h('div', { class: 'island-hero' },
@@ -29,12 +28,13 @@ export function topicScreen(id) {
         h('div', { class: 'stars big' }, starsText(topicStars(id))),
       ),
     ),
+    h('div', { class: 'acts' },
+      act(`#/quiz/${id}`, '🎯', 'Luyện tập', '10 câu, nhiều kiểu bài'),
+      act(`#/games/t-${id}`, '🎮', 'Trò chơi', 'Bóng bay, đua xe, ếch…'),
+    ),
     h('h2', { class: 'section-title' }, '💡 Con cần nhớ'),
     h('ul', { class: 'tips' }, t.tips.map((s) => h('li', {}, s))),
-    h('div', { class: 'acts' },
-      h('a', { class: 'act-btn', href: `#/quiz/${id}` },
-        h('span', { class: 'act-emoji' }, '🎯'), h('b', {}, 'Luyện 10 câu'), h('small', {}, 'Sai thì xem lại rồi làm tiếp')),
-    ),
+    ex ? h('div', { class: 'tips example' }, h('b', {}, '👀 Ví dụ: '), ex.text, ex.svg ? picture(ex.svg) : null) : null,
   );
 }
 
@@ -42,75 +42,77 @@ export function quizScreen(id) {
   const t = TOPICS[id];
   if (!t) { location.hash = BACK; return h('div'); }
   const queue = Array.from({ length: QUESTIONS }, () => t.make());
-  const retried = new Set();
-  let i = 0, done = 0, firstTry = 0, q;
+  const retry = new Set();
+  let i = 0, done = 0, firstTry = 0, streak = 0, best = 0, q, pad;
+  const runner = RUNNERS[Math.floor(Math.random() * RUNNERS.length)];
 
   const bar = h('i');
+  const runnerEl = h('span', { class: 'runner' }, runner);
   const counter = h('span', { class: 'counter' });
+  const streakEl = h('span', { class: 'chip combo' });
   const prompt = h('div', { class: 'quiz-q' });
   const area = h('div', { class: 'quiz-area' });
   const feedback = h('div', { class: 'feedback' });
-  const stage = h('div', { class: 'stage' }, prompt, area, feedback);
+  const stage = h('div', { class: 'stage wide' }, prompt, area, feedback);
   const root = h('div', { class: 'screen practice', style: '--c:#ff8c42' },
     topBar(`${t.emoji} ${t.title}`, `#/topic/${id}`),
-    h('div', { class: 'progress' }, h('span', { class: 'bar' }, bar), counter),
+    h('div', { class: 'progress' }, h('span', { class: 'bar track' }, bar, runnerEl, h('span', { class: 'goal' }, '🏁')), counter),
+    h('div', { class: 'hud' }, streakEl),
     stage,
   );
 
-  // Bàn phím số tạo 1 lần, dùng lại cho mọi câu nhập số.
-  const box = h('span', { class: 'answer-box' }, '?');
-  const pad = numpad({ max: 4, onChange: (v) => { box.textContent = v || '?'; }, onSubmit: (v) => check(v) });
-  pad.setEnabled(false);
+  // Mỗi câu chỉ có 1 bàn phím hoạt động (bàn phím cũ bị tắt để phím máy tính không gõ nhầm).
+  const makePad = (opts) => { pad?.setEnabled(false); pad = numpad(opts); return pad; };
+
+  const hud = () => {
+    const r = done / QUESTIONS;
+    bar.style.width = `${r * 100}%`;
+    runnerEl.style.left = `calc(${r * 100}% - 14px)`;
+    counter.textContent = `${Math.min(done + 1, QUESTIONS)}/${QUESTIONS}`;
+    streakEl.textContent = streak >= 2 ? `🔥 ${streak} câu đúng liền!` : '';
+  };
 
   function next() {
+    pad?.setEnabled(false);
     if (i >= queue.length) return finish();
     q = queue[i];
-    counter.textContent = `${Math.min(done + 1, QUESTIONS)}/${QUESTIONS}`;
-    bar.style.width = `${(done / QUESTIONS) * 100}%`;
+    hud();
     feedback.replaceChildren();
-    prompt.replaceChildren(h('p', {}, q.text), ...(q.svg ? [picture(q.svg)] : []));
+    prompt.replaceChildren(h('p', {}, q.text), q.svg && q.kind !== 'pick' && q.kind !== 'paint' ? picture(q.svg) : '');
     prompt.classList.remove('pop-in'); void prompt.offsetWidth; prompt.classList.add('pop-in');
-    if (q.choices) {
-      area.replaceChildren(h('div', { class: `quiz-choices n${q.choices.length}` },
-        q.choices.map((c) => h('button', { class: 'quiz-choice', onclick: (e) => check(c, e.currentTarget) }, c))));
-    } else {
-      box.className = 'answer-box';
-      pad.clear();
-      pad.setEnabled(true);
-      area.replaceChildren(h('div', { class: 'quiz-answer' }, 'Đáp án: ', box), pad.el);
-    }
+    area.replaceChildren(renderKind(q, check, makePad));
   }
 
-  async function check(v, btn) {
-    if (area.classList.contains('locked')) return;
-    area.classList.add('locked');
-    pad.setEnabled(false);
-    const correct = String(v) === q.answer;
-    const mark = (cls) => (btn ? btn.classList.add(cls) : box.classList.add(cls));
-
-    if (correct) {
-      if (!retried.has(i)) firstTry++;
-      done += retried.has(i) ? 0 : 1;
-      play('good');
-      mark('right');
-      feedback.replaceChildren(h('p', { class: 'ok' }, PRAISE[Math.floor(Math.random() * PRAISE.length)], ' 👍'));
+  async function check(ok, info = {}) {
+    const first = !retry.has(i);
+    if (first) done++;
+    area.querySelectorAll('.numpad, .center .btn-primary').forEach((el) => el.remove());
+    if (q.tilt != null) prompt.querySelector('.beam')?.style.setProperty('transform', `rotate(${q.tilt * 8}deg)`);
+    if (ok) {
+      if (first) firstTry++;
+      streak++;
+      best = Math.max(best, streak);
+      play(streak >= 3 ? 'fast' : 'good');
+      if (streak % 5 === 0) confetti(20);
+      feedback.replaceChildren(h('p', { class: 'ok' }, PRAISE[Math.floor(Math.random() * PRAISE.length)], streak >= 3 ? ' 🔥' : ' 👍'));
       i++;
-      await wait(900);
-      area.classList.remove('locked');
+      hud();
+      await wait(1100);
       next();
       return;
     }
-
-    // Sai: động viên, chỉ đáp án đúng + cách làm, rồi hỏi 1 câu cùng dạng ở cuối lượt.
+    // Sai: động viên, chỉ cách làm, thêm 1 câu cùng dạng ở cuối lượt (chỉ thêm 1 lần cho mỗi câu gốc).
     play('bad');
-    mark('wrong');
-    if (!retried.has(i)) { done++; queue.push(t.make()); retried.add(queue.length - 1); }
+    streak = 0;
+    if (first) { queue.push(t.make()); retry.add(queue.length - 1); }
+    hud();
     feedback.replaceChildren(h('div', { class: 'oops' },
-      h('p', {}, 'Chưa đúng rồi, mình cùng xem lại nhé!'),
-      h('p', { class: 'oops-eq' }, 'Đáp án đúng: ', h('b', {}, q.answer)),
-      h('p', {}, '💡 ', q.explain),
-      h('button', { class: 'btn-primary', onclick: () => { area.classList.remove('locked'); i++; next(); } }, 'Hiểu rồi 👍'),
+      h('p', {}, info.corrected ? 'Con đã tự sửa đúng rồi, giỏi lắm! 💪' : 'Chưa đúng rồi, mình cùng xem lại nhé!'),
+      info.corrected ? null : h('p', { class: 'oops-eq' }, 'Đáp án đúng: ', h('b', {}, q.show ?? q.answer)),
+      q.explain ? h('p', {}, '💡 ', q.explain) : null,
+      h('button', { class: 'btn-primary', onclick: () => { i++; next(); } }, 'Tiếp tục 👉'),
     ));
+    feedback.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
   }
 
   function finish() {
@@ -123,14 +125,18 @@ export function quizScreen(id) {
     play('win');
     if (stars >= 2) confetti();
     bar.style.width = '100%';
+    runnerEl.style.left = 'calc(100% - 14px)';
     counter.textContent = `${QUESTIONS}/${QUESTIONS}`;
+    streakEl.textContent = '';
     stage.replaceChildren(h('div', { class: 'result' },
       h('div', { class: 'result-stars' }, starsText(stars)),
-      h('h2', {}, stars === 3 ? 'Xuất sắc! 🏆' : stars === 2 ? 'Làm tốt lắm! 🎉' : 'Con đã cố gắng rồi, luyện thêm sẽ giỏi hơn! 💪'),
+      h('h2', {}, `${runner} `, stars === 3 ? 'Xuất sắc! 🏆' : stars === 2 ? 'Làm tốt lắm! 🎉' : 'Con đã cố gắng rồi, luyện thêm sẽ giỏi hơn! 💪'),
       h('p', {}, 'Đúng ngay lần đầu: ', h('b', {}, `${firstTry}/${QUESTIONS}`)),
+      h('p', {}, 'Chuỗi đúng dài nhất: ', h('b', {}, `🔥 ${best}`)),
       h('div', { class: 'result-actions' },
-        h('button', { class: 'btn-primary', onclick: () => { leave(); root.replaceWith(quizScreen(id)); } }, '🔁 Luyện tiếp'),
-        h('a', { class: 'btn-secondary', href: BACK }, '📚 Chọn bài khác'),
+        h('a', { class: 'btn-primary', href: randomGameHash(`t-${id}`) }, '🎁 Chơi trò thưởng'),
+        h('button', { class: 'btn-secondary', onclick: () => { leave(); root.replaceWith(quizScreen(id)); } }, '🔁 Luyện tiếp'),
+        h('a', { class: 'btn-secondary', href: `#/topic/${id}` }, '⬅️ Quay về'),
       ),
     ));
   }

@@ -1,7 +1,7 @@
 // Trò Đua xe ba làn: xe tự chạy, chạm vào làn có đáp án đúng để lái xe qua cổng đó. Chạy tới khi hết mạng, càng lúc càng nhanh.
 import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
-import { pick, poolFor, answer } from '../leitner.js';
-import { distractors, shuffle } from '../facts.js';
+import { source } from './source.js';
+import { shuffle } from '../facts.js';
 import { play } from '../sound.js';
 import { backFor, saveBest, gameResult, level, giftBag, giftPop } from './common.js';
 
@@ -23,7 +23,7 @@ const CAR_SVG = `<svg viewBox="0 0 60 100" aria-hidden="true">
 export function raceScreen(key = 'mix') {
   // Độ khó: số mạng và số giây để cổng chạy từ trên xuống tới xe ở câu đầu.
   const { LIVES, SLOW } = { easy: { LIVES: 5, SLOW: 8 }, normal: { LIVES: 3, SLOW: 5.5 }, hard: { LIVES: 3, SLOW: 3.5 } }[level()];
-  const pool = poolFor(key);
+  const src = source(key);
   let queue = [], round = 0, right = 0, lives = LIVES, score = 0, lane = 1, q, options, gateY, speed;
   let start, lastMove, raf, last, roadY = 0, boost = 0, over = false, hasGift = false;
   const bag = giftBag();
@@ -77,11 +77,11 @@ export function raceScreen(key = 'mix') {
 
   function startRound() {
     if (lives <= 0) return finish();
-    if (!queue.length) queue = pick(pool, 20);
+    if (!queue.length) queue = src.draw(20);
     q = queue.shift();
-    question.textContent = `${q.text} = ?`;
+    question.textContent = src.ask(q);
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
-    options = shuffle([q.answer, ...distractors(q, 2)]);
+    options = shuffle([q.answer, ...src.distractors(q, 2)]);
     gate.replaceChildren(...options.map((v) => h('span', { class: 'race-gate' }, v)));
     gate.classList.remove('passed');
     gateY = -90;
@@ -114,11 +114,11 @@ export function raceScreen(key = 'mix') {
     const cells = [...gate.children];
     const ok = options[lane] === q.answer;
     const ms = (ok && lastMove > start ? lastMove : performance.now()) - start;
-    answer(q, ok, ms);
+    src.record(q, ok, ms);
     round++;
     gate.classList.add('passed');
     cells[options.indexOf(q.answer)].classList.add('ok');
-    question.textContent = `${q.text} = ${q.answer}`;
+    question.textContent = src.reveal(q);
     if (ok) {
       right++;
       score += bag.points(10 + Math.max(0, Math.round((SLOW * 1000 - ms) / 400)));

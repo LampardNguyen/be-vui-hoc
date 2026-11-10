@@ -20,6 +20,16 @@ sai → giải thích + hỏi lại; xong → sao (lưu `state.topics`). Hình h
 - [x] 2.5 Test browser tablet + mobile từng chương, không lỗi console
 - [x] 2.6 sw.js, CHANGELOG, graphify, commit
 
+## Task 3 — Làm lại 15 chương: phong phú, sinh động, có trò chơi
+- [x] 3.1 6 trò chơi (bóng bay, đua 60s, lật thẻ, đua xe, ếch, quái vật) chơi được với câu hỏi của mọi chương (`js/games/source.js`)
+- [x] 3.2 Dạng bài mới (`js/ui/kinds.js`): đặt tính dọc (+ − ×), đặt tính chia, chạm chọn trên hình, tô màu, sắp xếp thẻ số, bài nhiều bước
+- [x] 3.3 Hình vẽ ngẫu nhiên (`js/topics/draw.js`): cân thăng bằng, thước, nhiệt kế, quả cân, hình phẳng xoay, đa giác, khối xếp chồng
+- [x] 3.4 Số & phép tính: so sánh có biểu thức + cân, sắp xếp; cộng trừ/nhân chia đặt tính; tìm lỗi sai; toán có lời; chia kẹo có dư; biểu thức từng bước
+- [x] 3.5 Tìm thành phần, Đo lường, Phân số: hộp bí ẩn từng bước, thước/nhiệt kế/cân, chọn đơn vị hợp lý, tô màu phân số, chọn hình chia đúng
+- [x] 3.6 Hình học: chạm trung điểm trên thước, chạm bán kính/đường kính/tâm, chạm góc vuông của đa giác, chạm tất cả hình cùng loại, đếm khối
+- [x] 3.7 Màn chương: nút Học / Luyện / Trò chơi; luyện có chuỗi 🔥 và nhân vật chạy theo tiến độ
+- [x] 3.8 Test browser tablet + mobile mọi dạng bài và trò chơi, sw.js, CHANGELOG, graphify, commit
+
 ## Danh sách chương Toán lớp 3
 - [x] Bảng cửu chương
 - [x] So sánh số dưới 1000

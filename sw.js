@@ -1,5 +1,5 @@
 // Cho phép mở trang khi không có mạng. Đổi VERSION mỗi lần cập nhật để máy tải bản mới.
-const VERSION = 'v13';
+const VERSION = 'v14';
 const CACHE = `cuu-chuong-${VERSION}`;
 const FILES = [
   './',
@@ -20,6 +20,7 @@ const FILES = [
   './js/games/index.js',
   './js/games/memory.js',
   './js/games/race.js',
+  './js/games/source.js',
   './js/games/sprint.js',
   './js/leitner.js',
   './js/screens/games.js',
@@ -30,12 +31,14 @@ const FILES = [
   './js/screens/rewards.js',
   './js/screens/topic.js',
   './js/sound.js',
+  './js/topics/draw.js',
   './js/topics/index.js',
   './js/topics/numbers.js',
   './js/topics/shapes.js',
   './js/topics/util.js',
   './js/speech.js',
   './js/storage.js',
+  './js/ui/kinds.js',
   './js/ui/numpad.js',
   './js/ui/widgets.js',
   './manifest.webmanifest',

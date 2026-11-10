@@ -4,12 +4,14 @@ import { GAMES, randomGame } from '../games/index.js';
 import { ISLANDS } from '../facts.js';
 import { state } from '../storage.js';
 import { play } from '../sound.js';
+import { topicOf } from '../games/source.js';
 
 export function gamesScreen(key = 'mix') {
   const t = parseInt(key, 10);
   const isTable = key !== 'mix' && ISLANDS[t];
-  const back = isTable ? `#/table/${t}` : '#/topic/cuu-chuong';
-  const title = isTable ? `🎮 Trò chơi bảng ${t}` : '🎮 Trò chơi';
+  const topic = topicOf(key);
+  const back = topic ? `#/topic/${topic.id}` : isTable ? `#/table/${t}` : '#/topic/cuu-chuong';
+  const title = topic ? `🎮 ${topic.title}` : isTable ? `🎮 Trò chơi bảng ${t}` : '🎮 Trò chơi';
 
   const dice = h('button', {
     class: 'dice-btn',

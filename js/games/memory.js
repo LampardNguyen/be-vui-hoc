@@ -1,6 +1,6 @@
 // Trò Lật thẻ: lật 2 thẻ, ghép phép tính với đúng kết quả của nó.
 import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
-import { pick, poolFor } from '../leitner.js';
+import { source } from './source.js';
 import { shuffle } from '../facts.js';
 import { markStudied } from '../storage.js';
 import { sayFact } from '../speech.js';
@@ -12,7 +12,8 @@ export function memoryScreen(key = 'mix') {
   // Chọn các phép có kết quả khác nhau để mỗi thẻ kết quả chỉ ghép được với 1 phép.
   const facts = [];
   const used = new Set();
-  for (const f of pick(poolFor(key), 40)) {
+  const src = source(key);
+  for (const f of src.draw(40)) {
     if (!used.has(f.answer)) { used.add(f.answer); facts.push(f); }
     if (facts.length === PAIRS) break;
   }
@@ -41,7 +42,7 @@ export function memoryScreen(key = 'mix') {
   ]));
 
   cards.forEach((c, i) => {
-    c.el = h('button', { class: `card-flip ${c.kind}`, style: `animation-delay:${i * 40}ms`, onclick: () => flip(c) },
+    c.el = h('button', { class: `card-flip ${c.kind}${c.face.length > 8 ? ' long' : ''}`, style: `animation-delay:${i * 40}ms`, onclick: () => flip(c) },
       h('span', { class: 'back' }, '❓'),
       h('span', { class: 'front' }, c.face));
     board.append(c.el);
@@ -64,7 +65,7 @@ export function memoryScreen(key = 'mix') {
       markStudied(Math.min(now - lastMatch, 15000));
       lastMatch = now;
       play('good');
-      sayFact(a.f);
+      if (src.isFact) sayFact(a.f);
       await wait(250);
       a.el.classList.add('matched');
       b.el.classList.add('matched');

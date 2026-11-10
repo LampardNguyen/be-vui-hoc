@@ -1,13 +1,13 @@
 // Trò Đua 60 giây: trả lời đúng càng nhiều càng tốt trong 1 phút, có chuỗi combo.
 import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
 import { numpad } from '../ui/numpad.js';
-import { pick, poolFor, answer } from '../leitner.js';
+import { source } from './source.js';
 import { play } from '../sound.js';
 import { backFor, saveBest, gameResult, level } from './common.js';
 
 export function sprintScreen(key = 'mix') {
   const SECONDS = { easy: 90, normal: 60, hard: 45 }[level()];
-  const pool = poolFor(key);
+  const src = source(key);
   let queue = [], q, start, score = 0, combo = 0, maxCombo = 0, wrong = 0, endAt = 0, timer, running = false;
 
   const scoreEl = h('span', { class: 'chip' });
@@ -66,11 +66,12 @@ export function sprintScreen(key = 'mix') {
   }
 
   function next() {
-    if (!queue.length) queue = pick(pool, 30);
+    if (!queue.length) queue = src.draw(30);
     q = queue.shift();
     answerBox.className = 'answer-box';
     answerBox.textContent = '?';
-    question.replaceChildren(h('span', {}, `${q.text} = `), answerBox);
+    question.classList.toggle('long', !src.isFact);
+    question.replaceChildren(h('span', {}, src.isFact ? `${q.text} = ` : [q.ask, h('br')]), answerBox);
     pad.clear();
     pad.setEnabled(true);
     start = performance.now();
@@ -80,7 +81,7 @@ export function sprintScreen(key = 'mix') {
     if (!running) return;
     const ms = performance.now() - start;
     const correct = +v === q.answer;
-    answer(q, correct, ms);
+    src.record(q, correct, ms);
     pad.setEnabled(false);
     if (correct) {
       score++; combo++; maxCombo = Math.max(maxCombo, combo);

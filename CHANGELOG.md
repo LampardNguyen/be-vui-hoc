@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-11 — Làm lại 15 chương Toán: vừa học vừa chơi
+- Mỗi chương có thêm **Trò chơi**: 6 trò (bóng bay, đua 60 giây, lật thẻ, đua xe, ếch, quái vật) dùng câu hỏi của chương (`js/games/source.js`, key `t-<id>`).
+- Dạng bài mới (`js/ui/kinds.js`): đặt tính dọc cộng/trừ/nhân (điền từng chữ số, hiện số nhớ, gợi ý từng hàng), đặt tính chia (thương + số dư), chạm chọn trên hình, tô màu, sắp xếp thẻ số, bài nhiều bước.
+- Hình vẽ ngẫu nhiên (`js/topics/draw.js`): cân thăng bằng nghiêng theo đáp án, thước kẻ, nhiệt kế, cân quả cân, bãi hình xoay ngẫu nhiên, đa giác tự tính góc vuông, khối xếp chồng, phân số chia đều/không đều, chia kẹo.
+- Nội dung: so sánh có biểu thức, toán có lời văn, "bạn tính đúng hay sai", biểu thức từng bước, tìm số trong hộp quà, chọn đơn vị hợp lý, tô 1/n hình, chạm trung điểm trên thước, chạm bán kính/đường kính/tâm, chạm góc vuông, đếm khối lập phương.
+- Màn luyện: thỏ/rùa… chạy theo tiến độ tới 🏁, chuỗi đúng 🔥, pháo giấy mỗi 5 câu đúng liền, xong thì có nút "Chơi trò thưởng".
+
 ## 2026-11-10 — Làm đủ 15 chương Toán lớp 3 còn lại
 - Bộ máy chương chung: `js/screens/topic.js` (trang "Con cần nhớ" + luyện 10 câu, sai → giải thích rồi hỏi thêm câu cùng dạng, chấm sao).
 - Câu hỏi sinh ngẫu nhiên: `js/topics/numbers.js` (so sánh, cộng trừ, nhân chia lớn, chia có dư, biểu thức, gấp mấy lần, tìm thành phần), `js/topics/shapes.js` (đổi đơn vị, một phần mấy, trung điểm, hình tròn, góc, hình phẳng, khối — hình vẽ SVG).

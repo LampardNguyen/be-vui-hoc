@@ -2,8 +2,8 @@
 // Chơi không giới hạn tới khi hết mạng. Mỗi câu có giới hạn thời gian: lá dưới chân ếch chìm dần,
 // hết giờ thì ếch rơi "tõm" xuống nước. Trả lời đúng thì lá trôi nhanh hơn, thời gian ngắn lại.
 import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
-import { pick, poolFor, answer } from '../leitner.js';
-import { distractors, shuffle } from '../facts.js';
+import { source } from './source.js';
+import { shuffle } from '../facts.js';
 import { play } from '../sound.js';
 import { backFor, saveBest, gameResult, level, giftBag } from './common.js';
 
@@ -66,7 +66,7 @@ export function frogScreen(key = 'mix') {
     normal: { LIVES: 3, BASE: 8, MIN: 3.5 },
     hard: { LIVES: 3, BASE: 5, MIN: 2.5 },
   }[level()];
-  const pool = poolFor(key);
+  const src = source(key);
   let queue = [], jumps = 0, score = 0, combo = 0, lives = LIVES, q, pads = [], deco = [], dir = 1;
   let start, missed, raf, last, busy = false, over = false, L, speed, padW, T, hasGift = false;
   // Theo tỉ lệ bề ngang sông: rx = vòng sáng (ngẫu nhiên giữa/trái/phải mỗi câu), fx = chỗ ếch đang đứng.
@@ -115,11 +115,11 @@ export function frogScreen(key = 'mix') {
   };
 
   function startRound() {
-    if (!queue.length) queue = pick(pool, 20);
+    if (!queue.length) queue = src.draw(20);
     q = queue.shift();
     missed = false;
     busy = false;
-    question.textContent = `${q.text} = ?`;
+    question.textContent = src.ask(q);
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
 
     const W = lane.clientWidth;
@@ -138,7 +138,7 @@ export function frogScreen(key = 'mix') {
     reach.style.left = `${rx * 100}%`;
     frog.style.left = `${fx * 100}%`;
 
-    const values = shuffle([q.answer, ...distractors(q, 3)]);
+    const values = shuffle([q.answer, ...src.distractors(q, 3)]);
     const offset = Math.random() * L;
     lane.querySelectorAll('.pad').forEach((p) => p.remove());
     pads = values.map((value, i) => {
@@ -196,7 +196,7 @@ export function frogScreen(key = 'mix') {
   function hurt() {
     const shielded = bag.hit();
     if (!shielded) lives = Math.max(0, lives - 1);
-    if (!missed) { missed = true; answer(q, false, performance.now() - start); }
+    if (!missed) { missed = true; src.record(q, false, performance.now() - start); }
     combo = 0;
     hud();
     return shielded;
@@ -211,7 +211,7 @@ export function frogScreen(key = 'mix') {
     frog.classList.add('splash');
     basePad.classList.add('sunk');
     pads.find((o) => o.value === q.answer).el.classList.add('hint');
-    say(`${shielded ? '🛡️ Khiên đỡ rồi! ' : 'Tõm! 💦 '}${q.text} = ${q.answer} nhé con`);
+    say(`${shielded ? '🛡️ Khiên đỡ rồi! ' : 'Tõm! 💦 '}${src.reveal(q)} nhé con`);
     await wait(1800);
     if (over) return;
     frog.classList.remove('splash');
@@ -231,7 +231,7 @@ export function frogScreen(key = 'mix') {
       if (lives === 0) {
         busy = true;
         cancelAnimationFrame(raf);
-        say(`${q.text} = ${q.answer} nhé con 🍃`);
+        say(`${src.reveal(q)} nhé con 🍃`);
         wait(1500).then(() => { if (!over) finish(); });
         return;
       }
@@ -245,7 +245,7 @@ export function frogScreen(key = 'mix') {
     busy = true;
     cancelAnimationFrame(raf);
     const ms = performance.now() - start;
-    if (!missed) answer(q, true, ms);
+    if (!missed) src.record(q, true, ms);
     combo = missed ? 0 : combo + 1;
     const bonus = combo > 0 && combo % COMBO === 0;
     score += bag.points(10 + Math.max(0, Math.round((T * 1000 - ms) / 500)) + (bonus ? 20 : 0));

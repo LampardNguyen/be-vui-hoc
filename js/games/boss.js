@@ -1,8 +1,9 @@
 // Trò Đánh quái vật: mỗi câu đúng là một đòn đánh, trả lời nhanh là đòn chí mạng.
 // Hết giờ hoặc chọn sai thì quái vật đánh lại.
 import { h, topBar, confetti, wait, onLeave } from '../ui/widgets.js';
-import { pick, poolFor, answer, FAST_MS } from '../leitner.js';
-import { distractors, shuffle } from '../facts.js';
+import { source } from './source.js';
+import { FAST_MS } from '../leitner.js';
+import { shuffle } from '../facts.js';
 import { play } from '../sound.js';
 import { backFor, saveBest, gameResult, level } from './common.js';
 
@@ -20,7 +21,7 @@ const MONSTERS = [
 export function bossScreen(key = 'mix') {
   // Thời gian câu đầu theo độ khó; mỗi câu sau ít hơn 0,2 giây, ít nhất 2,4 giây.
   const FIRST_MS = { easy: 12000, normal: 8000, hard: 4000 }[level()];
-  const pool = poolFor(key);
+  const src = source(key);
   const randomMonster = () => MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
   let monster = randomMonster();
   let hp = BOSS_HP, lives = LIVES, q, start, queue = [], turnTimer, over = false, hits = 0, crits = 0, turns = 0, beaten = 0, turnMs = FIRST_MS;
@@ -61,13 +62,13 @@ export function bossScreen(key = 'mix') {
 
   function next() {
     if (over) return;
-    if (!queue.length) queue = pick(pool, 20);
+    if (!queue.length) queue = src.draw(20);
     q = queue.shift();
     turnMs = Math.max(2400, FIRST_MS - turns * 200);
     turns++;
-    question.textContent = `${q.text} = ?`;
+    question.textContent = src.ask(q);
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
-    choices.replaceChildren(...shuffle([q.answer, ...distractors(q, 3)]).map((v) =>
+    choices.replaceChildren(...shuffle([q.answer, ...src.distractors(q, 3)]).map((v) =>
       h('button', { class: 'choice', onpointerdown: (e) => { e.preventDefault(); choose(v, e.currentTarget); } }, v)));
     // Thanh thời gian chạy bằng CSS, hết giờ thì quái vật đánh.
     turnBar.style.transition = 'none';
@@ -89,10 +90,10 @@ export function bossScreen(key = 'mix') {
     const ms = performance.now() - start;
     if (v !== q.answer) {
       btn.classList.add('wrong');
-      answer(q, false, ms);
+      src.record(q, false, ms);
       return bossAttack(btn);
     }
-    answer(q, true, ms);
+    src.record(q, true, ms);
     btn.classList.add('right');
     const crit = ms < FAST_MS;
     const dmg = crit ? 2 : 1;
@@ -123,9 +124,9 @@ export function bossScreen(key = 'mix') {
 
   async function bossAttack(wrongBtn) {
     if (over) return;
-    if (!wrongBtn) answer(q, false, turnMs);   // hết giờ
+    if (!wrongBtn) src.record(q, false, turnMs);   // hết giờ
     lock();
-    choices.querySelectorAll('button').forEach((b) => { if (+b.textContent === q.answer) b.classList.add('right'); });
+    choices.querySelectorAll('button').forEach((b) => { if (b.textContent === String(q.answer)) b.classList.add('right'); });
     play('bad');
     lives = Math.max(0, lives - 1);
     monsterEl.classList.remove('attack'); void monsterEl.offsetWidth; monsterEl.classList.add('attack');

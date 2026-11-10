@@ -128,6 +128,70 @@ a { text-decoration: none; }
 .quiz-choice.wrong { background: #ffd6d6; }
 .quiz-answer { text-align: center; font-size: 26px; font-weight: 800; margin: 8px 0; }
 
+
+/* ---------- Dạng bài tương tác (kinds.js) ---------- */
+.stage.wide { max-width: 640px; }
+.question.long { font-size: clamp(22px, 5vw, 32px); white-space: normal; flex-wrap: wrap; text-align: center; line-height: 1.3; }
+.question.long > span:first-child { flex-basis: 100%; }
+.stage.wide .topic-pic svg { width: min(100%, 480px); max-height: 320px; }
+.center { text-align: center; margin: 10px 0; }
+.quiz-choice.pic { padding: 8px; display: grid; place-items: center; }
+.choice-pic svg { width: 100%; height: auto; max-height: 130px; display: block; }
+.quiz-choices.tf .quiz-choice:first-child::before { content: '✅ '; }
+.quiz-choices.tf .quiz-choice:last-child::before { content: '❌ '; }
+.quiz-choices.n3 { grid-template-columns: repeat(3, 1fr); }
+.quiz-choice { line-height: 1.25; }
+.shake { animation: shake .35s; }
+.col-grid { display: inline-block; margin: 6px auto; padding: 10px 18px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+.quiz-area > div { text-align: center; }
+.col-row { display: flex; justify-content: center; }
+.col-cell { width: 52px; height: 58px; display: grid; place-items: center; font-size: 40px; font-weight: 800; }
+.col-marks .col-cell { height: 24px; font-size: 18px; color: var(--bad, #e63946); }
+.col-line { height: 4px; background: var(--ink, #3a3f58); border-radius: 2px; margin: 4px 0 6px; }
+.col-cell.slot { background: #f1f4fb; border-radius: 12px; margin: 0 2px; width: 48px; border: 3px dashed #c9cfdb; color: var(--primary); }
+.col-cell.slot.active { border-color: var(--primary); background: #fff4e6; animation: pulse 1s ease-in-out infinite; }
+.col-cell.slot.filled { border-style: solid; border-color: var(--good); color: var(--good); background: #e9fbf3; animation: none; }
+@keyframes pulse { 50% { transform: scale(1.06); } }
+.col-hint { min-height: 2.6em; font-size: 19px; color: var(--muted); margin: 6px 8px; }
+.col-hint.warn { color: #e85d04; }
+.div-grid { display: inline-flex; gap: 0; margin: 6px auto; padding: 12px 18px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); text-align: left; }
+.div-left { padding-right: 14px; border-right: 4px solid #3a3f58; min-width: 110px; }
+.div-right { padding-left: 12px; }
+.div-right .div-num { border-bottom: 4px solid #3a3f58; padding-bottom: 4px; margin-bottom: 6px; }
+.div-num { font-size: 40px; font-weight: 800; letter-spacing: 4px; }
+.div-work { font-size: 15px; color: var(--muted); max-width: 220px; }
+.div-quo { display: flex; gap: 4px; }
+.div-rest { font-size: 24px; font-weight: 800; margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.div-rest[hidden] { display: none; }
+.pickable [data-k] { cursor: pointer; }
+.pickable [data-k] .vis, .pickable [data-k] polygon, .pickable [data-k] circle:not([fill="transparent"]) { transition: stroke .15s, fill .15s; }
+.pickable [data-k].sel .vis, .pickable [data-k].sel polygon, .pickable [data-k].sel > circle:not([fill="transparent"]) { stroke: #e85d04 !important; stroke-width: 8; }
+.pickable [data-k].sel .vis { fill: #e85d04; }
+.pickable [data-k].ok .vis, .pickable [data-k].ok polygon, .pickable [data-k].ok > circle:not([fill="transparent"]) { stroke: var(--good) !important; stroke-width: 8; }
+.pickable [data-k].ok .vis { fill: var(--good); }
+.pickable [data-k].bad .vis, .pickable [data-k].bad polygon { stroke: #e63946 !important; stroke-width: 8; }
+.paint [data-k].on .part { fill: #ffd166; stroke: #e85d04; }
+.paint [data-k] .part { transition: fill .15s; }
+.topic-pic.pickable svg { max-height: 330px; width: min(100%, 520px); }
+.order-slots, .order-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 10px 0; }
+.order-slot { min-width: 76px; height: 58px; border: 3px dashed #c9cfdb; border-radius: 14px; display: grid; place-items: center; font-size: 28px; font-weight: 800; color: var(--good); }
+.order-slot.filled { border-style: solid; border-color: var(--good); background: #e9fbf3; animation: pop .3s; }
+.order-card { font: inherit; font-size: 30px; font-weight: 800; min-width: 86px; padding: 12px 10px; border: 0; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); color: inherit; }
+.order-card.used { visibility: hidden; }
+.steps { text-align: left; }
+.step { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 14px; margin: 10px 0; text-align: center; }
+.step.past { opacity: .6; }
+.step.past .quiz-choices, .step.past .numpad { pointer-events: none; }
+.step-q { font-size: 21px; font-weight: 800; margin: 4px 0 8px; }
+.step-fix { color: #e85d04; font-size: 18px; }
+.bar.track { position: relative; overflow: visible; }
+.runner { position: absolute; top: -18px; left: -14px; font-size: 28px; transition: left .5s; }
+.goal { position: absolute; right: -10px; top: -16px; font-size: 22px; }
+.progress { margin-top: 16px; }
+.beam { transition: transform .8s cubic-bezier(.3, 1.6, .5, 1); }
+.example .topic-pic svg { max-height: 160px; }
+.card-flip.long .front { font-size: clamp(14px, 2.6vw, 20px); padding: 6px; line-height: 1.2; text-align: center; }
+
 /* ---------- Đảo ---------- */
 .island-hero {
   display: flex; gap: 16px; align-items: center; background: var(--card); border-radius: var(--radius);
@@ -555,6 +619,10 @@ a { text-decoration: none; }
 
 /* ---------- Màn hình nhỏ (điện thoại) ---------- */
 @media (max-width: 640px) {
+  .col-cell { width: 40px; height: 48px; font-size: 32px; }
+  .col-cell.slot { width: 38px; }
+  .div-num { font-size: 32px; }
+  .order-card { min-width: 70px; font-size: 24px; }
   .topic-grid { grid-template-columns: 1fr; }
   .islands { grid-template-columns: repeat(2, 1fr); }
   .big-actions { gap: 10px; }

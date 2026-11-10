@@ -21,6 +21,11 @@ File: `js/games/*.js`, `js/screens/games.js`.
 - sprint: 90/60/45 giây. memory: 4/6/8 cặp.
 - Kỷ lục không tách theo độ khó.
 
+## Nguồn câu hỏi (`source.js`)
+`source(key)`: key cửu chương (`'3'`, `'3m'`, `'mix'`) → phép tính + Leitner; key `t-<id>` → `topic.game()` của chương ([[topics]]).
+Trả `{ draw(n), distractors(q, k), record(q, ok, ms), ask(q), reveal(q), isFact }`. Trò chơi không gọi `pick/poolFor/answer/distractors` trực tiếp nữa.
+Bộ chọn `#/games/t-<id>` quay về `#/topic/<id>`. Lật thẻ: mặt chữ dài > 8 ký tự có class `long` (chữ nhỏ). Đua 60 giây: câu chương có class `.question.long`.
+
 ## Dùng chung (`common.js`)
 - `backFor(key)` → `#/games/<key>`; `saveBest(gameId, key, score)` → `state.best`; `gameResult({...})` màn kết quả: Chơi lại / 🎲 Trò khác / Quay về.
 - Bộ chọn `#/games/<key>`: nút 🎲 ngẫu nhiên + 6 thẻ có kỷ lục. `randomGame(except)`, `randomGameHash(key, except)`.
