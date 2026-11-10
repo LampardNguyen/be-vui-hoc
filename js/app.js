@@ -1,6 +1,6 @@
 import { leave } from './ui/widgets.js';
 import { stopSpeaking } from './speech.js';
-import { homeScreen, tableScreen } from './screens/home.js';
+import { homeScreen, subjectScreen, cuuChuongScreen, tableScreen } from './screens/home.js';
 import { learnScreen } from './screens/learn.js';
 import { practiceScreen } from './screens/practice.js';
 import { parentScreen } from './screens/parent.js';
@@ -13,9 +13,11 @@ import { bossScreen } from './games/boss.js';
 import { raceScreen } from './games/race.js';
 import { frogScreen } from './games/frog.js';
 
-// Điều hướng bằng #hash: #/table/3, #/learn/3, #/practice/mix, #/games/3, #/balloon/3, #/rewards, #/parent
+// Điều hướng bằng #hash: #/subject/toan3, #/topic/cuu-chuong, #/table/3, #/learn/3, #/practice/mix, #/games/3, #/balloon/3, #/rewards, #/parent
 const routes = {
   '': homeScreen,
+  subject: subjectScreen,
+  topic: (p) => (p === 'cuu-chuong' ? cuuChuongScreen() : homeScreen()),
   table: tableScreen,
   learn: learnScreen,
   practice: practiceScreen,

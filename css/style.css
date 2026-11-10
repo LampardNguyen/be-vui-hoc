@@ -80,6 +80,36 @@ a { text-decoration: none; }
 .home-foot { text-align: center; margin-top: 24px; }
 .home-foot a { color: var(--muted); font-size: 18px; padding: 8px 16px; }
 
+
+/* ---------- Lớp / môn / chương ---------- */
+.grade-tabs { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+.grade-tab { padding: 10px 22px; border-radius: 999px; background: var(--card); font-weight: 800; font-size: 22px; box-shadow: var(--shadow); }
+.grade-tab.on { background: var(--primary); color: #fff; }
+.subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.subject-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 14px;
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  border-bottom: 8px solid var(--c); animation: rise .4s ease backwards; cursor: pointer;
+}
+.subject-emoji { font-size: 64px; line-height: 1.1; }
+.subject-card b { font-size: 28px; }
+.subject-card small, .topic-card small { color: var(--muted); font-size: 17px; }
+.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.topic-card {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 84px;
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  border-left: 8px solid var(--c); cursor: pointer;
+}
+.topic-emoji { font-size: 40px; }
+.topic-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.topic-info b { font-size: 20px; line-height: 1.2; }
+.locked { opacity: .55; border-color: #c9cfdb; }
+.subject-card:active, .topic-card:active { transform: translateY(4px) scale(.98); }
+.toast {
+  position: fixed; left: 50%; bottom: 40px; translate: -50% 0; z-index: 50;
+  background: #333; color: #fff; padding: 12px 22px; border-radius: 999px; font-size: 20px; font-weight: 700; white-space: nowrap;
+}
+
 /* ---------- Đảo ---------- */
 .island-hero {
   display: flex; gap: 16px; align-items: center; background: var(--card); border-radius: var(--radius);
@@ -507,6 +537,7 @@ a { text-decoration: none; }
 
 /* ---------- Màn hình nhỏ (điện thoại) ---------- */
 @media (max-width: 640px) {
+  .topic-grid { grid-template-columns: 1fr; }
   .islands { grid-template-columns: repeat(2, 1fr); }
   .big-actions { gap: 10px; }
   .big-emoji { font-size: 38px; }

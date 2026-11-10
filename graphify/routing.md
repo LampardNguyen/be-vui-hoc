@@ -3,7 +3,7 @@
 File: `js/app.js`, `js/ui/widgets.js`.
 
 ## Luồng
-- `routes` map tên → hàm màn hình; URL dạng `#/<tên>/<param>` (vd `#/table/3`, `#/practice/3m`, `#/boss/mix`).
+- `routes` map tên → hàm màn hình; URL dạng `#/<tên>/<param>` (vd `#/subject/toan3`, `#/topic/cuu-chuong`, `#/table/3`, `#/practice/3m`, `#/boss/mix`).
 - `render()` (mỗi `hashchange`): `leave()` → `stopSpeaking()` → `screen(param)` thay nội dung `#app`.
 - Màn hình là hàm trả về 1 element, tạo bằng `h(tag, attrs, ...children)` (`onclick` → listener, `class`, `style`).
 - `onLeave(fn)` đăng ký dọn dẹp (clearInterval, cancelAnimationFrame, gỡ listener bàn phím); `leave()` gọi hết.

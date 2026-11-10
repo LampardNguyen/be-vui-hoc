@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-10 — Trang chủ phân cấp Lớp → Môn → Chương trình
+- Thêm `js/curriculum.js`: cây chương trình lớp 3 (Toán 16 chương chia 5 nhóm, Tiếng Việt sắp có).
+- Trang chủ mới: chọn lớp + thẻ môn học; màn môn `#/subject/toan3` liệt kê chương theo nhóm, chương chưa có hiện "🔒 Sắp có".
+- Trang chủ bảng cửu chương cũ chuyển sang `#/topic/cuu-chuong`; các nút quay lại trỏ về đây.
+- Thêm `TODO.md` làm checklist tiến độ.
+
 ## 2026-11-05 — Đua xe: bánh xe lăn
 - Bánh xe có vạch gai lốp chạy theo tốc độ xe (nhanh khi tăng tốc, chậm khi đi nhầm cổng), thêm vệt bụi sau bánh.
 

@@ -8,7 +8,7 @@ import { play } from '../sound.js';
 export function gamesScreen(key = 'mix') {
   const t = parseInt(key, 10);
   const isTable = key !== 'mix' && ISLANDS[t];
-  const back = isTable ? `#/table/${t}` : '#/';
+  const back = isTable ? `#/table/${t}` : '#/topic/cuu-chuong';
   const title = isTable ? `🎮 Trò chơi bảng ${t}` : '🎮 Trò chơi';
 
   const dice = h('button', {

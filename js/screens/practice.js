@@ -16,7 +16,7 @@ function titleFor(key) {
 }
 
 export function practiceScreen(key = 'mix') {
-  const back = key === 'mix' ? '#/' : `#/table/${parseInt(key, 10)}`;
+  const back = key === 'mix' ? '#/topic/cuu-chuong' : `#/table/${parseInt(key, 10)}`;
   const queue = pick(poolFor(key), QUESTIONS);
   const total = queue.length;
   const wrongOnce = new Set();
