@@ -1,6 +1,8 @@
 import { leave } from './ui/widgets.js';
 import { stopSpeaking } from './speech.js';
 import { homeScreen, subjectScreen, cuuChuongScreen, tableScreen } from './screens/home.js';
+import { topicScreen, quizScreen } from './screens/topic.js';
+import { TOPICS } from './topics/index.js';
 import { learnScreen } from './screens/learn.js';
 import { practiceScreen } from './screens/practice.js';
 import { parentScreen } from './screens/parent.js';
@@ -17,7 +19,8 @@ import { frogScreen } from './games/frog.js';
 const routes = {
   '': homeScreen,
   subject: subjectScreen,
-  topic: (p) => (p === 'cuu-chuong' ? cuuChuongScreen() : homeScreen()),
+  topic: (p) => (p === 'cuu-chuong' ? cuuChuongScreen() : Object.hasOwn(TOPICS, p || '') ? topicScreen(p) : homeScreen()),
+  quiz: (p) => (Object.hasOwn(TOPICS, p || '') ? quizScreen(p) : homeScreen()),
   table: tableScreen,
   learn: learnScreen,
   practice: practiceScreen,

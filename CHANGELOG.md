@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-10 — Làm đủ 15 chương Toán lớp 3 còn lại
+- Bộ máy chương chung: `js/screens/topic.js` (trang "Con cần nhớ" + luyện 10 câu, sai → giải thích rồi hỏi thêm câu cùng dạng, chấm sao).
+- Câu hỏi sinh ngẫu nhiên: `js/topics/numbers.js` (so sánh, cộng trừ, nhân chia lớn, chia có dư, biểu thức, gấp mấy lần, tìm thành phần), `js/topics/shapes.js` (đổi đơn vị, một phần mấy, trung điểm, hình tròn, góc, hình phẳng, khối — hình vẽ SVG).
+- Route `#/topic/<id>` và `#/quiz/<id>`; sao từng chương lưu `state.topics`, hiện trong màn môn Toán.
+
 ## 2026-11-10 — Trang chủ phân cấp Lớp → Môn → Chương trình
 - Thêm `js/curriculum.js`: cây chương trình lớp 3 (Toán 16 chương chia 5 nhóm, Tiếng Việt sắp có).
 - Trang chủ mới: chọn lớp + thẻ môn học; màn môn `#/subject/toan3` liệt kê chương theo nhóm, chương chưa có hiện "🔒 Sắp có".

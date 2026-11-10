@@ -110,6 +110,24 @@ a { text-decoration: none; }
   background: #333; color: #fff; padding: 12px 22px; border-radius: 999px; font-size: 20px; font-weight: 700; white-space: nowrap;
 }
 
+
+/* ---------- Chương học: mẹo + luyện ---------- */
+.tips { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 20px 14px 40px; margin: 0; }
+.tips li { font-size: 20px; line-height: 1.45; margin: 6px 0; }
+.quiz-q { text-align: center; }
+.quiz-q p { font-size: clamp(24px, 4.5vw, 36px); font-weight: 800; margin: 8px 0; }
+.topic-pic svg { width: min(100%, 360px); height: auto; display: block; margin: 0 auto; }
+.quiz-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
+.quiz-choices.n2, .quiz-choices.n4 { grid-template-columns: 1fr 1fr; }
+.quiz-choice {
+  font: inherit; font-size: 26px; font-weight: 800; padding: 18px 8px; border: 0; border-radius: var(--radius);
+  background: var(--card); box-shadow: var(--shadow); color: inherit; cursor: pointer;
+}
+.quiz-choice:active { transform: translateY(3px); }
+.quiz-choice.right { background: var(--good); color: #fff; }
+.quiz-choice.wrong { background: #ffd6d6; }
+.quiz-answer { text-align: center; font-size: 26px; font-weight: 800; margin: 8px 0; }
+
 /* ---------- Đảo ---------- */
 .island-hero {
   display: flex; gap: 16px; align-items: center; background: var(--card); border-radius: var(--radius);

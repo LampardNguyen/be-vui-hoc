@@ -7,6 +7,7 @@
 - [[storage]] — `state` trong localStorage: cấu trúc, chuỗi ngày học, sao lưu/khôi phục
 
 ## Học & luyện
+- [[topics]] — 15 chương Toán dạng luyện (mẹo + 10 câu, hình SVG)
 - [[curriculum]] — Cây Lớp → Môn → Chương, trang chủ và màn môn học
 - [[facts]] — 160 phép tính (nhân + chia, bảng 2–9 × 1–10), id, đáp án nhiễu, đảo
 - [[leitner]] — Lặp lại ngắt quãng: hộp 0–5, "thuộc" = hộp ≥ 4, chọn câu có trọng số

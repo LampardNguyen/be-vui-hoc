@@ -8,6 +8,7 @@ function defaults() {
     facts: {},                       // id phép tính -> { box, seen, right, wrong, ms, last }
     played: {},                      // số lượt đã hoàn thành theo từng chế độ
     best: {},                        // kỷ lục trò chơi
+    topics: {},                      // id chương -> { best: sao cao nhất, played }
     streak: { count: 0, last: null, best: 0 },
     seenStickers: [],                // sticker bé đã được thông báo
     days: {},                        // 'YYYY-MM-DD' -> { ms, answers }

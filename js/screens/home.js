@@ -3,6 +3,7 @@ import { TABLES, ISLANDS, factsOf } from '../facts.js';
 import { tableProgress, isMastered } from '../leitner.js';
 import { currentStreak } from '../storage.js';
 import { GRADES, findSubject } from '../curriculum.js';
+import { topicStars } from './topic.js';
 import { pet, earnedStickers, STICKERS, takeNewStickers, newStickerPopup } from './rewards.js';
 
 // Chạm chữ "Bé Vui Học" 3 lần liền → xoá bản offline và tải lại bản mới nhất.
@@ -90,7 +91,7 @@ export function subjectScreen(param) {
   const { grade, subject } = found;
   const progressOf = (t) => (t.id === 'cuu-chuong'
     ? h('span', { class: 'bar' }, h('i', { style: `width:${Math.round(cuuChuongRatio() * 100)}%` }))
-    : null);
+    : h('span', { class: 'stars' }, starsText(topicStars(t.id))));
 
   return h('div', { class: 'screen', style: `--c:${subject.color}` },
     topBar(`${subject.emoji} ${subject.name} ${grade.name.toLowerCase()}`),

@@ -10,21 +10,31 @@
 - [x] 1.5 CSS thẻ môn/chương, test tablet 768×1024 + mobile 375×812, không lỗi console
 - [x] 1.6 sw.js (VERSION, FILES), CHANGELOG.md, graphify, commit
 
-## Sau này — nội dung từng chương (Toán lớp 3)
+## Task 2 — Nội dung 15 chương Toán còn lại
+Cách làm: mỗi chương = trang "Kiến thức + mẹo" + luyện 10 câu (chọn đáp án hoặc bàn phím số),
+sai → giải thích + hỏi lại; xong → sao (lưu `state.topics`). Hình học vẽ bằng SVG.
+- [x] 2.1 Bộ máy chung: `js/screens/topic.js`, `js/topics/*.js`, route `#/topic/<id>`, sao trong màn môn
+- [x] 2.2 Nhóm Số và phép tính (6 chương)
+- [x] 2.3 Tìm thành phần (2), Đo lường (1), Phân số (1)
+- [x] 2.4 Hình học (5 chương)
+- [x] 2.5 Test browser tablet + mobile từng chương, không lỗi console
+- [x] 2.6 sw.js, CHANGELOG, graphify, commit
+
+## Danh sách chương Toán lớp 3
 - [x] Bảng cửu chương
-- [ ] So sánh số dưới 1000
-- [ ] Cộng trừ dưới 1000
-- [ ] Tìm thành phần phép cộng trừ (số hạng, tổng, số trừ, số bị trừ, hiệu)
-- [ ] Tìm thành phần phép nhân chia
-- [ ] Nhân, chia số 2–3 chữ số với 1 chữ số
-- [ ] Phép chia hết và có dư
-- [ ] Biểu thức số, tính giá trị biểu thức
-- [ ] So sánh số lớn gấp mấy lần số bé
-- [ ] Đổi đơn vị đo (khối lượng, độ dài, nhiệt độ)
-- [ ] Phân số một phần mấy
-- [ ] Điểm giữa, trung điểm đoạn thẳng
-- [ ] Hình tròn, tâm, bán kính, đường kính
-- [ ] Góc vuông, góc không vuông
-- [ ] Hình tam giác, tứ giác, hình vuông, hình chữ nhật
-- [ ] Khối lập phương, khối hộp chữ nhật
+- [x] So sánh số dưới 1000
+- [x] Cộng trừ dưới 1000
+- [x] Tìm thành phần phép cộng trừ (số hạng, tổng, số trừ, số bị trừ, hiệu)
+- [x] Tìm thành phần phép nhân chia
+- [x] Nhân, chia số 2–3 chữ số với 1 chữ số
+- [x] Phép chia hết và có dư
+- [x] Biểu thức số, tính giá trị biểu thức
+- [x] So sánh số lớn gấp mấy lần số bé
+- [x] Đổi đơn vị đo (khối lượng, độ dài, nhiệt độ)
+- [x] Phân số một phần mấy
+- [x] Điểm giữa, trung điểm đoạn thẳng
+- [x] Hình tròn, tâm, bán kính, đường kính
+- [x] Góc vuông, góc không vuông
+- [x] Hình tam giác, tứ giác, hình vuông, hình chữ nhật
+- [x] Khối lập phương, khối hộp chữ nhật
 - [ ] Môn Tiếng Việt

@@ -1,5 +1,5 @@
 // Cho phép mở trang khi không có mạng. Đổi VERSION mỗi lần cập nhật để máy tải bản mới.
-const VERSION = 'v12';
+const VERSION = 'v13';
 const CACHE = `cuu-chuong-${VERSION}`;
 const FILES = [
   './',
@@ -28,7 +28,12 @@ const FILES = [
   './js/screens/parent.js',
   './js/screens/practice.js',
   './js/screens/rewards.js',
+  './js/screens/topic.js',
   './js/sound.js',
+  './js/topics/index.js',
+  './js/topics/numbers.js',
+  './js/topics/shapes.js',
+  './js/topics/util.js',
   './js/speech.js',
   './js/storage.js',
   './js/ui/numpad.js',

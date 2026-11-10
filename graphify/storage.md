@@ -20,3 +20,5 @@ File: `js/storage.js`. Khóa localStorage: `be-vui-hoc-v1` (theo tên app, dùng
 
 ## Liên quan
 - [[index]] · [[leitner]] · [[rewards]] · [[parent]]
+
+- `topics`: id chương → `{ best, played }` (xem [[topics]]).
