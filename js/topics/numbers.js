@@ -10,7 +10,7 @@ const sign = (a, b) => (a > b ? '>' : a < b ? '<' : '=');
 const tilt = (a, b) => (a > b ? -1 : a < b ? 1 : 0);
 const cmp = (lt, lv, rt, rv, explain) => ({
   text: 'Cân nghiêng về bên nào? Chọn dấu đúng nhé ⚖️', svg: balance(lt, rt), choices: ['<', '=', '>'],
-  answer: sign(lv, rv), tilt: tilt(lv, rv), show: `${lt} ${sign(lv, rv)} ${rt}`, explain,
+  answer: sign(lv, rv), tilt: tilt(lv, rv), calcText: `${lt}; ${rt}`, show: `${lt} ${sign(lv, rv)} ${rt}`, explain,
 });
 
 // Kết quả sai "thường gặp" khi quên nhớ / quên mượn.
@@ -224,7 +224,7 @@ const congTru = {
         return `<g data-k="${keys[i]}"><ellipse cx="${x}" cy="${y}" rx="68" ry="46" fill="#b5651d" stroke="${INK}" stroke-width="3" class="vis"/><rect x="${x - 22}" y="${y - 54}" width="44" height="12" rx="4" fill="#7a3e0c"/>${label(x, y, t, 17, '#fff')}${label(x, y + 30, keys[i], 14, '#ffe8c2')}</g>`;
       }).join('');
       const correct = jars.map(([, v], i) => (v > lim ? keys[i] : '')).filter(Boolean);
-      return { kind: 'pick', text: `Chạm vào TẤT CẢ các chum có kết quả LỚN HƠN ${lim} rồi bấm Xong 🏺`, svg: svg(body, '0 0 300 215'), pick: { multi: true, correct }, show: `chum ${correct.join(', ')}`, explain: jars.map(([t, v], i) => `${keys[i]}: ${t} = ${v}`).join('; ') + '.' };
+      return { kind: 'pick', text: `Chạm vào TẤT CẢ các chum có kết quả LỚN HƠN ${lim} rồi bấm Xong 🏺`, svg: svg(body, '0 0 300 215'), calcText: jars.map(([t]) => t).join('; '), pick: { multi: true, correct }, show: `chum ${correct.join(', ')}`, explain: jars.map(([t, v], i) => `${keys[i]}: ${t} = ${v}`).join('; ') + '.' };
     }, 2],
     [() => {
       // Toán 2 bước: ít hơn / nhiều hơn rồi tính tổng; hoặc tổng và hiệu.
@@ -233,8 +233,8 @@ const congTru = {
         return {
           kind: 'steps', text: `Khối lớp Ba có ${a} học sinh, khối lớp Bốn có ${less ? 'ít' : 'nhiều'} hơn khối lớp Ba ${d} học sinh 🏫`,
           steps: [
-            { text: 'Khối lớp Bốn có bao nhiêu học sinh?', max: 3, answer: String(b), explain: `${a} ${less ? '−' : '+'} ${d} = ${b}` },
-            { text: 'Cả hai khối có bao nhiêu học sinh?', max: 3, answer: String(a + b), explain: `${a} + ${b} = ${a + b}` },
+            { text: 'Khối lớp Bốn có bao nhiêu học sinh?', calcText: `${a} ${less ? '−' : '+'} ${d}`, max: 3, answer: String(b), explain: `${a} ${less ? '−' : '+'} ${d} = ${b}` },
+            { text: 'Cả hai khối có bao nhiêu học sinh?', calcText: `${a} + ${b}`, max: 3, answer: String(a + b), explain: `${a} + ${b} = ${a + b}` },
           ],
           explain: `Lớp Bốn: ${a} ${less ? '−' : '+'} ${d} = ${b}; cả hai: ${a} + ${b} = ${a + b}.`,
         };
@@ -243,8 +243,8 @@ const congTru = {
       return {
         kind: 'steps', text: `Con trâu 🐃 nặng ${a} kg, con nghé 🐄 nặng ${b} kg.`,
         steps: [
-          { text: 'Cả hai con nặng tất cả bao nhiêu ki-lô-gam?', max: 4, answer: String(a + b) },
-          { text: 'Con trâu nặng hơn con nghé bao nhiêu ki-lô-gam?', max: 3, answer: String(a - b) },
+          { text: 'Cả hai con nặng tất cả bao nhiêu ki-lô-gam?', calcText: `${a} + ${b}`, max: 4, answer: String(a + b) },
+          { text: 'Con trâu nặng hơn con nghé bao nhiêu ki-lô-gam?', calcText: `${a} − ${b}`, max: 3, answer: String(a - b) },
         ],
         explain: `${a} + ${b} = ${a + b} (kg); ${a} − ${b} = ${a - b} (kg).`,
       };

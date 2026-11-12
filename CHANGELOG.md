@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-12 — Nút "Đặt tính" (nháp) cho câu có cộng trừ
+
+- Câu chọn đáp án / nhập số / chạm hình có phép + − thì hiện nút ✍️ Đặt tính: bấm vào mở nháp đặt tính dọc, tính xong ghi kết quả lên trên rồi bé điền đáp án.
+- Nhiều phép liên tiếp (a + b − c) thì đặt tính lần lượt, lấy kết quả lần trước làm số đầu của lần sau (nút "Đặt tính 1/2").
+- Câu so sánh trên cân, chum, toán 2 bước có sẵn phép tính để đặt tính (`calcText`).
+
 ## 2026-11-12 — Thêm dạng bài theo sách: ôn số đến 1000, cộng trừ
 
 - So sánh số: so sánh tổng trăm-chục-đơn vị (400 + 70 + 5 ? 475), điền dãy số đếm thêm/bớt 1, số gồm mấy trăm-chục-đơn vị, đọc/viết số bằng chữ, viết số thành tổng, ba số liên tiếp, tìm con vật nặng nhất/nhẹ nhất.

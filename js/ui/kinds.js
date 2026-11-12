@@ -36,15 +36,24 @@ function choice(q, done) {
 }
 
 // ---------- Nhập số ----------
+// remount(): tạo lại bàn phím (sau khi bé dùng nháp đặt tính xong).
 function num(q, done, makePad) {
   const box = h('span', { class: 'answer-box' }, '?');
-  const pad = makePad({ max: q.max || 4, onChange: (v) => { box.textContent = v || '?'; }, onSubmit: (v) => {
-    pad.setEnabled(false);
-    const ok = +v === +q.answer;
-    box.classList.add(ok ? 'right' : 'wrong');
-    done(ok);
-  } });
-  return h('div', {}, h('div', { class: 'quiz-answer' }, q.unit ? ['', box, ` ${q.unit}`] : ['Đáp án: ', box]), pad.el);
+  const holder = h('div');
+  const mount = () => {
+    box.textContent = '?';
+    const pad = makePad({ max: q.max || 4, onChange: (v) => { box.textContent = v || '?'; }, onSubmit: (v) => {
+      pad.setEnabled(false);
+      const ok = +v === +q.answer;
+      box.classList.add(ok ? 'right' : 'wrong');
+      done(ok);
+    } });
+    holder.replaceChildren(pad.el);
+  };
+  mount();
+  const el = h('div', {}, h('div', { class: 'quiz-answer' }, q.unit ? ['', box, ` ${q.unit}`] : ['Đáp án: ', box]), holder);
+  el.remount = mount;
+  return el;
 }
 
 // ---------- Đặt tính dọc: cộng, trừ, nhân (số thứ hai 1 chữ số khi nhân) ----------
@@ -284,7 +293,61 @@ function steps(q, done, makePad) {
 
 const KINDS = { choice, num, column, divide, pick, paint, order, steps };
 
+// ---------- Nháp đặt tính cho câu có cộng / trừ ----------
+// Lấy các phép + / − trong câu (q.calc, hoặc chữ q.calcText ?? q.text). "a + b − c" → a + b rồi lấy kết quả − c.
+function findOps(q) {
+  if (q.calc) return q.calc;
+  const t = q.calcText ?? q.text;
+  if (!t || /×| : |\(|nhẩm|gọi là gì/.test(t)) return [];
+  const out = [];
+  for (const m of t.match(/\d+(?:\s*[+−-]\s*\d+)+/g) || []) {
+    const parts = m.split(/\s*([+−-])\s*/);
+    let acc = +parts[0];
+    for (let i = 1; i < parts.length; i += 2) {
+      const op = parts[i] === '+' ? '+' : '-', b = +parts[i + 1], r = op === '+' ? acc + b : acc - b;
+      if (r < 0) return [];
+      out.push({ op, a: acc, b });
+      acc = r;
+    }
+  }
+  return out.filter((o) => Math.max(o.a, o.b) >= 10);
+}
+
+function withScratch(kind, q, done, makePad, ops) {
+  let k = 0, scratchPad = null;
+  const notes = h('div', { class: 'scratch-notes' });
+  const panel = h('div', { class: 'scratch' });
+  const btn = h('button', { class: 'scratch-btn', onclick: () => open() });
+  const label = () => { btn.textContent = ops.length > 1 ? `✍️ Đặt tính ${k + 1}/${ops.length}` : '✍️ Đặt tính'; };
+  const el = KINDS[kind](q, (...a) => { btn.remove(); panel.remove(); done(...a); }, makePad);
+  label();
+  function close() {
+    scratchPad?.setEnabled(false);
+    panel.replaceChildren();
+    el.style.display = '';
+    btn.style.display = k < ops.length ? '' : 'none';
+    el.remount?.();
+  }
+  function open() {
+    const o = ops[k], sign = o.op === '+' ? '+' : '−', r = o.op === '+' ? o.a + o.b : o.a - o.b;
+    btn.style.display = 'none';
+    el.style.display = 'none';
+    panel.replaceChildren(
+      h('p', { class: 'scratch-title' }, `📝 Nháp: ${o.a} ${sign} ${o.b}`, h('button', { class: 'scratch-x', onclick: close }, '✖')),
+      column({ col: o }, async () => {
+        notes.append(h('span', { class: 'scratch-note' }, `${o.a} ${sign} ${o.b} = ${r}`));
+        k++;
+        label();
+        await wait(900);
+        close();
+      }, (opts) => (scratchPad = makePad(opts))),
+    );
+  }
+  return h('div', {}, notes, h('div', { class: 'center' }, btn), panel, el);
+}
+
 export function renderKind(q, done, makePad) {
   const kind = q.kind || (q.choices ? 'choice' : 'num');
-  return KINDS[kind](q, done, makePad);
+  const ops = ['choice', 'num', 'pick'].includes(kind) ? findOps(q) : [];
+  return ops.length ? withScratch(kind, q, done, makePad, ops) : KINDS[kind](q, done, makePad);
 }
