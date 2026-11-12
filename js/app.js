@@ -20,7 +20,7 @@ const routes = {
   '': homeScreen,
   subject: subjectScreen,
   topic: (p) => (p === 'cuu-chuong' ? cuuChuongScreen() : Object.hasOwn(TOPICS, p || '') ? topicScreen(p) : homeScreen()),
-  quiz: (p) => (Object.hasOwn(TOPICS, p || '') ? quizScreen(p) : homeScreen()),
+  quiz: (p) => (Object.hasOwn(TOPICS, (p || '').split('.')[0]) ? quizScreen(p) : homeScreen()),   // #/quiz/don-vi.dong-ho = 1 phần của chương
   table: tableScreen,
   learn: learnScreen,
   practice: practiceScreen,

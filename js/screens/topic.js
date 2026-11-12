@@ -14,6 +14,8 @@ const BACK = '#/subject/toan3';
 
 export function topicStars(id) { return state.topics?.[id]?.best || 0; }
 
+// Chương có nhiều phần (parts): mỗi phần một nút luyện riêng, sao lưu theo `<id>.<phần>`.
+
 export function topicScreen(id) {
   const t = TOPICS[id];
   const act = (href, emoji, title, sub) =>
@@ -29,9 +31,11 @@ export function topicScreen(id) {
       ),
     ),
     h('div', { class: 'acts' },
-      act(`#/quiz/${id}`, '🎯', 'Luyện tập', '10 câu, nhiều kiểu bài'),
+      act(`#/quiz/${id}`, '🎯', t.parts ? 'Luyện trộn' : 'Luyện tập', t.parts ? '10 câu, trộn mọi phần' : '10 câu, nhiều kiểu bài'),
       act(`#/games/t-${id}`, '🎮', 'Trò chơi', 'Bóng bay, đua xe, ếch…'),
     ),
+    t.parts ? h('h2', { class: 'section-title' }, '🎯 Luyện từng phần') : null,
+    t.parts ? h('div', { class: 'acts parts' }, t.parts.map((p) => act(`#/quiz/${id}.${p.id}`, p.emoji, p.title, starsText(topicStars(`${id}.${p.id}`))))) : null,
     h('h2', { class: 'section-title' }, '💡 Con cần nhớ'),
     h('ul', { class: 'tips' }, t.tips.map((s) => h('li', {}, s))),
     ex ? h('div', { class: 'tips example' }, h('b', {}, '👀 Ví dụ: '), ex.text, ex.svg ? picture(ex.svg) : null) : null,
@@ -39,8 +43,10 @@ export function topicScreen(id) {
 }
 
 export function quizScreen(id) {
-  const t = TOPICS[id];
-  if (!t) { location.hash = BACK; return h('div'); }
+  const [base, partId] = id.split('.');
+  const topic = TOPICS[base], part = topic?.parts?.find((p) => p.id === partId);
+  if (!topic || (partId && !part)) { location.hash = BACK; return h('div'); }
+  const t = part || topic;
   const queue = Array.from({ length: QUESTIONS }, () => t.make());
   const retry = new Set();
   let i = 0, done = 0, firstTry = 0, streak = 0, best = 0, q, pad;
@@ -55,7 +61,7 @@ export function quizScreen(id) {
   const feedback = h('div', { class: 'feedback' });
   const stage = h('div', { class: 'stage wide' }, prompt, area, feedback);
   const root = h('div', { class: 'screen practice', style: '--c:#ff8c42' },
-    topBar(`${t.emoji} ${t.title}`, `#/topic/${id}`),
+    topBar(`${t.emoji} ${t.title}`, `#/topic/${base}`),
     h('div', { class: 'progress' }, h('span', { class: 'bar track' }, bar, runnerEl, h('span', { class: 'goal' }, '🏁')), counter),
     h('div', { class: 'hud' }, streakEl),
     stage,
@@ -121,6 +127,7 @@ export function quizScreen(id) {
     state.topics ||= {};
     const rec = state.topics[id] || { best: 0, played: 0 };
     state.topics[id] = { best: Math.max(rec.best, stars), played: rec.played + 1 };
+    if (part) { const top = state.topics[base] || { best: 0, played: 0 }; state.topics[base] = { best: Math.max(top.best, stars), played: top.played + 1 }; }
     save();
     play('win');
     if (stars >= 2) confetti();
@@ -134,9 +141,9 @@ export function quizScreen(id) {
       h('p', {}, 'Đúng ngay lần đầu: ', h('b', {}, `${firstTry}/${QUESTIONS}`)),
       h('p', {}, 'Chuỗi đúng dài nhất: ', h('b', {}, `🔥 ${best}`)),
       h('div', { class: 'result-actions' },
-        h('a', { class: 'btn-primary', href: randomGameHash(`t-${id}`) }, '🎁 Chơi trò thưởng'),
+        h('a', { class: 'btn-primary', href: randomGameHash(`t-${base}`) }, '🎁 Chơi trò thưởng'),
         h('button', { class: 'btn-secondary', onclick: () => { leave(); root.replaceWith(quizScreen(id)); } }, '🔁 Luyện tiếp'),
-        h('a', { class: 'btn-secondary', href: `#/topic/${id}` }, '⬅️ Quay về'),
+        h('a', { class: 'btn-secondary', href: `#/topic/${base}` }, '⬅️ Quay về'),
       ),
     ));
   }

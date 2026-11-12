@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-12 — Chương Đo lường: luyện riêng từng phần, thêm thời gian
+
+- Chương "Đổi đơn vị đo" đổi thành "Đo lường", tách sang `js/topics/measure.js`, gồm 6 phần có nút luyện riêng (sao riêng): Độ dài, Khối lượng, Dung tích (lít), Nhiệt độ, Xem đồng hồ, Ngày tháng thứ. Nút "Luyện trộn" vẫn trộn tất cả.
+- Mẫu bài theo sách: cân đồng hồ (quả mít, dưa hấu, nặng hơn bao nhiêu kg), hai can dầu (cả hai / hơn bao nhiêu lít), rót can 3 l – 5 l, l ↔ ml.
+- Thời gian: đọc đồng hồ kim (đáp án nhiễu đảo kim), giờ điện tử 13–22 giờ ↔ giờ chiều/tối, chọn đồng hồ đúng, thêm 15/30/60 phút; thứ trong tuần, ngày của thứ tuần sau, số ngày trong tháng, tuần–ngày–giờ–phút, bài gạo ăn mấy tuần.
+- Route `#/quiz/<chương>.<phần>`; sao của phần cũng nâng sao của chương.
+
 ## 2026-11-12 — Thêm dạng bài theo sách: Tìm thành phần trong phép cộng, trừ
 
 - Sơ đồ đoạn thẳng (tổng gồm 2 phần, tìm phần còn thiếu hoặc tìm tổng).

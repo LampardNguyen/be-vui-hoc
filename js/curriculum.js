@@ -20,7 +20,7 @@ export const GRADES = [
             { id: 'tp-nhan-chia', name: 'Trong phép nhân, chia', emoji: '🔎', href: '#/topic/tp-nhan-chia' },
           ] },
           { name: '📏 Đo lường', topics: [
-            { id: 'don-vi', name: 'Đổi đơn vị: khối lượng, độ dài, nhiệt độ', emoji: '🌡️', href: '#/topic/don-vi' },
+            { id: 'don-vi', name: 'Đo lường: độ dài, khối lượng, lít, nhiệt độ, thời gian', emoji: '📏', href: '#/topic/don-vi' },
           ] },
           { name: '🍕 Phân số', topics: [
             { id: 'mot-phan', name: 'Một phần mấy', emoji: '🍰', href: '#/topic/mot-phan' },

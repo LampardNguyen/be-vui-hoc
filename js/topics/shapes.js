@@ -1,76 +1,12 @@
-// Chương Đo lường, Phân số và Hình học — hình vẽ ngẫu nhiên (js/topics/draw.js).
-import { rnd, pickOne, shuffle, fmt, gq, mix, FRIENDS } from './util.js';
+// Chương Phân số và Hình học — hình vẽ ngẫu nhiên (js/topics/draw.js).
+import { rnd, pickOne, shuffle, gq, mix, FRIENDS } from './util.js';
 import {
-  INK, SOFT, HI, COLORS, rad, svg, label, dot, tapLine, tapDot, balance, ruler, thermometer, weights,
+  INK, SOFT, HI, COLORS, rad, svg, label, dot, tapLine, tapDot,
   shape, shapeField, polygonPick, place, cubeStack, box, fracShape, itemGrid,
 } from './draw.js';
 
 const TF = ['Đúng', 'Sai'];
 const tf = (text, ok, explain, pic) => ({ text, choices: TF, tf: true, answer: ok ? 'Đúng' : 'Sai', explain, svg: pic });
-const sign = (a, b) => (a > b ? '>' : a < b ? '<' : '=');
-
-// ---------- Đổi đơn vị đo ----------
-const LENGTH = ['km', 'hm', 'dam', 'm', 'dm', 'cm', 'mm'];
-const MASS = ['kg', 'hg', 'dag', 'g'];
-const SIZES = [
-  ['Chiếc bút chì dài khoảng', [14, 18], 'cm'], ['Cái bàn học cao khoảng', [6, 8], 'dm'], ['Cột cờ cao khoảng', [8, 15], 'm'],
-  ['Quãng đường từ nhà bà tới thành phố dài khoảng', [20, 90], 'km'], ['Con kiến dài khoảng', [3, 6], 'mm'],
-  ['Quả trứng gà nặng khoảng', [50, 60], 'g'], ['Bao gạo nặng khoảng', [10, 25], 'kg'], ['Quyển vở nặng khoảng', [100, 200], 'g'],
-  ['Con mèo nặng khoảng', [3, 5], 'kg'],
-];
-const TEMPS = [['Nước đang sôi', 100], ['Nước đá đang tan', 0], ['Cơ thể người khỏe mạnh', 37], ['Một ngày hè nóng bức', 35]];
-const donVi = {
-  id: 'don-vi', title: 'Đổi đơn vị đo', emoji: '🌡️',
-  tips: [
-    'Độ dài từ lớn đến bé: km → hm → dam → m → dm → cm → mm. Mỗi đơn vị gấp 10 lần đơn vị liền sau.',
-    'Khối lượng: kg → hg → dag → g. 1 kg = 1000 g.',
-    'Nhiệt độ đo bằng nhiệt kế, đơn vị độ C (°C): nước đá 0°C, cơ thể người 37°C, nước sôi 100°C.',
-  ],
-  make: mix([
-    [() => {
-      const from = rnd(0, 4), len = rnd(2, 9), e = pickOne(['✏️', '🖍️', '🐛', '🔑', '🥖']);
-      return { text: 'Vật này dài mấy xăng-ti-mét? 📏', svg: ruler(14, from, from + len, e), max: 2, unit: 'cm', answer: String(len), explain: from ? `Đầu vật ở vạch ${from}, cuối ở vạch ${from + len}: ${from + len} − ${from} = ${len} cm.` : `Đầu vật ở vạch 0, cuối ở vạch ${len} → ${len} cm.` };
-    }, 2],
-    [() => {
-      const v = rnd(0, 20) * 5;
-      return { text: 'Nhiệt kế chỉ bao nhiêu độ C? 🌡️', svg: thermometer(v), max: 3, unit: '°C', answer: String(v), explain: `Mỗi vạch dài là 10°C, vạch ngắn ở giữa là 5°C. Cột đỏ tới ${v}°C.` };
-    }, 2],
-    [() => {
-      const list = shuffle([pickOne([0, 1000]), pickOne([0, 500]), pickOne([200, 100, 0]), pickOne([100, 200]), pickOne([0, 50])]).filter(Boolean);
-      const total = list.reduce((s, w) => s + w, 0), e = pickOne(['🍉', '🎃', '🍍', '🥥', '🧸']);
-      return { text: 'Cân thăng bằng. Vật bên trái nặng bao nhiêu gam?', svg: weights(e, list), max: 4, unit: 'g', answer: String(total), explain: `Cộng các quả cân: ${list.map((w) => `${w} g`).join(' + ')} = ${fmt(total)} g.` };
-    }, 2],
-    [() => {
-      const [t, [lo, hi], u] = pickOne(SIZES), n = rnd(lo, hi), all = u === 'g' || u === 'kg' ? ['g', 'kg'] : ['mm', 'cm', 'dm', 'm', 'km'];
-      return { text: `${t} ${n} … (chọn đơn vị hợp lý) 🤔`, choices: shuffle([u, ...shuffle(all.filter((x) => x !== u)).slice(0, 2)]), answer: u, explain: `${t} ${n} ${u}.` };
-    }, 2],
-    [() => {
-      const units = Math.random() < 0.35 ? MASS : LENGTH;
-      const i = rnd(0, units.length - 2), j = Math.min(units.length - 1, i + rnd(1, 3)), f = 10 ** (j - i), n = rnd(1, 9);
-      if (j - i === 1 && Math.random() < 0.5) {
-        const m = rnd(1, 9);
-        return { text: `${n} ${units[i]} ${m} ${units[j]} = ? ${units[j]}`, max: 3, unit: units[j], answer: String(n * f + m), explain: `${n} ${units[i]} = ${n * f} ${units[j]}, thêm ${m} ${units[j]} là ${n * f + m} ${units[j]}.` };
-      }
-      return { text: `${n} ${units[i]} = ? ${units[j]}`, max: 4, unit: units[j], answer: String(n * f), explain: `1 ${units[i]} = ${fmt(f)} ${units[j]}, nên ${n} ${units[i]} = ${fmt(n * f)} ${units[j]}.` };
-    }, 2],
-    [() => {
-      const i = rnd(2, 4), n = rnd(2, 9), u = LENGTH[i + 1], lv = n * 10, rv = lv + pickOne([0, 1, -1, 5, -5]);
-      const lt = `${n} ${LENGTH[i]}`, rt = `${rv} ${u}`;
-      return { text: 'So sánh hai độ dài ⚖️', svg: balance(lt, rt), choices: ['<', '=', '>'], answer: sign(lv, rv), tilt: lv > rv ? -1 : lv < rv ? 1 : 0, show: `${lt} ${sign(lv, rv)} ${rt}`, explain: `${lt} = ${lv} ${u}, so với ${rv} ${u}.` };
-    }, 1],
-    [() => {
-      const [t, v] = pickOne(TEMPS);
-      return { text: `🌡️ ${t} có nhiệt độ khoảng bao nhiêu?`, choices: shuffle(['0°C', '37°C', '35°C', '100°C']), answer: `${v}°C`, explain: `${t}: khoảng ${v}°C.` };
-    }, 1],
-  ]),
-  game() {
-    const k = rnd(0, 3), n = rnd(1, 9);
-    if (k === 0) return gq(`${n} m = ? dm`, n * 10, [1, 10], `${n} m = ? dm`, `${n} m = ${n * 10} dm`);
-    if (k === 1) return gq(`${n} dm = ? cm`, n * 10, [1, 10], `${n} dm = ? cm`, `${n} dm = ${n * 10} cm`);
-    if (k === 2) return gq(`${n} m = ? cm`, n * 100, [10, 100], `${n} m = ? cm`, `${n} m = ${n * 100} cm`);
-    return gq(`${n} cm = ? mm`, n * 10, [1, 10], `${n} cm = ? mm`, `${n} cm = ${n * 10} mm`);
-  },
-};
 
 // ---------- Một phần mấy ----------
 const motPhan = {
@@ -369,4 +305,4 @@ const khoi = {
   },
 };
 
-export const SHAPE_TOPICS = [donVi, motPhan, trungDiem, hinhTron, goc, hinhPhang, khoi];
+export const SHAPE_TOPICS = [motPhan, trungDiem, hinhTron, goc, hinhPhang, khoi];

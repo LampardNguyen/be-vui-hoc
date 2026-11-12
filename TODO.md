@@ -40,7 +40,7 @@ sai → giải thích + hỏi lại; xong → sao (lưu `state.topics`). Hình h
 - [x] Phép chia hết và có dư
 - [x] Biểu thức số, tính giá trị biểu thức
 - [x] So sánh số lớn gấp mấy lần số bé
-- [x] Đổi đơn vị đo (khối lượng, độ dài, nhiệt độ)
+- [x] Đo lường: độ dài, khối lượng, lít, nhiệt độ, đồng hồ, ngày tháng (luyện riêng từng phần)
 - [x] Phân số một phần mấy
 - [x] Điểm giữa, trung điểm đoạn thẳng
 - [x] Hình tròn, tâm, bán kính, đường kính
