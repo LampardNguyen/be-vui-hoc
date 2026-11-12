@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-12 — Thêm dạng bài theo sách: Tìm thành phần trong phép nhân, chia
+
+- Bảng Thừa số/Tích và Số bị chia/Số chia/Thương, mỗi cột 1 ô ? (làm từng ô).
+- Mũi tên ngược: ? →×2→ 8, ? →:5→ 6.
+- Toán lời văn: ca nước (hình các ca có ?), ca-bin, cắm hoa vào lọ, xếp cam vào đĩa.
+- Chọn câu trả lời đúng A/B/C (tìm số bị chia, số chia, thừa số).
+
 ## 2026-11-12 — Chương Đo lường: luyện riêng từng phần, thêm thời gian
 
 - Chương "Đổi đơn vị đo" đổi thành "Đo lường", tách sang `js/topics/measure.js`, gồm 6 phần có nút luyện riêng (sao riêng): Độ dài, Khối lượng, Dung tích (lít), Nhiệt độ, Xem đồng hồ, Ngày tháng thứ. Nút "Luyện trộn" vẫn trộn tất cả.

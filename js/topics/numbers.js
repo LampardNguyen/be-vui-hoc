@@ -564,6 +564,23 @@ const tpCongTru = {
   },
 };
 
+// Mũi tên ngược: ? →(op k)→ kết quả. Bé tìm số ban đầu.
+function arrowSvg(op, k, res) {
+  return svg(`<rect x="10" y="22" width="56" height="50" rx="4" fill="#fff" stroke="${INK}" stroke-width="3"/>${label(38, 47, '?', 22)}
+    <line x1="68" y1="47" x2="214" y2="47" stroke="${INK}" stroke-width="3"/><path d="M214 40 L228 47 L214 54 Z" fill="${INK}"/>${label(146, 26, `${op} ${k}`, 18)}
+    <circle cx="258" cy="47" r="28" fill="${pickOne(['#90be6d', '#ffd166', '#ff8fab', '#4cc9f0'])}" stroke="${INK}" stroke-width="3"/>${label(258, 47, res, 20)}`, '0 0 300 90');
+}
+// n ca nước giống nhau, mỗi ca "?", ngoặc dưới ghi tổng.
+function jugsSvg(n, total, unit) {
+  const w = Math.min(60, 270 / n);
+  let body = '';
+  for (let i = 0; i < n; i++) {
+    const x = 15 + i * w;
+    body += `<rect x="${x + 4}" y="20" width="${w - 14}" height="56" rx="6" fill="#bde0fe" stroke="${INK}" stroke-width="2"/><rect x="${x + 2}" y="14" width="${w - 10}" height="8" rx="3" fill="#ff8fab"/>${label(x + w / 2 - 3, 50, '?', 15, '#e76f51')}`;
+  }
+  return svg(`${body}<path d="M15 88 Q15 98 ${15 + (n * w) / 2} 98 Q${15 + n * w} 98 ${15 + n * w} 88" fill="none" stroke="${INK}" stroke-width="2"/>${label(15 + (n * w) / 2, 114, `${total} ${unit}`, 15)}`, `0 0 ${Math.max(300, 30 + n * w)} 126`);
+}
+
 const tpNhanChia = {
   id: 'tp-nhan-chia', title: 'Tìm thành phần trong phép nhân, chia', emoji: '🔎',
   tips: [
@@ -590,6 +607,50 @@ const tpNhanChia = {
       return { text: `Cân thăng bằng! Hộp quà 🎁 là số mấy?`, svg: balance(`${BOX} × ${b}`, String(a * b)), max: 2, answer: String(a), explain: `${BOX} = ${a * b} : ${b} = ${a}.` };
     }, 1],
     [() => { const a = rnd(2, 9), b = rnd(2, 9); return Math.random() < 0.5 ? nameQ('×', a, b) : nameQ(':', a * b, b); }, 2],
+    [() => {
+      // Bảng Thừa số / Tích hoặc Số bị chia / Số chia / Thương, mỗi cột 1 ô "?".
+      const mul = Math.random() < 0.5, names = mul ? ['Thừa số', 'Thừa số', 'Tích'] : ['Số bị chia', 'Số chia', 'Thương'];
+      const cols = [...Array(3)].map(() => {
+        const x = rnd(2, 9), y = rnd(2, 9), full = mul ? [x, y, x * y] : [x * y, y, x], k = rnd(0, 2);
+        return { full, k, show: full.map((v, i) => (i === k ? null : v)) };
+      });
+      const how = (c) => (mul ? (c.k === 2 ? `${c.full[0]} × ${c.full[1]}` : `${c.full[2]} : ${c.full[1 - c.k]}`)
+        : c.k === 0 ? `${c.full[2]} × ${c.full[1]}` : c.k === 1 ? `${c.full[0]} : ${c.full[2]}` : `${c.full[0]} : ${c.full[1]}`);
+      return {
+        kind: 'steps', text: 'Số? Điền các ô ? trong bảng 📋', svg: tableSvg(names, cols.map((c) => c.show)),
+        steps: cols.map((c, i) => ({ text: `Ô ?${i + 1} (${names[c.k]}) là số nào?`, max: 2, answer: String(c.full[c.k]), explain: `${how(c)} = ${c.full[c.k]}` })),
+        explain: cols.map((c, i) => `?${i + 1} = ${how(c)} = ${c.full[c.k]}`).join('; ') + '.',
+      };
+    }, 2],
+    [() => {
+      // Như sách: ? →×2→ 8, ? →:5→ 6.
+      const k = rnd(2, 9), r = rnd(2, 9), mul = Math.random() < 0.5;
+      return mul ? { text: 'Số ở ô vuông là bao nhiêu? (đi ngược mũi tên ⬅️)', svg: arrowSvg('×', k, k * r), max: 2, answer: String(r), explain: `? × ${k} = ${k * r} → ? = ${k * r} : ${k} = ${r} (tìm thừa số).` }
+        : { text: 'Số ở ô vuông là bao nhiêu? (đi ngược mũi tên ⬅️)', svg: arrowSvg(':', k, r), max: 2, answer: String(k * r), explain: `? : ${k} = ${r} → ? = ${r} × ${k} = ${k * r} (tìm số bị chia).` };
+    }, 2],
+    [() => {
+      // Toán lời văn theo sách: tìm thừa số, số bị chia, số chia.
+      const n = rnd(2, 6), each = rnd(2, 9), t = n * each;
+      return pickOne([
+        () => ({ text: `${n} ca đựng nước như nhau có tất cả ${t} l nước. Hỏi mỗi ca đựng mấy lít nước?`, svg: jugsSvg(n, t, 'l'), max: 1, unit: 'l', answer: String(each), explain: `? × ${n} = ${t} → ${t} : ${n} = ${each} (l).` }),
+        () => ({ text: `${n} ca-bin 🚡 chở tất cả ${t} người, số người ở mỗi ca-bin như nhau. Hỏi mỗi ca-bin chở bao nhiêu người?`, max: 1, answer: String(each), explain: `${t} : ${n} = ${each} (người).` }),
+        () => ({ text: `Mai cắm hết số bông hoa 🌻 vào ${n} lọ, mỗi lọ ${each} bông. Hỏi Mai có bao nhiêu bông hoa? (? : ${n} = ${each})`, max: 2, answer: String(t), explain: `Tìm số bị chia: ${each} × ${n} = ${t} (bông).` }),
+        () => ({ text: `Có ${t} quả cam 🍊 xếp vào các đĩa, mỗi đĩa ${each} quả. Hỏi xếp được mấy đĩa? (${t} : ? = ${each})`, max: 1, answer: String(n), explain: `Tìm số chia: ${t} : ${each} = ${n} (đĩa).` }),
+      ])();
+    }, 3],
+    [() => {
+      // Chọn câu trả lời đúng A/B/C.
+      const a = rnd(2, 9), b = rnd(2, 9), kind = rnd(0, 2);
+      const [given, ans, w1] = [
+        [`Biết số chia là ${b}, thương là ${a}, số bị chia là:`, a * b, a + b],
+        [`Biết số bị chia là ${a * b}, thương là ${a}, số chia là:`, b, a * b - a],
+        [`Biết tích là ${a * b}, một thừa số là ${a}, thừa số kia là:`, b, a * b + a],
+      ][kind];
+      const opts = [...new Set([ans, w1, ans + pickOne([1, 2, 10])])];
+      while (opts.length < 3) opts.push(ans + opts.length * 3);
+      const keys = ['A', 'B', 'C'], sh = shuffle(opts);
+      return { text: `Chọn câu trả lời đúng: ${given}`, choices: sh.map((v, i) => `${keys[i]}. ${v}`), answer: `${keys[sh.indexOf(ans)]}. ${ans}`, explain: [`Số bị chia = thương × số chia = ${a} × ${b} = ${a * b}.`, `Số chia = số bị chia : thương = ${a * b} : ${a} = ${b}.`, `Thừa số = tích : thừa số kia = ${a * b} : ${a} = ${b}.`][kind] };
+    }, 2],
   ]),
   game() {
     const a = rnd(2, 9), b = rnd(2, 9), p = a * b;
