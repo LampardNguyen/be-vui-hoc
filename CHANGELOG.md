@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-12 — Thêm dạng bài theo sách: Tìm thành phần trong phép cộng, trừ
+
+- Sơ đồ đoạn thẳng (tổng gồm 2 phần, tìm phần còn thiếu hoặc tìm tổng).
+- Bảng Số hạng/Tổng và Số bị trừ/Số trừ/Hiệu, mỗi cột 1 ô ? (làm từng ô).
+- Chọn câu trả lời đúng A/B/C (biết số trừ và hiệu → số bị trừ; biết số bị trừ và hiệu → số trừ).
+- Toán lời văn: hai bến thuyền, vịt xuống ao, viên bi, vườn cam bưởi; hình viên bi bị gạch.
+- Các câu mới đều có nút ✍️ Đặt tính.
+
 ## 2026-11-12 — Nút "Đặt tính" (nháp) cho câu có cộng trừ
 
 - Câu chọn đáp án / nhập số / chạm hình có phép + − thì hiện nút ✍️ Đặt tính: bấm vào mở nháp đặt tính dọc, tính xong ghi kết quả lên trên rồi bé điền đáp án.

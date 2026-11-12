@@ -449,6 +449,39 @@ function nameQ(op, x, y) {
   const names = [...new Set(NAME_Q[op])];
   return { text: `Trong phép tính ${x} ${op === '-' ? '−' : op} ${y} = ${z}, số ${shown} gọi là gì?`, choices: names, answer: NAME_Q[op][i], explain: `${x} ${op === '-' ? '−' : op} ${y} = ${z}: ${NAME_Q[op][0].toLowerCase()} ${op} ${NAME_Q[op][1].toLowerCase()} = ${NAME_Q[op][2].toLowerCase()}.` };
 }
+// Sơ đồ đoạn thẳng: cả đoạn = tổng, chia 2 phần (p1, p2); null = ô "?".
+function tapeSvg2(total, p1, p2, n1, n2) {
+  const v1 = p1 ?? total - p2, w = Math.max(70, Math.min(190, Math.round((v1 / (total ?? p1 + p2)) * 260)));
+  const box = (x, y, t) => `<rect x="${x - 26}" y="${y - 15}" width="52" height="30" rx="6" fill="${t === '?' ? '#fff3c4' : '#fff'}" stroke="${t === '?' ? '#f4a261' : INK}" stroke-width="2"/>${label(x, y, t, 16)}`;
+  return svg(`<path d="M20 52 Q20 38 150 38 Q280 38 280 52" fill="none" stroke="${INK}" stroke-width="2"/>${box(150, 20, total ?? '?')}
+    <rect x="20" y="58" width="${w}" height="26" rx="5" fill="#90be6d" stroke="${INK}" stroke-width="2"/>${label(20 + w / 2, 71, n1, 13, '#fff')}
+    <rect x="${20 + w}" y="58" width="${260 - w}" height="26" rx="5" fill="#f78c6b" stroke="${INK}" stroke-width="2"/>${label(150 + w / 2, 71, n2, 13, '#fff')}
+    ${box(20 + w / 2, 108, p1 ?? '?')}${box(150 + w / 2, 108, p2 ?? '?')}`, '0 0 300 128');
+}
+
+// Bảng 3 hàng (tên thành phần), mỗi cột có 1 ô "?".
+function tableSvg(names, cols) {
+  const cw = (300 - 92) / cols.length;
+  let body = '';
+  names.forEach((n, r) => {
+    const y = 6 + r * 36;
+    body += `<rect x="2" y="${y}" width="90" height="36" fill="#ffe8c2" stroke="${INK}" stroke-width="1.5"/>${label(47, y + 18, n, 13)}`;
+    cols.forEach((c, i) => {
+      const x = 92 + i * cw, q = c[r] === null;
+      body += `<rect x="${x}" y="${y}" width="${cw}" height="36" fill="${q ? '#fff3c4' : '#fff'}" stroke="${INK}" stroke-width="1.5"/>${label(x + cw / 2, y + 18, q ? `?${i + 1}` : c[r], 15, q ? '#e76f51' : INK)}`;
+    });
+  });
+  return svg(body, '0 0 300 116');
+}
+
+// Bài tìm thành phần có lời văn: [câu chuyện, cách tính, đáp án].
+const tpStories = [
+  (a, b) => [`Hai bến có tất cả ${a + b} thuyền ⛵, bến thứ nhất có ${a} thuyền. Hỏi bến thứ hai có bao nhiêu thuyền?`, `${a + b} − ${a}`, b],
+  (a, b) => [`Lúc đầu có ${a + b} con vịt 🦆 ở trên bờ. Một số con xuống ao bơi, trên bờ còn lại ${a} con. Hỏi có bao nhiêu con vịt xuống ao?`, `${a + b} − ${a}`, b],
+  (a, b) => [`${pickOne(FRIENDS)} có một số viên bi 🔵, đã cho bạn ${b} viên, còn lại ${a} viên. Hỏi lúc đầu có bao nhiêu viên bi?`, `${a} + ${b}`, a + b],
+  (a, b) => [`Một vườn có ${a + b} cây 🌳 gồm cây cam và cây bưởi, trong đó có ${a} cây cam. Hỏi có bao nhiêu cây bưởi?`, `${a + b} − ${a}`, b],
+];
+
 const tpCongTru = {
   id: 'tp-cong-tru', title: 'Tìm thành phần trong phép cộng, trừ', emoji: '🔍',
   tips: [
@@ -475,6 +508,51 @@ const tpCongTru = {
       return { kind: 'column', text: `${f} có một số ${name} ${e}. Sau khi cho bạn ${give} ${name}, ${f} còn ${left} ${name}. Hỏi lúc đầu ${f} có bao nhiêu? (Số bị trừ = Hiệu + Số trừ)`, col: { op: '+', a: left, b: give }, show: left + give };
     }, 1],
     [() => (Math.random() < 0.5 ? nameQ('+', rnd(10, 400), rnd(10, 400)) : (() => { const y = rnd(10, 300), z = rnd(10, 300); return nameQ('-', y + z, y); })()), 2],
+    [() => {
+      // Sơ đồ: tổng gồm 2 phần, tìm 1 phần (hoặc tìm tổng).
+      const [e, name] = pickOne(THINGS), a = rnd(10, 400), b = rnd(10, 400), k = rnd(0, 2);
+      const parts = [a + b, a, b].map((v, i) => (i === k ? null : v));
+      const calc = k === 0 ? `${a} + ${b}` : k === 1 ? `${a + b} − ${b}` : `${a + b} − ${a}`;
+      const ans = [a + b, a, b][k];
+      return { text: `Nhìn sơ đồ ${e}: có tất cả ${parts[0] ?? '?'} ${name}, phần xanh ${parts[1] ?? '?'}, phần cam ${parts[2] ?? '?'}. Số ? là bao nhiêu?`, svg: tapeSvg2(parts[0], parts[1], parts[2], 'xanh', 'cam'), max: 3, answer: String(ans), calcText: calc, explain: k ? `Tìm một phần: lấy tổng trừ phần kia, ${calc} = ${ans}.` : `${calc} = ${ans}.` };
+    }, 2],
+    [() => {
+      // Bảng Số hạng / Tổng hoặc Số bị trừ / Số trừ / Hiệu, mỗi cột 1 ô "?".
+      const add = Math.random() < 0.5, names = add ? ['Số hạng', 'Số hạng', 'Tổng'] : ['Số bị trừ', 'Số trừ', 'Hiệu'];
+      const cols = [...Array(3)].map(() => {
+        const x = rnd(10, 300), y = rnd(10, 300), full = add ? [x, y, x + y] : [x + y, y, x], k = rnd(0, 2);
+        return { full, k, show: full.map((v, i) => (i === k ? null : v)) };
+      });
+      const how = (c) => (add ? (c.k === 2 ? `${c.full[0]} + ${c.full[1]}` : `${c.full[2]} − ${c.full[1 - c.k]}`)
+        : c.k === 0 ? `${c.full[2]} + ${c.full[1]}` : c.k === 1 ? `${c.full[0]} − ${c.full[2]}` : `${c.full[0]} − ${c.full[1]}`);
+      return {
+        kind: 'steps', text: 'Số? Điền các ô ? trong bảng 📋', svg: tableSvg(names, cols.map((c) => c.show)),
+        steps: cols.map((c, i) => ({ text: `Ô ?${i + 1} (${names[c.k]}) là số nào?`, calcText: how(c), max: 3, answer: String(c.full[c.k]), explain: `${how(c)} = ${c.full[c.k]}` })),
+        explain: cols.map((c, i) => `?${i + 1} = ${how(c)} = ${c.full[c.k]}`).join('; ') + '.',
+      };
+    }, 2],
+    [() => {
+      // Chọn câu trả lời đúng: biết 2 thành phần, tìm thành phần còn lại.
+      const y = rnd(11, 90), z = rnd(11, 90), bitru = Math.random() < 0.5;
+      const [given, ans, wrongOp] = bitru ? [`Biết số trừ là ${y}, hiệu là ${z}, số bị trừ là:`, y + z, Math.abs(y - z)]
+        : [`Biết số bị trừ là ${y + z}, hiệu là ${z}, số trừ là:`, y, y + 2 * z];
+      const opts = [...new Set([ans, wrongOp, ans + pickOne([10, -10])])].filter((v) => v > 0);
+      while (opts.length < 3) opts.push(ans + 10 * opts.length + 1);
+      const keys = ['A', 'B', 'C'], sh = shuffle(opts);
+      return { text: `Chọn câu trả lời đúng: ${given}`, calcText: bitru ? `${z} + ${y}` : `${y + z} − ${z}`, choices: sh.map((v, i) => `${keys[i]}. ${v}`), answer: `${keys[sh.indexOf(ans)]}. ${ans}`, explain: bitru ? `Số bị trừ = hiệu + số trừ = ${z} + ${y} = ${ans}.` : `Số trừ = số bị trừ − hiệu = ${y + z} − ${z} = ${ans}.` };
+    }, 2],
+    [() => {
+      const [text, calc, ans] = pickOne(tpStories)(rnd(15, 400), rnd(12, 300));
+      return { text, calcText: calc, max: 3, answer: String(ans), explain: `${calc} = ${ans}.` };
+    }, 2],
+    [() => {
+      // Hình viên bi: gạch các viên đã cho, tìm số lúc đầu / số đã cho.
+      const give = rnd(2, 6), left = rnd(2, 6), n = give + left, findGive = Math.random() < 0.5;
+      const balls = [...Array(n)].map((_, i) => `<circle cx="${22 + i * 26}" cy="30" r="11" fill="#e63946" stroke="${INK}" stroke-width="2"/>${i < give && !findGive ? `<line x1="${13 + i * 26}" y1="39" x2="${31 + i * 26}" y2="21" stroke="${INK}" stroke-width="2.5"/>` : ''}`).join('');
+      return findGive
+        ? { text: `Nam có ${n} viên bi, cho bạn một số viên, còn lại ${left} viên. Hỏi Nam đã cho bạn mấy viên? (Số trừ = Số bị trừ − Hiệu)`, svg: svg(balls, `0 0 ${n * 26 + 18} 60`), max: 2, answer: String(give), explain: `${n} − ${left} = ${give} (viên).` }
+        : { text: `Việt đã cho bạn ${give} viên bi (bị gạch), còn lại ${left} viên. Hỏi lúc đầu Việt có bao nhiêu viên? (Số bị trừ = Hiệu + Số trừ)`, svg: svg(balls, `0 0 ${n * 26 + 18} 60`), max: 2, answer: String(n), explain: `${left} + ${give} = ${n} (viên).` };
+    }, 1],
   ]),
   game() {
     const x = rnd(10, 400), y = rnd(10, 400), s = x + y;
