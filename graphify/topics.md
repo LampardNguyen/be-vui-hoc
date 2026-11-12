@@ -15,6 +15,7 @@
   `column` (`col: { op: '+'|'-'|'×', a, b }`) · `divide` (`div: { a, b }`) · `pick` (svg có `data-k`, `pick: { multi, correct }`) ·
   `paint` (svg có `data-k` + `.part`, `paint: { need }`) · `order` (`order: { items, asc }`) · `steps` (`steps: [câu con choice/num]`).
   Không ghi `kind` thì tự suy: có `choices` → choice, không → num.
+- `numbers.js` có `readNum(n)` (đọc số 100–999 bằng chữ: linh, mốt, tư, lăm) và `digits(n)` → [trăm, chục, đơn vị]; dạng bài bám theo sách giáo khoa (dãy số, chum chạm chọn, chuỗi mũi tên, toán 2 bước).
 - `game()` trả câu trò chơi `{ text (ngắn, cho thẻ lật), ask, answer: số, wrong: [3 số], reveal }` — dùng `gq()`.
 
 **Luồng luyện:** 10 câu, mỗi câu `renderKind` → `done(ok, { corrected })`. `corrected`: bé đã tự sửa trong bài (đặt tính, sắp xếp, nhiều bước) → khen + giải thích, không hiện "đáp án đúng". Sai lần đầu → thêm 1 câu cùng chương cuối lượt. `q.tilt` (−1/0/1) làm cân nghiêng sau khi trả lời. Sao: ≥90% đúng lần đầu 3⭐, ≥70% 2⭐ → `state.topics[id]`.

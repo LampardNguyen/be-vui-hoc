@@ -1,7 +1,7 @@
 // Chương nhóm "Số và phép tính" và "Tìm thành phần".
 // Chương: { id, title, emoji, tips, make() → câu luyện (xem js/ui/kinds.js), game() → câu trò chơi (đáp án số) }.
 import { rnd, pickOne, shuffle, gq, mix, FRIENDS, THINGS } from './util.js';
-import { balance, svg, label, shareSvg } from './draw.js';
+import { balance, svg, label, shareSvg, INK } from './draw.js';
 import { colSteps } from '../ui/kinds.js';
 
 const TF = ['Đúng', 'Sai'];
@@ -21,6 +21,19 @@ function slip(op, a, b) {
   if (k < 0) return right + pickOne([10, -10, 1]);
   return op === '-' ? right + 10 ** (k + 1) : right - 10 ** (k + 1) * (op === '×' ? +st[k].mark : 1);
 }
+
+// Đọc số 100–999 bằng chữ: 271 → "hai trăm bảy mươi mốt".
+const WORD = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+function readNum(n) {
+  const h = Math.floor(n / 100), t = Math.floor(n / 10) % 10, u = n % 10;
+  let s = `${WORD[h]} trăm`;
+  if (!t && !u) return s;
+  if (!t) return `${s} linh ${WORD[u]}`;
+  s += t === 1 ? ' mười' : ` ${WORD[t]} mươi`;
+  if (u) s += ` ${u === 5 ? 'lăm' : u === 1 && t > 1 ? 'mốt' : u === 4 && t > 1 ? 'tư' : WORD[u]}`;
+  return s;
+}
+const digits = (n) => [Math.floor(n / 100), Math.floor(n / 10) % 10, n % 10];
 
 // ---------- So sánh số dưới 1000 ----------
 const soSanh = {
@@ -59,6 +72,71 @@ const soSanh = {
     [() => {
       const n = rnd(101, 998), after = Math.random() < 0.5;
       return { text: `Số liền ${after ? 'sau' : 'trước'} của ${n} là số nào?`, max: 3, answer: String(after ? n + 1 : n - 1), explain: `Số liền ${after ? 'sau thì thêm' : 'trước thì bớt'} 1.` };
+    }, 1],
+    [() => {
+      // Tổng các trăm, chục, đơn vị so với một số.
+      const n = rnd(101, 989), [h, t, u] = digits(n), lt = [h * 100, t * 10, u].filter((v) => v).join(' + ');
+      const rv = pickOne([n, n, h * 100 + u * 10 + t, n + pickOne([1, -1, 10, -10])]);
+      return Math.random() < 0.5 ? cmp(lt, n, String(rv), rv, `${lt} = ${n}, mà ${n} ${sign(n, rv)} ${rv}.`)
+        : cmp(String(rv), rv, lt, n, `${lt} = ${n}, mà ${rv} ${sign(rv, n)} ${n}.`);
+    }, 2],
+    [() => {
+      // Dãy số đếm thêm / bớt 1, điền các ô trống.
+      const up = Math.random() < 0.5, len = 7, start = up ? rnd(100, 990) : rnd(108, 1000);
+      const seq = [...Array(len)].map((_, i) => (up ? start + i : start - i));
+      const holes = shuffle([1, 2, 3, 4, 5]).slice(0, 2).sort((a, b) => a - b);
+      const row = seq.map((v, i) => (holes.includes(i) ? '❓' : v)).join(' → ');
+      return {
+        kind: 'steps', text: `Điền số còn thiếu (đếm ${up ? 'thêm' : 'bớt'} 1): ${row}`,
+        steps: holes.map((i, k) => ({ text: `Ô ❓ thứ ${k + 1} là số nào?`, max: 4, answer: String(seq[i]) })),
+        explain: seq.join(', '),
+      };
+    }, 2],
+    [() => {
+      const n = rnd(100, 999), [h, t, u] = digits(n);
+      if (Math.random() < 0.5) return { text: `Số gồm ${h} trăm, ${t} chục và ${u} đơn vị là số nào?`, max: 3, answer: String(n), explain: `${h * 100} + ${t * 10} + ${u} = ${n}.` };
+      return {
+        kind: 'steps', text: `Số ${n} gồm mấy trăm, mấy chục, mấy đơn vị? 🧱`,
+        steps: [['trăm', h], ['chục', t], ['đơn vị', u]].map(([w, v]) => ({ text: `Số ${w}?`, max: 1, answer: String(v) })),
+        explain: `${n} = ${h * 100} + ${t * 10} + ${u}.`,
+      };
+    }, 2],
+    [() => {
+      // Đọc số: chọn cách đọc đúng (số dễ nhầm: 0 ở giữa, 1, 4, 5 ở hàng đơn vị).
+      const n = rnd(1, 9) * 100 + pickOne([0, rnd(1, 9), rnd(1, 9) * 10, rnd(2, 9) * 10 + pickOne([1, 4, 5]), 10 + rnd(1, 9)]);
+      const [h, t, u] = digits(n), opts = new Set([readNum(n)]);
+      for (const m of [h * 100 + u * 10 + t, h * 100 + t * 10 + (u + 1) % 10, ((h % 9) + 1) * 100 + t * 10 + u, h * 100 + ((t + 1) % 10) * 10 + u]) {
+        if (opts.size < 4 && m >= 100 && m !== n) opts.add(readNum(m));
+      }
+      if (Math.random() < 0.6) return { text: `Số ${n} đọc là gì? 🗣️`, choices: shuffle([...opts]), answer: readNum(n), explain: `${n}: ${readNum(n)}.` };
+      return { text: `Viết số: "${readNum(n)}" ✏️`, max: 3, answer: String(n), explain: `${readNum(n)}: ${n}.` };
+    }, 2],
+    [() => {
+      const n = rnd(101, 999), [h, t, u] = digits(n);
+      if (!t || !u) return { text: `Viết ${n} thành tổng các trăm, chục, đơn vị. Số trăm là bao nhiêu?`, max: 3, answer: String(h * 100), explain: `${n} = ${[h * 100, t * 10, u].filter((v) => v).join(' + ')}.` };
+      const k = rnd(0, 2), parts = [h * 100, t * 10, u], shown = parts.map((v, i) => (i === k ? '❓' : v)).join(' + ');
+      return { text: `${n} = ${shown}. Số ❓ là bao nhiêu?`, max: 3, answer: String(parts[k]), explain: `${n} = ${parts.join(' + ')}.` };
+    }, 1],
+    [() => {
+      // Ba số liên tiếp, có thể đếm xuôi hoặc ngược.
+      const m = rnd(101, 998), up = Math.random() < 0.5, k = rnd(0, 2);
+      const seq = up ? [m - 1, m, m + 1] : [m + 1, m, m - 1];
+      return { text: `Tìm số ở ô ❓ để được ba số liên tiếp: ${seq.map((v, i) => (i === k ? '❓' : v)).join(', ')}`, max: 3, answer: String(seq[k]), explain: `${seq.join(', ')} là ba số liên tiếp.` };
+    }, 1],
+    [() => {
+      // Ba con vật, tìm con nặng nhất / nhẹ nhất.
+      const [e1, e2, e3] = shuffle(['🐷', '🐶', '🐑', '🐐', '🐼']);
+      const base = rnd(90, 800), w = shuffle([base, base + rnd(2, 19), base + rnd(20, 60)]);
+      const s = [...w].sort((a, b) => a - b), choices = w.map(String);
+      return {
+        kind: 'steps', text: `Ba bạn ${e1}${e2}${e3} nặng ${w.join(' kg, ')} kg.`,
+        steps: [
+          { text: 'Bạn nặng nhất nặng bao nhiêu kg?', choices, answer: String(s[2]) },
+          { text: 'Bạn nhẹ nhất nặng bao nhiêu kg?', choices, answer: String(s[0]) },
+          { text: 'Bạn còn lại nặng bao nhiêu kg?', choices, answer: String(s[1]) },
+        ],
+        explain: `${s[0]} < ${s[1]} < ${s[2]}.`,
+      };
     }, 1],
   ]),
   game() {
@@ -100,6 +178,77 @@ const congTru = {
       return add ? { text: `Tính nhẩm: ${a} + ${b} = ?`, max: 3, answer: String(a + b), explain: `${a / 100} trăm + ${b / 100} trăm = ${(a + b) / 100} trăm.` }
         : { text: `Tính nhẩm: ${a + b} − ${b} = ?`, max: 3, answer: String(a), explain: `${(a + b) / 100} trăm − ${b / 100} trăm = ${a / 100} trăm.` };
     }, 1],
+    [() => {
+      // Tính nhẩm tròn chục / tròn trăm, có cả 100 và 1000.
+      const big = Math.random() < 0.5, u = big ? 100 : 10, x = rnd(1, 9) * u, tot = 10 * u;
+      return pickOne([
+        { text: `Tính nhẩm: ${x} + ${tot - x} = ?`, max: 4, answer: String(tot), explain: `${x / u} ${big ? 'trăm' : 'chục'} + ${10 - x / u} ${big ? 'trăm' : 'chục'} = 10 ${big ? 'trăm = 1000' : 'chục = 100'}.` },
+        { text: `Tính nhẩm: ${tot} − ${x} = ?`, max: 3, answer: String(tot - x), explain: `${tot} − ${x} = ${tot - x}.` },
+      ]);
+    }, 1],
+    [() => {
+      // Gọi đúng tên thành phần: số hạng, tổng, số bị trừ, số trừ, hiệu.
+      if (Math.random() < 0.5) { const a = rnd(20, 600), b = rnd(10, 999 - a); return { kind: 'column', text: `Số hạng là ${a} và ${b}. Tìm tổng ✍️`, col: { op: '+', a, b }, show: a + b }; }
+      const a = rnd(100, 1000), b = rnd(10, a - 10);
+      return { kind: 'column', text: `Số bị trừ là ${a}, số trừ là ${b}. Tìm hiệu ✍️`, col: { op: '-', a, b }, show: a - b };
+    }, 2],
+    [() => {
+      // Chuỗi phép tính: □ → +x → ○ → −y → △
+      const s = rnd(100, 500), x = rnd(10, 999 - s), m = s + x, y = rnd(10, m - 10), e = m - y;
+      const body = `<rect x="6" y="40" width="64" height="44" rx="6" fill="#90be6d" stroke="${INK}" stroke-width="3"/>${label(38, 62, s)}
+        <line x1="72" y1="62" x2="114" y2="62" stroke="${INK}" stroke-width="3"/><path d="M114 56 L124 62 L114 68 Z" fill="${INK}"/>${label(98, 36, `+ ${x}`, 15)}
+        <circle cx="152" cy="62" r="26" fill="#fff" stroke="${INK}" stroke-width="3"/>${label(152, 62, '?')}
+        <line x1="180" y1="62" x2="222" y2="62" stroke="${INK}" stroke-width="3"/><path d="M222 56 L232 62 L222 68 Z" fill="${INK}"/>${label(206, 36, `− ${y}`, 15)}
+        <polygon points="266,30 296,90 236,90" fill="#fff" stroke="${INK}" stroke-width="3"/>${label(266, 70, '?')}`;
+      return {
+        kind: 'steps', text: 'Số? Đi theo mũi tên nhé ➡️', svg: svg(body, '0 20 300 80'),
+        steps: [
+          { text: `Hình tròn: ${s} + ${x} = ?`, max: 4, answer: String(m) },
+          { text: `Hình tam giác: ${m} − ${y} = ?`, max: 3, answer: String(e) },
+        ],
+        explain: `${s} + ${x} = ${m}; ${m} − ${y} = ${e}.`,
+      };
+    }, 2],
+    [() => {
+      // Những chum có kết quả lớn hơn một số: chạm chọn nhiều.
+      const lim = rnd(10, 60) * 10, jars = [], keys = 'ABCD';
+      while (jars.length < 4) {
+        const add = Math.random() < 0.5, v = lim + pickOne([rnd(5, 120), -rnd(5, 120), rnd(1, 9), 0]);
+        if (v < 20 || v > 989) continue;
+        const b = rnd(10, add ? v - 10 : 999 - v), a = add ? v - b : v + b;
+        jars.push([add ? `${a} + ${b}` : `${a} − ${b}`, v]);
+      }
+      if (!jars.some(([, v]) => v > lim)) jars[0] = [`${lim} + ${rnd(5, 9)}`, lim + 9];
+      const body = jars.map(([t], i) => {
+        const x = 75 + (i % 2) * 150, y = 60 + Math.floor(i / 2) * 105;
+        return `<g data-k="${keys[i]}"><ellipse cx="${x}" cy="${y}" rx="68" ry="46" fill="#b5651d" stroke="${INK}" stroke-width="3" class="vis"/><rect x="${x - 22}" y="${y - 54}" width="44" height="12" rx="4" fill="#7a3e0c"/>${label(x, y, t, 17, '#fff')}${label(x, y + 30, keys[i], 14, '#ffe8c2')}</g>`;
+      }).join('');
+      const correct = jars.map(([, v], i) => (v > lim ? keys[i] : '')).filter(Boolean);
+      return { kind: 'pick', text: `Chạm vào TẤT CẢ các chum có kết quả LỚN HƠN ${lim} rồi bấm Xong 🏺`, svg: svg(body, '0 0 300 215'), pick: { multi: true, correct }, show: `chum ${correct.join(', ')}`, explain: jars.map(([t, v], i) => `${keys[i]}: ${t} = ${v}`).join('; ') + '.' };
+    }, 2],
+    [() => {
+      // Toán 2 bước: ít hơn / nhiều hơn rồi tính tổng; hoặc tổng và hiệu.
+      if (Math.random() < 0.5) {
+        const a = rnd(100, 450), d = rnd(10, 90), less = Math.random() < 0.5, b = less ? a - d : a + d;
+        return {
+          kind: 'steps', text: `Khối lớp Ba có ${a} học sinh, khối lớp Bốn có ${less ? 'ít' : 'nhiều'} hơn khối lớp Ba ${d} học sinh 🏫`,
+          steps: [
+            { text: 'Khối lớp Bốn có bao nhiêu học sinh?', max: 3, answer: String(b), explain: `${a} ${less ? '−' : '+'} ${d} = ${b}` },
+            { text: 'Cả hai khối có bao nhiêu học sinh?', max: 3, answer: String(a + b), explain: `${a} + ${b} = ${a + b}` },
+          ],
+          explain: `Lớp Bốn: ${a} ${less ? '−' : '+'} ${d} = ${b}; cả hai: ${a} + ${b} = ${a + b}.`,
+        };
+      }
+      const a = rnd(30, 70) * 10, b = rnd(5, a / 10 - 5) * 10;
+      return {
+        kind: 'steps', text: `Con trâu 🐃 nặng ${a} kg, con nghé 🐄 nặng ${b} kg.`,
+        steps: [
+          { text: 'Cả hai con nặng tất cả bao nhiêu ki-lô-gam?', max: 4, answer: String(a + b) },
+          { text: 'Con trâu nặng hơn con nghé bao nhiêu ki-lô-gam?', max: 3, answer: String(a - b) },
+        ],
+        explain: `${a} + ${b} = ${a + b} (kg); ${a} − ${b} = ${a - b} (kg).`,
+      };
+    }, 2],
   ]),
   game() {
     if (Math.random() < 0.5) { const a = rnd(20, 500), b = rnd(10, 400); return gq(`${a} + ${b}`, a + b, [1, 10, 100]); }

@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-12 — Thêm dạng bài theo sách: ôn số đến 1000, cộng trừ
+
+- So sánh số: so sánh tổng trăm-chục-đơn vị (400 + 70 + 5 ? 475), điền dãy số đếm thêm/bớt 1, số gồm mấy trăm-chục-đơn vị, đọc/viết số bằng chữ, viết số thành tổng, ba số liên tiếp, tìm con vật nặng nhất/nhẹ nhất.
+- Cộng trừ: tính nhẩm tròn chục/trăm (80 + 20, 1000 − 700), gọi tên số hạng/tổng/số bị trừ/số trừ/hiệu, chuỗi phép tính theo mũi tên, chạm chọn chum có kết quả lớn hơn một số, toán 2 bước (ít hơn rồi tính tổng; trâu và nghé).
+
 ## 2026-11-11 — Làm lại 15 chương Toán: vừa học vừa chơi
 - Mỗi chương có thêm **Trò chơi**: 6 trò (bóng bay, đua 60 giây, lật thẻ, đua xe, ếch, quái vật) dùng câu hỏi của chương (`js/games/source.js`, key `t-<id>`).
 - Dạng bài mới (`js/ui/kinds.js`): đặt tính dọc cộng/trừ/nhân (điền từng chữ số, hiện số nhớ, gợi ý từng hàng), đặt tính chia (thương + số dư), chạm chọn trên hình, tô màu, sắp xếp thẻ số, bài nhiều bước.
