@@ -9,6 +9,29 @@ const TF = ['Đúng', 'Sai'];
 const tf = (text, ok, explain, pic) => ({ text, choices: TF, tf: true, answer: ok ? 'Đúng' : 'Sai', explain, svg: pic });
 
 // ---------- Một phần mấy ----------
+// Đọc phân số 1/n: "một phần tư", "một phần năm"…
+const FRAC_READ = { 2: 'Một phần hai', 3: 'Một phần ba', 4: 'Một phần tư', 5: 'Một phần năm', 6: 'Một phần sáu', 7: 'Một phần bảy', 8: 'Một phần tám', 9: 'Một phần chín' };
+// Lưới rows × cols đồ vật, khoanh 1 hàng (byRow) hoặc 1 cột.
+function circledGrid(rows, cols, byRow, emoji) {
+  const w = 52, hh = 50, k = rnd(0, (byRow ? rows : cols) - 1);
+  let body = '';
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) body += label(30 + c * w, 30 + r * hh, emoji, 30);
+  body += byRow ? `<rect x="4" y="${6 + k * hh}" width="${cols * w}" height="48" rx="24" fill="none" stroke="${HI}" stroke-width="3"/>`
+    : `<rect x="${5 + k * w}" y="4" width="50" height="${rows * hh}" rx="24" fill="none" stroke="${HI}" stroke-width="3"/>`;
+  return svg(body, `0 0 ${cols * w + 8} ${rows * hh + 8}`);
+}
+// n đĩa, mỗi đĩa k đồ vật (chia thành n phần bằng nhau).
+function platesSvg(n, k, emoji) {
+  const W = 300 / Math.min(n, 3), rowsPer = Math.ceil(k / 3);
+  let body = '';
+  for (let g = 0; g < n; g++) {
+    const cx = (g % 3) * W + W / 2, cy = Math.floor(g / 3) * (rowsPer * 28 + 30) + (rowsPer * 28 + 20) / 2 + 4;
+    body += `<ellipse cx="${cx}" cy="${cy}" rx="${W / 2 - 6}" ry="${(rowsPer * 28 + 20) / 2}" fill="#e7ecf7" stroke="#c9cfdb" stroke-width="2"/>`;
+    for (let i = 0; i < k; i++) body += label(cx - 26 + (i % 3) * 26, cy - ((rowsPer - 1) * 28) / 2 + Math.floor(i / 3) * 28, emoji, 22);
+  }
+  return svg(body, `0 0 300 ${Math.ceil(n / 3) * (rowsPer * 28 + 30) + 4}`);
+}
+
 const motPhan = {
   id: 'mot-phan', title: 'Một phần mấy', emoji: '🍰',
   tips: [
@@ -44,6 +67,38 @@ const motPhan = {
     [() => {
       const n = rnd(2, 9), k = rnd(2, 9), f = pickOne(FRIENDS);
       return { text: `${f} có ${n * k} viên bi, cho em 1/${n} số bi. ${f} đã cho em mấy viên?`, max: 2, answer: String(k), explain: `1/${n} của ${n * k} là ${n * k} : ${n} = ${k}.` };
+    }, 1],
+    [() => {
+      // Đ/S như sách: hình chia n phần, tô 1 phần, câu nói 1/m.
+      const n = rnd(2, 9), m = pickOne([n, n, n + 1, n - 1 > 1 ? n - 1 : n + 2]), kind = pickOne(['bar', 'pie']);
+      return tf(`Đã tô màu 1/${m} hình ${kind === 'pie' ? 'tròn' : 'chữ nhật'}. Đúng hay sai?`, m === n, `Hình chia ${n} phần bằng nhau, tô 1 phần → 1/${n}.`, fracShape(n, { kind, shade: [rnd(0, n - 1)] }));
+    }, 2],
+    [() => {
+      // Đọc / viết một phần mấy.
+      const n = rnd(2, 9), others = shuffle([2, 3, 4, 5, 6, 7, 8, 9].filter((k) => k !== n)).slice(0, 3);
+      return Math.random() < 0.5
+        ? { text: `Phân số 1/${n} đọc là gì? 🗣️`, svg: fracShape(n, { kind: 'pie', shade: [0] }), choices: shuffle([n, ...others]).map((k) => FRAC_READ[k]), answer: FRAC_READ[n], explain: `1/${n} đọc là "${FRAC_READ[n].toLowerCase()}".` }
+        : { text: `"${FRAC_READ[n]}" viết là gì? ✏️`, choices: shuffle([n, ...others]).map((k) => `1/${k}`), answer: `1/${n}`, explain: `${FRAC_READ[n]} viết là 1/${n}.` };
+    }, 2],
+    [() => {
+      // Như sách: đã khoanh vào 1/n số cây ở hình nào?
+      const e = pickOne(['🥬', '🌰', '🍎', '🐟', '🌸']), opts = [];
+      while (opts.length < 3) {
+        const rows = rnd(2, 4), cols = rnd(2, 5), byRow = Math.random() < 0.5, frac = byRow ? rows : cols;
+        if (rows === cols || opts.some((o) => o.frac === frac)) continue;
+        opts.push({ frac, svg: circledGrid(rows, cols, byRow, e) });
+      }
+      const want = pickOne(opts).frac, keys = ['A', 'B', 'C'];
+      return { text: `Đã khoanh vào 1/${want} số ${e} của hình nào?`, choices: opts.map((o, i) => ({ value: keys[i], svg: o.svg, label: keys[i] })), answer: keys[opts.findIndex((o) => o.frac === want)], explain: `Hình được chia thành ${want} hàng (hoặc cột) bằng nhau, khoanh 1 hàng (cột) → 1/${want}.` };
+    }, 2],
+    [() => {
+      // Như sách: chia 12 quả cam thành 3 phần bằng nhau, 1/3 số quả cam là ? quả.
+      const n = rnd(2, 5), k = rnd(2, 5), e = pickOne(['🍊', '🍎', '🍓', '🥕', '🍬']);
+      return { text: `Chia ${n * k} ${e} thành ${n} phần bằng nhau. 1/${n} số ${e} là mấy ${e}?`, svg: platesSvg(n, k, e), max: 2, answer: String(k), explain: `${n * k} : ${n} = ${k}.` };
+    }, 2],
+    [() => {
+      const n = pickOne([2, 3, 4, 5, 6]), f = pickOne(FRIENDS);
+      return { text: `Chiếc bánh trung thu 🥮 chia thành ${n} phần bằng nhau cho ${n} bạn. Mỗi bạn được mấy phần chiếc bánh?`, svg: fracShape(n, { kind: 'pie', shade: [0] }), choices: shuffle([...new Set([n, n + 1, n - 1 > 1 ? n - 1 : n + 2, 2])]).map((k) => `1/${k}`), answer: `1/${n}`, explain: `Chia ${n} phần bằng nhau, ${f} lấy 1 phần → 1/${n} chiếc bánh.` };
     }, 1],
   ]),
   game() { const n = rnd(2, 9), k = rnd(2, 9); return gq(`1/${n} của ${n * k}`, k, [1, 2], `1/${n} của ${n * k} là?`, `1/${n} của ${n * k} là ${k}`); },

@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-12 — Thêm dạng bài theo sách: Một phần mấy
+
+- Đ/S: "Đã tô màu 1/m hình tròn / hình chữ nhật" với hình chia n phần.
+- Đọc / viết: 1/4 đọc là "Một phần tư", "Một phần năm" viết là 1/5.
+- Đã khoanh vào 1/n số cây ở hình nào (A/B/C, khoanh 1 hàng hoặc 1 cột).
+- Chia 12 quả cam thành 3 phần bằng nhau (hình các đĩa), 1/3 là mấy quả.
+- Chia bánh trung thu cho n bạn, mỗi bạn được mấy phần.
+
 ## 2026-11-12 — Thêm dạng bài theo sách: Tìm thành phần trong phép nhân, chia
 
 - Bảng Thừa số/Tích và Số bị chia/Số chia/Thương, mỗi cột 1 ô ? (làm từng ô).
