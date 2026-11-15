@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài Nhân số có ba chữ số với số có một chữ số
+
+- Tính nhẩm số tròn trăm (300 × 3…), tìm tích từ hai thừa số.
+- Bài toán có đặt tính: hải âu – mèo gấp lần ngày tuổi, đường kính từ bán kính, cái ấm cân bằng các cái chén.
+- Gấu đen và hũ mật ong (hai bước: nhân rồi trừ).
+- Thừa số giảm 2 lần thì thừa số kia gấp 2 lần (sơ đồ 600 = 200 × 3 = 100 × 6).
+
 ## 2026-11-15 — Đo lường: thêm dạng bài Mi-li-mét, Gam, Mi-li-lít, Nhiệt độ theo sách
 
 - Độ dài: thước có vạch mm đo đoạn AB, đổi cm/m ↔ mm, so sánh, tính với mm, ve sầu 3 cm – kiến 3 mm,

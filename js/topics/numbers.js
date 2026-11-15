@@ -297,6 +297,34 @@ const nhanChiaLon = {
       ]);
       return { kind: 'column', text: txt, col: { op: '×', a, b }, show: a * b, explain: `${a} × ${b} = ${a * b} (${unit}).` };
     }, 2],
+    // ----- Nhân số có 3 chữ số với số có 1 chữ số (như sách) -----
+    [() => {
+      const t = rnd(1, 4), k = rnd(2, Math.floor(9 / t));
+      return { text: `Tính nhẩm: ${t * 100} × ${k} = ?`, max: 3, answer: String(t * 100 * k), explain: `${t} trăm × ${k} = ${t * k} trăm, nên ${t * 100} × ${k} = ${t * 100 * k}.` };
+    }, 1],
+    [() => {
+      const b = rnd(2, 9), a = rnd(101, Math.floor(999 / b));
+      return { text: `Thừa số ${a}, thừa số ${b}. Tích là bao nhiêu?`, max: 3, answer: String(a * b), calcText: '', explain: `${a} × ${b} = ${a * b}.` };
+    }, 1],
+    [() => {
+      const k = rnd(0, 2);
+      if (k === 0) { const a = rnd(101, 199), m = rnd(2, 4); return { kind: 'column', text: `Hôm nay hải âu 🐦 được ${a} ngày tuổi, số ngày tuổi của mèo 🐱 gấp ${m} lần hải âu. Hỏi mèo được bao nhiêu ngày tuổi?`, col: { op: '×', a, b: m }, show: a * m, explain: `${a} × ${m} = ${a * m} (ngày).` }; }
+      if (k === 1) { const r = rnd(101, 450); return { kind: 'column', text: `Hình tròn tâm O có bán kính ${r} cm. Đường kính dài bao nhiêu xăng-ti-mét?`, col: { op: '×', a: r, b: 2 }, show: r * 2, explain: `Đường kính = ${r} × 2 = ${r * 2} (cm).` }; }
+      const n = rnd(2, 4), w = rnd(101, Math.floor(999 / n)); return { kind: 'column', text: `Cân thăng bằng: một bên là cái ấm 🫖, bên kia là ${n} cái chén, mỗi cái chén nặng ${w} g. Cái ấm nặng bao nhiêu gam?`, col: { op: '×', a: w, b: n }, show: w * n, explain: `${w} × ${n} = ${w * n} (g).` };
+    }, 2],
+    [() => {
+      const n = 3, per = pickOne([150, 200, 250, 300]), used = rnd(10, per * n / 5 - 1) * 5;
+      return { kind: 'steps', text: `Gấu đen 🐻 có ${n} hũ mật ong, mỗi hũ ${per} ml. Gấu đã dùng ${used} ml để làm bánh. Hỏi gấu còn bao nhiêu mi-li-lít mật ong?`,
+        steps: [
+          { text: `Bước 1: Cả ${n} hũ có: ${per} × ${n} = ?`, max: 3, unit: 'ml', answer: String(per * n), explain: `${per} × ${n} = ${per * n} (ml)` },
+          { text: `Bước 2: Còn lại: ${per * n} − ${used} = ?`, max: 3, unit: 'ml', answer: String(per * n - used), explain: `${per * n} − ${used} = ${per * n - used} (ml)` },
+        ], explain: `Đáp số: ${per * n - used} ml.` };
+    }, 1],
+    // Như sách: sơ đồ 600 = 200 × 3 = 100 × 6 — tìm số còn thiếu.
+    [() => {
+      const b = pickOne([2, 4]), a = rnd(51, Math.floor(499 / b)) * 2, p = a * b;
+      return { text: `${a} × ${b} = ${p}. Vậy ${a / 2} × ? = ${p}`, max: 1, answer: String(b * 2), explain: `Thừa số thứ nhất giảm 2 lần thì thừa số kia gấp 2 lần: ${a / 2} × ${b * 2} = ${p}.` };
+    }, 1],
     // ----- Chia số có 2 chữ số cho số có 1 chữ số (như sách) -----
     [() => {
       const b = rnd(2, 9), q = rnd(1, Math.floor(9 / b)) * 10;
