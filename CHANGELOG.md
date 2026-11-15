@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài theo sách cho chương Góc vuông
+
+- Góc có chữ: hỏi đỉnh, hai cạnh, góc đỉnh … là góc vuông hay không vuông.
+- Chọn hình có nhiều góc vuông nhất trong 3 hình.
+- Con tàu tới hành tinh: chọn đường gấp khúc chỉ gồm góc vuông.
+
 ## 2026-11-15 — Thêm dạng bài theo sách cho chương Hình tròn
 
 - Hình tròn có chữ: hỏi tâm là điểm nào, đoạn nào là bán kính / đường kính (có dây cung gây nhiễu).

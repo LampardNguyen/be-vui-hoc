@@ -305,6 +305,31 @@ const goc = {
       const right = Math.random() < 0.5, ang = right ? 90 : pickOne([rnd(35, 70), rnd(110, 150)]);
       return { text: 'Đây là góc gì?', svg: angleSvg(ang, rnd(0, 359)), choices: ['Góc vuông', 'Góc không vuông'], answer: right ? 'Góc vuông' : 'Góc không vuông', explain: right ? 'Hai cạnh vuông góc, khít ê ke → góc vuông.' : `Góc này ${ang < 90 ? 'hẹp hơn' : 'rộng hơn'} góc vuông.` };
     }, 1],
+    // Như sách: góc có chữ, hỏi đỉnh / cạnh / tên góc vuông.
+    [() => {
+      const [v, a, b] = shuffle(['A', 'B', 'C', 'M', 'N', 'P', 'G', 'H', 'K', 'E', 'X', 'Y']), base = rnd(0, 359);
+      const right = Math.random() < 0.5, deg = right ? 90 : pickOne([rnd(35, 65), rnd(115, 145)]);
+      const L = 70, end = (d) => [100 + L * Math.cos(rad(d)), 100 - L * Math.sin(rad(d))], pa = end(base), pb = end(base + deg);
+      const lab = (p, t) => label(100 + (p[0] - 100) * 1.25, 100 + (p[1] - 100) * 1.25, t);
+      const mid = end(base + deg / 2), pic = svg(`<line x1="100" y1="100" x2="${pa[0]}" y2="${pa[1]}" stroke="${INK}" stroke-width="4"/><line x1="100" y1="100" x2="${pb[0]}" y2="${pb[1]}" stroke="${INK}" stroke-width="4"/>${dot(100, 100, '')}${label(100 - (mid[0] - 100) * 0.3, 100 - (mid[1] - 100) * 0.3, v)}${lab(pa, a)}${lab(pb, b)}`, '0 0 200 200');
+      const ask = rnd(0, 2), kind = right ? 'Góc vuông' : 'Góc không vuông';
+      if (ask === 0) return { text: 'Đỉnh của góc là điểm nào?', svg: pic, choices: shuffle([v, a, b]), answer: v, explain: `Đỉnh là chỗ 2 cạnh gặp nhau: ${v}.` };
+      if (ask === 1) return { text: `Góc đỉnh ${v} có hai cạnh là:`, svg: pic, choices: shuffle([`${v}${a} và ${v}${b}`, `${a}${b} và ${v}${a}`, `${a}${v} và ${a}${b}`]), answer: `${v}${a} và ${v}${b}`, explain: `Hai cạnh đều xuất phát từ đỉnh ${v}: ${v}${a} và ${v}${b}.` };
+      return { text: `Góc đỉnh ${v}, cạnh ${v}${a}, ${v}${b} là góc gì?`, svg: pic, choices: ['Góc vuông', 'Góc không vuông'], answer: kind, explain: right ? 'Khít ê ke → góc vuông.' : `Góc ${deg < 90 ? 'hẹp' : 'rộng'} hơn góc vuông.` };
+    }, 3],
+    // Như sách: hình nào có nhiều góc vuông nhất.
+    [() => {
+      let ps, cnt, mx;
+      do { ps = shuffle(POLYS).slice(0, 3).map((f) => polygonPick(place(f()))); cnt = ps.map((p) => p.right.length); mx = Math.max(...cnt); } while (cnt.filter((c) => c === mx).length > 1);
+      return { text: 'Hình nào có NHIỀU góc vuông nhất? 🏆', choices: ps.map((p, i) => ({ value: `h${i}`, svg: p.svg })), answer: `h${cnt.indexOf(mx)}`, show: `hình có ${mx} góc vuông`, explain: `Hình đó có ${mx} góc vuông, các hình kia có ${cnt.filter((c) => c !== mx).join(' và ')}.` };
+    }, 2],
+    // Như sách: con tàu đi theo đường chỉ gồm góc vuông.
+    [() => {
+      const step = () => { let x = 10, y = 20, pts = [[x, y]]; for (let i = 0; i < 4; i++) { if (i % 2 === 0) y += rnd(25, 45); else x += rnd(40, 60); pts.push([x, y]); } return pts; };
+      const good = step(), bad = step(); const k = rnd(1, 3); bad[k] = [bad[k][0] + 25, bad[k][1]]; // xô lệch 1 đỉnh → có góc không vuông
+      const draw = (pts) => svg(`<polyline points="${pts.map((p) => p.join(',')).join(' ')}" fill="none" stroke="${HI}" stroke-width="5"/>${label(pts[0][0], pts[0][1] - 10, '🛸', 18)}${label(pts[4][0] + 8, pts[4][1] + 12, '🪐', 18)}`, '-5 0 150 130');
+      return { text: 'Đường nào chỉ gồm các GÓC VUÔNG để tàu tới hành tinh? 🛸', choices: shuffle([{ value: 'g', svg: draw(good) }, { value: 'b', svg: draw(bad) }]), answer: 'g', show: 'đường gấp khúc toàn góc vuông', explain: 'Ở mỗi chỗ rẽ, đường đúng đều rẽ vuông như góc ê ke; đường kia có chỗ rẽ xiên.' };
+    }, 2],
   ]),
   game() {
     const k = rnd(2, 6), [e, n] = pickOne([['⬜', 4], ['▭', 4], ['◺', 1]]);
