@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài Gấp một số lên một số lần
+
+- Mũi tên "gấp k lần" và "thêm k đơn vị" xen kẽ để bé phân biệt nhân với cộng.
+- Chuỗi: thêm m đơn vị rồi gấp k lần.
+- Chú kiến qua đường hầm: chọn "gấp k lần" hay "thêm k đơn vị".
+- Bài toán lời văn: tuổi bố gấp k lần tuổi con, ghế xếp theo bàn.
+- Số có 2 chữ số gấp k lần (14 gấp 6 lần…).
+
 ## 2026-11-15 — Thêm dạng bài Giảm một số đi một số lần
 
 - Chương đổi tên: "Gấp mấy lần, giảm một số lần", thêm mẹo "giảm k lần là chia k".

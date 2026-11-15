@@ -412,6 +412,33 @@ const gapMayLan = {
       const a = rnd(2, 9), k = rnd(2, 6), plus = Math.random() < 0.5, shown = plus ? a + k : a * k;
       return tf(`${a} gấp lên ${k} lần được ${shown}. Đúng hay sai?`, !plus || a + k === a * k, `Gấp lên ${k} lần là nhân: ${a} × ${k} = ${a * k} (không phải cộng).`);
     }, 1],
+    // ----- Gấp một số lên một số lần (như sách) -----
+    [() => {
+      const a = rnd(3, 15), k = rnd(2, 8), mul = Math.random() < 0.5;
+      return mul ? { text: `${a} → gấp ${k} lần → ?`, max: 3, answer: String(a * k), explain: `Gấp ${k} lần là nhân: ${a} × ${k} = ${a * k}.` }
+        : { text: `${a} → thêm ${k} đơn vị → ?`, max: 2, answer: String(a + k), explain: `Thêm ${k} đơn vị là cộng: ${a} + ${k} = ${a + k}.` };
+    }, 2],
+    [() => {
+      const a = rnd(2, 10), m = rnd(2, 5), k = rnd(2, 7);
+      return { text: `${a} → thêm ${m} đơn vị → ? → gấp ${k} lần → ? Số cuối cùng là mấy?`, max: 3, answer: String((a + m) * k), explain: `${a} + ${m} = ${a + m}, rồi ${a + m} × ${k} = ${(a + m) * k}.` };
+    }, 1],
+    // Như bài chú kiến: từ a qua đường hầm ra b, đường nào đúng?
+    [() => {
+      const a = rnd(3, 12), k = rnd(2, 9), mul = Math.random() < 0.5;
+      const b = mul ? a * k : a + k, other = mul ? `thêm ${k} đơn vị` : `gấp ${k} lần`, right = mul ? `gấp ${k} lần` : `thêm ${k} đơn vị`;
+      return { text: `🐜 Chú kiến mang số ${a} qua đường hầm, ra thành số ${b}. Đường hầm là:`, choices: shuffle([right, other]), answer: right, explain: mul ? `${a} × ${k} = ${b}.` : `${a} + ${k} = ${b}.` };
+    }, 2],
+    [() => {
+      const k = rnd(2, 9), [txt, ans, ex] = pickOne([
+        (() => { const c = rnd(5, 10), kk = rnd(3, 5); return [`Năm nay con ${c} tuổi, tuổi bố gấp ${kk} lần tuổi con. Hỏi năm nay bố bao nhiêu tuổi?`, c * kk, `${c} × ${kk} = ${c * kk} (tuổi).`]; })(),
+        [`Trong phòng có ${k} cái bàn. Mỗi bàn xếp 2 cái ghế. Hỏi cần bao nhiêu cái ghế?`, k * 2, `${k} × 2 = ${k * 2} (cái ghế).`],
+      ]);
+      return { text: txt, max: 2, answer: String(ans), explain: ex };
+    }, 2],
+    [() => {
+      const a = rnd(11, 49), k = rnd(2, Math.min(9, Math.floor(99 / a)));
+      return { text: `${a} gấp ${k} lần là bao nhiêu?`, max: 2, answer: String(a * k), explain: `${a} × ${k} = ${a * k}.` };
+    }, 1],
     // ----- Giảm một số đi một số lần (như sách) -----
     [() => {
       const k = rnd(2, 9), r = rnd(2, 9), n = r * k;
