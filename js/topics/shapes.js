@@ -379,6 +379,53 @@ const hinhPhang = {
       const [s, ok] = pickOne(facts);
       return tf(s, ok, ok ? 'Câu này đúng rồi!' : 'Câu này sai. Tam giác: 3 cạnh, 3 đỉnh. Tứ giác: 4 cạnh, 4 góc. Chữ nhật: 2 cạnh dài, 2 cạnh ngắn.');
     }, 1],
+    // Như sách: hình có chữ, kể tên các đỉnh / các cạnh.
+    [() => {
+      const tri = Math.random() < 0.5, L = shuffle(['A', 'B', 'C', 'D', 'M', 'N', 'P', 'Q', 'E', 'G']).slice(0, tri ? 3 : 4);
+      const pts = tri ? [[150, 25], [60, 170], [240, 170]] : [[90, 40], [220, 40], [255, 165], [45, 165]];
+      const off = tri ? [[0, -14], [-14, 10], [14, 10]] : [[-10, -12], [10, -12], [14, 10], [-14, 10]];
+      const pic = svg(`<polygon points="${pts.map((p) => p.join(',')).join(' ')}" fill="${SOFT}" stroke="${INK}" stroke-width="3"/>${pts.map((p, i) => label(p[0] + off[i][0], p[1] + off[i][1], L[i])).join('')}`, '0 0 300 195');
+      const nm = `hình ${tri ? 'tam giác' : 'tứ giác'} ${L.join('')}`, edges = L.map((x, i) => x + L[(i + 1) % L.length]);
+      if (Math.random() < 0.5) {
+        const right = L.join(', '), wrong = [edges.slice(0, L.length - 1).join(', '), [...L.slice(0, -1), pickOne(['K', 'H', 'X'])].join(', ')];
+        return { text: `Các đỉnh của ${nm} là:`, svg: pic, choices: shuffle([right, ...wrong]), answer: right, explain: `Đỉnh là các điểm góc: ${right}.` };
+      }
+      const right = edges.join(', '), bad1 = L.join(', '), bad2 = edges.slice(0, -1).join(', ');
+      return { text: `Các cạnh của ${nm} là:`, svg: pic, choices: shuffle([right, bad1, bad2]), answer: right, explain: `${tri ? 3 : 4} cạnh nối các đỉnh liền nhau: ${right}.` };
+    }, 3],
+    // Như sách: đếm tam giác / tứ giác trong hình thang chia 3.
+    [() => {
+      const [A, B, C, D, E] = shuffle(['A', 'B', 'C', 'D', 'E', 'M', 'N', 'P', 'Q']).slice(0, 5), isTri = Math.random() < 0.5;
+      const pic = svg(`<polygon points="70,30 230,30 280,170 20,170" fill="${SOFT}" stroke="${INK}" stroke-width="3"/><polyline points="70,30 150,170 230,30" fill="none" stroke="${INK}" stroke-width="3"/>${label(62, 18, A)}${label(238, 18, B)}${label(150, 186, C)}${label(12, 182, D)}${label(288, 182, E)}`, '0 0 300 195');
+      return isTri ? { text: 'Trong hình bên có mấy hình tam giác? 🔺', svg: pic, max: 1, answer: '3', explain: `3 hình tam giác: ${A}${C}${D}, ${A}${B}${C}, ${C}${B}${E}.` }
+        : { text: 'Trong hình bên có mấy hình tứ giác? (kể cả hình to)', svg: pic, max: 1, answer: '3', explain: `3 hình tứ giác: ${A}${B}${C}${D}, ${A}${B}${E}${C}, ${A}${B}${E}${D}.` };
+    }, 2],
+    // Như sách: cắt hình chữ nhật theo một đoạn thẳng.
+    [() => {
+      const k = rnd(0, 2), N = [120, 170], M = k === 0 ? [200, 30] : [40, 30];
+      const res = ['2 hình tứ giác', '1 hình tam giác và 1 hình tứ giác', '2 hình tam giác'];
+      // k=0: cạnh trên → cạnh dưới (2 tứ giác); k=1: đỉnh → cạnh dưới (tam giác + tứ giác); k=2: đường chéo (2 tam giác).
+      const seg = k === 2 ? [[40, 30], [260, 170]] : [M, N], ans = k === 0 ? res[0] : k === 1 ? res[1] : res[2];
+      const pic = svg(`<rect x="40" y="30" width="220" height="140" fill="${SOFT}" stroke="${INK}" stroke-width="3"/><line x1="${seg[0][0]}" y1="${seg[0][1]}" x2="${seg[1][0]}" y2="${seg[1][1]}" stroke="${HI}" stroke-width="4" stroke-dasharray="8 6"/>`, '20 15 260 170');
+      return { text: 'Cắt tờ giấy hình chữ nhật theo nét đứt ✂️ thì được:', svg: pic, choices: res, answer: ans, explain: k === 0 ? 'Mỗi phần có 4 cạnh → 2 hình tứ giác.' : k === 1 ? 'Phần nhỏ có 3 cạnh (tam giác), phần to có 4 cạnh (tứ giác).' : 'Cắt theo đường chéo được 2 hình tam giác.' };
+    }, 2],
+    // Như sách: kiến bò theo cạnh hình vuông, bọ rùa theo cạnh hình chữ nhật.
+    [() => {
+      const a = rnd(2, 9), l = rnd(3, 9), w = rnd(1, l - 1), ant = 2 * a, bug = l + w;
+      if (Math.random() < 0.5) return { text: `Hình vuông ABCD có cạnh ${a} cm. Kiến bò theo các cạnh từ A đến C (qua B). Kiến bò bao nhiêu cm? 🐜`, max: 2, unit: 'cm', answer: String(ant), explain: `AB + BC = ${a} + ${a} = ${ant} cm.` };
+      if (ant === bug) return { text: `Hình chữ nhật MNPQ dài ${l} cm, rộng ${w} cm. Bọ rùa bò từ M đến P (qua N) dài bao nhiêu cm? 🐞`, max: 2, unit: 'cm', answer: String(bug), explain: `MN + NP = ${l} + ${w} = ${bug} cm.` };
+      return { text: `Kiến bò theo cạnh hình vuông ABCD (cạnh ${a} cm) từ A đến C qua B. Bọ rùa bò theo cạnh hình chữ nhật MNPQ (dài ${l} cm, rộng ${w} cm) từ M đến P qua N. Ai bò quãng đường dài hơn?`, choices: ['Kiến 🐜', 'Bọ rùa 🐞'], answer: ant > bug ? 'Kiến 🐜' : 'Bọ rùa 🐞', explain: `Kiến: ${a} + ${a} = ${ant} cm. Bọ rùa: ${l} + ${w} = ${bug} cm.` };
+    }, 2],
+    // Như sách: xếp hình chữ nhật bằng que tính.
+    [() => {
+      const l = rnd(1, 4), w = rnd(1, l), n = 2 * (l + w), sq = l === w;
+      return { text: `Rô-bốt xếp một hình ${sq ? 'vuông' : 'chữ nhật'} mỗi cạnh dài ${sq ? `${l} que` : `${l} que, rộng ${w} que`} 🤖. Cần tất cả mấy que tính?`, max: 2, answer: String(n), explain: `${l} + ${w} + ${l} + ${w} = ${n} que tính.` };
+    }, 1],
+    // Như sách: 2 đường chéo chia hình vuông.
+    [() => {
+      const [t, ok] = pickOne([['Kẻ 2 đường chéo, hình vuông được chia thành 4 hình tam giác.', true], ['Kẻ 1 đường chéo, hình vuông được chia thành 2 hình tam giác.', true], ['Kẻ 2 đường chéo, hình vuông được chia thành 2 hình tam giác.', false]]);
+      return tf(t, ok, '1 đường chéo → 2 tam giác; 2 đường chéo cắt nhau ở giữa → 4 tam giác.', svg(`<rect x="90" y="20" width="120" height="120" fill="${SOFT}" stroke="${INK}" stroke-width="3"/>`, '60 10 180 140'));
+    }, 1],
   ]),
   game() {
     const k = rnd(2, 6), [e, part, n] = pickOne([['🔺', 'cạnh', 3], ['🔺', 'đỉnh', 3], ['⬜', 'cạnh', 4], ['⬜', 'góc', 4]]);

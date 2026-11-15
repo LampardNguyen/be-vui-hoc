@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài theo sách cho chương Tam giác, tứ giác, chữ nhật, vuông
+
+- Hình có chữ: chọn đúng các đỉnh / các cạnh của tam giác, tứ giác.
+- Đếm hình tam giác, tứ giác trong hình thang chia 3.
+- Cắt tờ giấy chữ nhật theo nét đứt được những hình gì.
+- Kiến bò theo cạnh hình vuông, bọ rùa theo cạnh hình chữ nhật: tính quãng đường, ai bò xa hơn.
+- Xếp hình chữ nhật/vuông bằng que tính; Đúng/Sai về đường chéo hình vuông.
+
 ## 2026-11-15 — Thêm dạng bài Gấp một số lên một số lần
 
 - Mũi tên "gấp k lần" và "thêm k đơn vị" xen kẽ để bé phân biệt nhân với cộng.
