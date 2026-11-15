@@ -43,6 +43,22 @@ function dialScale(v, emoji, dx = 0) {
     <circle cx="${cx}" cy="${cy}" r="42" fill="#fff" stroke="${INK}" stroke-width="2"/>${nums}${label(cx, cy - 15, 'kg', 8)}
     <line x1="${cx}" y1="${cy}" x2="${(cx + 24 * Math.cos(a)).toFixed(1)}" y2="${(cy + 24 * Math.sin(a)).toFixed(1)}" stroke="${HI}" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="4" fill="${INK}"/>`;
 }
+// Cân đồng hồ 1 kg (vạch 0–1000 g, mỗi vạch 50 g), kim chỉ v gam.
+function gramScale(v, emoji, dx = 0) {
+  const cx = 75 + dx, cy = 118;
+  let t = `<rect x="${cx - 60}" y="56" width="120" height="10" rx="4" fill="#4cc9f0" stroke="${INK}" stroke-width="2"/>${label(cx, 36, emoji, 38)}<rect x="${cx - 52}" y="70" width="104" height="104" rx="14" fill="#8ecae6" stroke="${INK}" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="44" fill="#fff" stroke="${INK}" stroke-width="2"/>`;
+  for (let k = 0; k < 20; k++) { const a = ((k * 18 - 90) * Math.PI) / 180, L = k % 5 === 0 ? 9 : 4; t += `<line x1="${(cx + 44 * Math.cos(a)).toFixed(1)}" y1="${(cy + 44 * Math.sin(a)).toFixed(1)}" x2="${(cx + (44 - L) * Math.cos(a)).toFixed(1)}" y2="${(cy + (44 - L) * Math.sin(a)).toFixed(1)}" stroke="${INK}" stroke-width="1.5"/>`; }
+  [['1 kg', 0], ['250 g', 90], ['500 g', 180], ['750 g', 270]].forEach(([n, d]) => { const a = ((d - 90) * Math.PI) / 180; t += label(cx + 26 * Math.cos(a), cy + 26 * Math.sin(a), n, 8); });
+  const a = ((v * 0.36 - 90) * Math.PI) / 180;
+  return t + `<line x1="${cx}" y1="${cy}" x2="${(cx + 38 * Math.cos(a)).toFixed(1)}" y2="${(cy + 38 * Math.sin(a)).toFixed(1)}" stroke="${HI}" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="4" fill="${INK}"/>`;
+}
+// Ca đong 500 ml, nước tới mức v ml; vạch mỗi 100 ml.
+function jug(x, v, name) {
+  const top = 30, H = 110, lvl = top + H - (H * v) / 500;
+  let t = `<rect x="${x}" y="${lvl}" width="60" height="${top + H - lvl}" fill="#4cc9f0"/><path d="M${x} ${top} v${H} h60 v-${H}" fill="none" stroke="${INK}" stroke-width="3"/><path d="M${x + 60} ${top + 20} q22 0 22 30 t-22 30" fill="none" stroke="${INK}" stroke-width="3"/>`;
+  for (let k = 1; k <= 5; k++) { const y = top + H - (H * k * 100) / 500; t += `<line x1="${x}" y1="${y}" x2="${x + 10}" y2="${y}" stroke="${INK}" stroke-width="1.5"/>`; }
+  return t + label(x + 30, 18, '500 ml', 11) + label(x + 30, top + H + 16, name, 15);
+}
 // Can dầu: chiều cao theo dung tích.
 function can(x, l, max) {
   const hgt = 50 + (90 * l) / max, y = 170 - hgt;
@@ -64,6 +80,17 @@ const timeText = (h, m) => (m ? `${h} giờ ${m} phút` : `${h} giờ`);
 const DAYS = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ nhật'];   // tuần bắt đầu Thứ Hai
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+// Thước 0–4 cm có vạch mm, đoạn AB từ a mm tới b mm.
+function mmRuler(a, b) {
+  const x0 = 20, u = 6.5;
+  let t = `<rect x="10" y="60" width="285" height="50" rx="8" fill="#bde0fe" stroke="${INK}" stroke-width="2"/>`;
+  for (let i = 0; i <= 40; i++) { const x = x0 + i * u, big = i % 10 === 0, mid = i % 5 === 0; t += `<line x1="${x}" y1="60" x2="${x}" y2="${60 + (big ? 18 : mid ? 12 : 7)}" stroke="${INK}" stroke-width="${big ? 2 : 1}"/>`; if (big) t += label(x, 94, i ? i / 10 : 0, 14); }
+  const xa = x0 + a * u, xb = x0 + b * u;
+  t += `<line x1="${xa}" y1="38" x2="${xb}" y2="38" stroke="${HI}" stroke-width="4"/><circle cx="${xa}" cy="38" r="4" fill="${INK}"/><circle cx="${xb}" cy="38" r="4" fill="${INK}"/>${label(xa, 22, 'A', 15)}${label(xb, 22, 'B', 15)}`;
+  t += `<line x1="${xa}" y1="38" x2="${xa}" y2="60" stroke="${INK}" stroke-dasharray="3 3"/><line x1="${xb}" y1="38" x2="${xb}" y2="60" stroke="${INK}" stroke-dasharray="3 3"/>`;
+  return svg(t, '0 10 305 105');
+}
+
 // ---------- Các phần ----------
 const doDai = {
   id: 'do-dai', title: 'Độ dài', emoji: '📏',
@@ -82,6 +109,48 @@ const doDai = {
     [() => {
       const a = rnd(20, 90), b = rnd(10, a - 5);
       return { text: `Sợi dây đỏ dài ${a} cm, sợi dây xanh dài ${b} cm. Sợi dây đỏ dài hơn sợi dây xanh bao nhiêu xăng-ti-mét?`, max: 2, unit: 'cm', answer: String(a - b), calcText: `${a} − ${b}`, explain: `${a} − ${b} = ${a - b} (cm).` };
+    }, 1],
+    // ----- Mi-li-mét (như sách) -----
+    [() => {
+      const len = rnd(5, 38), from = Math.random() < 0.6 ? 0 : rnd(1, 2) * 10;
+      return { text: 'Đoạn thẳng AB dài mấy mi-li-mét? 📏 (mỗi vạch nhỏ là 1 mm)', svg: mmRuler(from, from + len), max: 2, unit: 'mm', answer: String(len), explain: from ? `Từ vạch ${from / 10} cm (${from} mm) tới ${from + len} mm: ${from + len} − ${from} = ${len} mm.` : `Đếm từ vạch 0: ${Math.floor(len / 10)} cm là ${Math.floor(len / 10) * 10} mm, thêm ${len % 10} vạch nhỏ → ${len} mm.` };
+    }, 2],
+    [() => {
+      const k = rnd(0, 3), n = rnd(1, 9);
+      if (k === 0) return { text: `${n} cm = ? mm`, max: 2, unit: 'mm', answer: String(n * 10), explain: `1 cm = 10 mm, nên ${n} cm = ${n * 10} mm.` };
+      if (k === 1) return { text: `${n * 10} mm = ? cm`, max: 1, unit: 'cm', answer: String(n), explain: `10 mm = 1 cm, nên ${n * 10} mm = ${n} cm.` };
+      if (k === 2) return { text: `1 m = ? mm`, max: 4, unit: 'mm', answer: '1000', explain: '1 m = 100 cm = 1000 mm.' };
+      const m = rnd(1, 9);
+      return { text: `${n} cm ${m} mm = ? mm`, max: 2, unit: 'mm', answer: String(n * 10 + m), explain: `${n} cm = ${n * 10} mm, thêm ${m} mm là ${n * 10 + m} mm.` };
+    }, 2],
+    [() => {
+      const pairs = [['1 cm', 10, '10 mm', 10], ['10 cm', 100, '10 mm', 10], ['1000 mm', 1000, '500 mm', 500], ['1 mm', 1, '1 m', 1000]];
+      const n = rnd(2, 9), m = rnd(1, 99), extra = [[`${n} cm`, n * 10, `${m} mm`, m]];
+      const [lt, lv, rt, rv] = pickOne([...pairs, ...extra, ...extra]);
+      return { text: 'So sánh hai độ dài ⚖️', svg: balance(lt, rt), choices: ['<', '=', '>'], answer: sign(lv, rv), tilt: tiltOf(lv, rv), show: `${lt} ${sign(lv, rv)} ${rt}`, explain: `Đổi về mm: ${lv} mm và ${rv} mm.` };
+    }, 2],
+    [() => {
+      const k = rnd(0, 3);
+      if (k === 0) { const a = rnd(10, 500), b = rnd(3, 400); return { text: `${a} mm + ${b} mm = ?`, max: 3, unit: 'mm', answer: String(a + b), explain: `${a} + ${b} = ${a + b} (mm).` }; }
+      if (k === 1) { const a = rnd(30, 600), b = rnd(5, a - 5); return { text: `${a} mm − ${b} mm = ?`, max: 3, unit: 'mm', answer: String(a - b), explain: `${a} − ${b} = ${a - b} (mm).` }; }
+      if (k === 2) { const a = rnd(11, 30), b = rnd(2, 3); return { text: `${a} mm × ${b} = ?`, max: 2, unit: 'mm', answer: String(a * b), explain: `${a} × ${b} = ${a * b} (mm).` }; }
+      const b = rnd(2, 5), q = rnd(5, 19); return { text: `${q * b} mm : ${b} = ?`, max: 2, unit: 'mm', answer: String(q), explain: `${q * b} : ${b} = ${q} (mm).` };
+    }, 2],
+    [() => {
+      const n = rnd(2, 9), [a, b] = shuffle([['Ve sầu', `${n} cm`], ['Kiến', `${n} mm`]]);
+      return { text: `${a[0]} nói: "Tớ dài ${a[1]}". ${b[0]} nói: "Tớ dài ${b[1]}". Bạn nào dài hơn?`, choices: [a[0], b[0]], answer: 'Ve sầu', explain: `${n} cm = ${n * 10} mm, mà ${n * 10} mm > ${n} mm nên ve sầu dài hơn kiến.` };
+    }, 1],
+    [() => {
+      if (Math.random() < 0.5) {
+        const a = rnd(100, 400), b = rnd(100, 500);
+        return { text: `Ốc sên 🐌 đi từ nhà đến trường. Bạn ấy đã đi được ${a} mm, còn phải đi ${b} mm nữa. Quãng đường từ nhà đến trường dài bao nhiêu mi-li-mét?`, max: 3, unit: 'mm', answer: String(a + b), explain: `${a} + ${b} = ${a + b} (mm).` };
+      }
+      const a = rnd(10, 30), k = rnd(2, 3);
+      return { text: `Ngày đầu cào cào 🦗 nhảy xa được ${a} mm. Một tuần sau cào cào nhảy xa gấp ${k} lần ngày đầu. Khi đó cào cào nhảy xa được bao nhiêu mi-li-mét?`, max: 2, unit: 'mm', answer: String(a * k), explain: `${a} × ${k} = ${a * k} (mm).` };
+    }, 2],
+    [() => {
+      const k = rnd(2, 5), up = Math.random() < 0.5, a = up ? rnd(5, 19) : k * rnd(3, 19);
+      return { text: `${a} mm → ${up ? 'gấp' : 'giảm'} ${k} lần → ? mm`, max: 2, unit: 'mm', answer: String(up ? a * k : a / k), explain: up ? `${a} × ${k} = ${a * k} (mm).` : `${a} : ${k} = ${a / k} (mm).` };
     }, 1],
   ]),
 };
@@ -115,6 +184,34 @@ const khoiLuong = {
     [() => convQ(MASS), 1],
     [() => { const n = rnd(1, 9); return Math.random() < 0.5 ? { text: `${n} kg = ? g`, max: 4, unit: 'g', answer: String(n * 1000), explain: `1 kg = 1000 g → ${n} kg = ${fmt(n * 1000)} g.` } : { text: `${n * 1000} g = ? kg`, max: 1, unit: 'kg', answer: String(n), explain: `1000 g = 1 kg.` }; }, 1],
     [() => unitQ(pickOne(MASS_SIZES), ['g', 'kg']), 1],
+    // ----- Gam (như sách) -----
+    [() => {
+      const v = pickOne([250, 500, 750, 100, 200, 300, 400, 600, 700, 800, 900, 150, 350, 450]), e = pickOne(['🍎', '🧈', '🍬', '🥕', '🍇']);
+      return { text: 'Cân đồng hồ 1 kg (mỗi vạch nhỏ 50 g). Vật nặng bao nhiêu gam?', svg: svg(gramScale(v, e), '0 0 150 180'), max: 3, unit: 'g', answer: String(v), explain: `Kim chỉ ${v} g.` };
+    }, 2],
+    [() => {
+      const a = pickOne([600, 700, 800, 900, 750]), b = pickOne([250, 300, 400, 500].filter((x) => x < a));
+      return {
+        kind: 'steps', text: 'Túi táo 🍎 và gói bột mì 🥡 trên hai cân đồng hồ 1 kg.', svg: svg(gramScale(a, '🍎') + gramScale(b, '🥡', 150), '0 0 300 180'),
+        steps: [
+          { text: 'Túi táo cân nặng bao nhiêu gam?', max: 3, unit: 'g', answer: String(a) },
+          { text: 'Gói bột mì cân nặng bao nhiêu gam?', max: 3, unit: 'g', answer: String(b) },
+          { text: 'Túi táo nặng hơn gói bột mì bao nhiêu gam?', max: 3, unit: 'g', answer: String(a - b), explain: `${a} − ${b} = ${a - b} (g)` },
+          { text: 'Cả túi táo và gói bột mì nặng bao nhiêu gam?', max: 4, unit: 'g', answer: String(a + b), explain: `${a} + ${b} = ${a + b} (g)` },
+        ],
+        explain: `Táo ${a} g, bột mì ${b} g.`,
+      };
+    }, 2],
+    [() => {
+      const k = rnd(0, 2);
+      if (k === 0) { const a = rnd(30, 95) * 10, b = rnd(10, a / 10 - 5) * 10; return { text: `${a} g − ${b} g = ?`, max: 3, unit: 'g', answer: String(a - b), explain: `${a} − ${b} = ${a - b} (g).` }; }
+      if (k === 1) { const a = rnd(11, 25), b = rnd(2, 4); return { text: `${a} g × ${b} = ?`, max: 3, unit: 'g', answer: String(a * b), explain: `${a} × ${b} = ${a * b} (g).` }; }
+      const b = rnd(2, 9), q = rnd(2, 9); return { text: `${q * b} g : ${b} = ?`, max: 2, unit: 'g', answer: String(q), explain: `${q * b} : ${b} = ${q} (g).` };
+    }, 2],
+    [() => {
+      const [e, name, w] = pickOne([['🐦', 'Con chim sẻ', '200 g'], ['🐔', 'Con gà', '2 kg'], ['🐕', 'Con chó', '20 kg'], ['🐄', 'Con bò', '200 kg']]);
+      return { text: `${e} ${name} nặng khoảng bao nhiêu?`, choices: ['200 g', '2 kg', '20 kg', '200 kg'], answer: w, explain: `${name} nặng khoảng ${w}.` };
+    }, 1],
   ]),
 };
 
@@ -137,6 +234,42 @@ const dungTich = {
       const per = rnd(2, 5), days = rnd(2, 9), f = pickOne(FRIENDS);
       return { text: `Mỗi ngày nhà ${f} uống ${per} l sữa 🥛. Sau ${days} ngày uống hết bao nhiêu lít sữa?`, max: 2, unit: 'l', answer: String(per * days), explain: `${per} × ${days} = ${per * days} (l).` };
     }, 1],
+    // ----- Mi-li-lít (như sách) -----
+    [() => {
+      const vs = [500, pickOne([100, 200, 300, 400]), pickOne([100, 200, 300, 400])], tot = vs[0] + vs[1] + vs[2];
+      return {
+        kind: 'steps', text: 'Rót hết nước từ bình sang 3 ca (mỗi vạch là 100 ml). Ca A có 500 ml nước.', svg: svg(jug(10, vs[0], 'A') + jug(110, vs[1], 'B') + jug(210, vs[2], 'C'), '0 0 300 165'),
+        steps: [
+          { text: 'Ca B có bao nhiêu mi-li-lít nước?', max: 3, unit: 'ml', answer: String(vs[1]) },
+          { text: 'Ca C có bao nhiêu mi-li-lít nước?', max: 3, unit: 'ml', answer: String(vs[2]) },
+          { text: 'Lúc đầu, trong bình có bao nhiêu mi-li-lít nước?', max: 4, unit: 'ml', answer: String(tot), explain: `500 + ${vs[1]} + ${vs[2]} = ${tot} (ml)` },
+        ], explain: `Bình có ${tot} ml nước.` };
+    }, 2],
+    [() => {
+      const a = pickOne([100, 200, 300]), b = pickOne([100, 200, 250]), c = pickOne([50, 100, 150]), rest = 1000 - a - b - c;
+      return { text: `Trong phích có 1 l nước 🫖. Rót sang 3 ca: ${a} ml, ${b} ml và ${c} ml. Phích còn lại bao nhiêu mi-li-lít nước?`, max: 4, unit: 'ml', answer: String(rest), explain: `1 l = 1000 ml. ${a} + ${b} + ${c} = ${a + b + c} ml, 1000 − ${a + b + c} = ${rest} ml.` };
+    }, 2],
+    [() => {
+      const k = rnd(0, 3);
+      if (k === 0) return { text: '1 l = ? ml', max: 4, unit: 'ml', answer: '1000', explain: '1 l = 1000 ml.' };
+      if (k === 1) { const a = rnd(5, 30) * 10, b = rnd(1, a / 10 - 1) * 10; return { text: `${a} ml − ${b} ml = ?`, max: 3, unit: 'ml', answer: String(a - b), explain: `${a} − ${b} = ${a - b} (ml).` }; }
+      if (k === 2) { const a = rnd(11, 30), b = rnd(2, 3); return { text: `${a} ml × ${b} = ?`, max: 2, unit: 'ml', answer: String(a * b), explain: `${a} × ${b} = ${a * b} (ml).` }; }
+      const b = rnd(2, 5), q = rnd(2, 19) ; return { text: `${q * b} ml : ${b} = ?`, max: 2, unit: 'ml', answer: String(q), explain: `${q * b} : ${b} = ${q} (ml).` };
+    }, 2],
+    [() => {
+      const a = pickOne([500, 750, 900, 1000]), r = rnd(1, a / 50 - 1) * 50;
+      return { text: `Một chai dầu ăn có ${a} ml dầu. Mẹ dùng để nấu ăn, trong chai còn lại ${r} ml. Mẹ đã dùng bao nhiêu mi-li-lít dầu?`, max: 4, unit: 'ml', answer: String(a - r), explain: `${a} − ${r} = ${a - r} (ml).` };
+    }, 1],
+    [() => {
+      const most = Math.random() < 0.5;
+      for (;;) {
+        const vals = shuffle([[pickOne([100, 200, 300, 400, 500, 600, 700, 800, 900]), 'ml'], [pickOne([1, 2]), 'l'], [pickOne([150, 250, 450, 650, 850]), 'ml']]);
+        const ml = vals.map(([v, u]) => (u === 'l' ? v * 1000 : v)), pick = most ? Math.max(...ml) : Math.min(...ml);
+        if (ml.filter((x) => x === pick).length > 1) continue;
+        const names = ['Chai A', 'Chai B', 'Chai C'];
+        return { text: `${names.map((n, i) => `${n} đựng ${vals[i][0]} ${vals[i][1]}`).join(', ')} nước. Chai nào đựng ${most ? 'NHIỀU' : 'ÍT'} nước nhất?`, choices: names, answer: names[ml.indexOf(pick)], explain: `Đổi ra ml: ${ml.map((x, i) => `${names[i]} ${x} ml`).join(', ')}.` };
+      }
+    }, 1],
   ]),
 };
 
@@ -153,6 +286,34 @@ const nhietDo = {
       const a = rnd(2, 19) * 5, b = rnd(2, 19) * 5;
       if (a === b) return nhietDo.make();
       return { text: `Nhiệt kế A chỉ ${a}°C, nhiệt kế B chỉ ${b}°C. Nơi nào nóng hơn? 🔥`, choices: ['A', 'B'], answer: a > b ? 'A' : 'B', explain: `${Math.max(a, b)}°C > ${Math.min(a, b)}°C.` };
+    }, 1],
+    // ----- Như sách: bảng nhiệt độ ba địa phương -----
+    [() => {
+      for (;;) {
+        const places = shuffle(['Hà Nội', 'Lào Cai', 'Sa Pa', 'Đà Nẵng', 'Huế', 'Đà Lạt']).slice(0, 3), t = places.map(() => rnd(8, 36));
+        if (new Set(t).size < 3) continue;
+        const [i, j] = shuffle([0, 1, 2]).slice(0, 2), hot = Math.random() < 0.5, win = (hot ? t[i] > t[j] : t[i] < t[j]) ? places[i] : places[j];
+        return { text: `Nhiệt độ buổi sáng: ${places.map((p, k) => `${p} ${t[k]}°C`).join(', ')}. Giữa ${places[i]} và ${places[j]}, nơi nào có nhiệt độ ${hot ? 'CAO' : 'THẤP'} hơn?`, choices: [places[i], places[j]], answer: win, explain: `${places[i]} ${t[i]}°C, ${places[j]} ${t[j]}°C.` };
+      }
+    }, 2],
+    // Như sách: dự báo sáng – trưa – đêm, thấp nhất / cao nhất.
+    [() => {
+      const s = rnd(20, 29), tr = rnd(30, 38), d = rnd(12, 19), low = Math.random() < 0.5;
+      return { text: `Dự báo nhiệt độ: sáng ${s}°C, trưa ${tr}°C, đêm ${d}°C. Nhiệt độ ${low ? 'thấp' : 'cao'} nhất là bao nhiêu độ C?`, max: 2, unit: '°C', answer: String(low ? d : tr), explain: `${low ? `Đêm ${d}°C là thấp nhất` : `Trưa ${tr}°C là cao nhất`}.` };
+    }, 2],
+    // Như sách: đọc số đo bằng chữ; so sánh nhiệt độ cơ thể với 37°C.
+    [() => {
+      const W = { 36: 'ba mươi sáu', 37: 'ba mươi bảy', 38: 'ba mươi tám', 39: 'ba mươi chín', 40: 'bốn mươi' }, v = rnd(36, 40), f = pickOne(FRIENDS);
+      return { text: `Nhiệt độ cơ thể của ${f} là ${W[v]} độ xê. Viết bằng số:`, max: 2, unit: '°C', answer: String(v), explain: `${W[v]} độ xê = ${v}°C.` };
+    }, 1],
+    [() => {
+      const pick = rnd(38, 40), vals = shuffle([37, 36, pick]);
+      return { text: `Ba người đo nhiệt độ cơ thể: ${vals.map((v) => `${v}°C`).join('; ')}. Người bình thường là 37°C. Nhiệt độ nào cao hơn bình thường?`, choices: vals.map((v) => `${v}°C`), answer: `${pick}°C`, explain: `${pick}°C > 37°C.` };
+    }, 1],
+    // Như sách: nối cốc nước với nhiệt độ.
+    [() => {
+      const [n, t] = pickOne([['Cốc nước đá 🧊', '5°C'], ['Cốc nước nóng vừa rót từ phích ♨️', '95°C'], ['Cốc nước lọc thường 🥛', '25°C']]);
+      return { text: `${n} có nhiệt độ khoảng bao nhiêu?`, choices: ['5°C', '25°C', '95°C'], answer: t, explain: 'Nước đá rất lạnh (5°C), nước lọc mát (25°C), nước phích rất nóng (95°C).' };
     }, 1],
   ]),
 };

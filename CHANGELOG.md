@@ -1,5 +1,15 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Đo lường: thêm dạng bài Mi-li-mét, Gam, Mi-li-lít, Nhiệt độ theo sách
+
+- Độ dài: thước có vạch mm đo đoạn AB, đổi cm/m ↔ mm, so sánh, tính với mm, ve sầu 3 cm – kiến 3 mm,
+  ốc sên đi học, cào cào nhảy gấp 3 lần, gấp/giảm với mm.
+- Khối lượng: cân đồng hồ 1 kg (vạch 50 g), túi táo – gói bột mì (hơn bao nhiêu, cả hai), tính với g,
+  con vật nặng khoảng 200 g / 2 kg / 20 kg / 200 kg.
+- Dung tích: rót bình sang 3 ca đong 500 ml, phích 1 l rót ra còn lại, tính với ml, chai dầu ăn, chai nào nhiều/ít nhất.
+- Nhiệt độ: bảng ba địa phương (nơi cao/thấp hơn), dự báo sáng–trưa–đêm, đọc "ba mươi bảy độ xê",
+  nhiệt độ cơ thể cao hơn 37°C, cốc nước đá / lọc / nóng.
+
 ## 2026-11-15 — Chương mới Bài toán giải bằng hai bước tính; thêm dạng Nhân số có hai chữ số
 
 - Chương mới `hai-buoc` (nhóm Số và phép tính): sơ đồ tóm tắt hai đoạn thẳng, làm theo Bước 1 → Bước 2.
