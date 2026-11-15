@@ -279,6 +279,44 @@ const nhanChiaLon = {
       const b = rnd(2, 9), a = rnd(12, Math.floor(999 / b)), right = a * b, shown = Math.random() < 0.5 ? right : slip('×', a, b);
       return tf(`${pickOne(FRIENDS)} tính: ${a} × ${b} = ${shown}. Đúng hay sai? 🤔`, shown === right, `${a} × ${b} = ${right}.`);
     }, 1],
+    // ----- Chia số có 2 chữ số cho số có 1 chữ số (như sách) -----
+    [() => {
+      const b = rnd(2, 9), q = rnd(1, Math.floor(9 / b)) * 10;
+      return { text: `Tính nhẩm: ${q * b} : ${b} = ?`, max: 2, answer: String(q), explain: `${q * b / 10} chục : ${b} = ${q / 10} chục = ${q}.` };
+    }, 1],
+    [() => {
+      const b = rnd(2, 5), q = rnd(11, Math.floor(99 / b)), left = Math.random() < 0.5;
+      return { text: left ? `${b} × ? = ${q * b}` : `? × ${b} = ${q * b}`, max: 2, answer: String(q), explain: `Lấy tích chia cho thừa số kia: ${q * b} : ${b} = ${q}.` };
+    }, 1],
+    [() => {
+      const b = rnd(2, 4), q = rnd(11, Math.floor(99 / b));
+      const opts = shuffle([...new Set([q, q + 10, q - 1, Math.floor(q / 10) + (q % 10) * 10].filter((v) => v > 0))]).slice(0, 4);
+      if (!opts.includes(q)) opts[0] = q;
+      return { text: `Nối phép tính với kết quả: ${q * b} : ${b} = ?`, choices: shuffle(opts), answer: q, explain: `${q * b} : ${b} = ${q}.` };
+    }, 1],
+    [() => {
+      const b = rnd(2, 5), q = rnd(11, Math.floor(99 / b)), [txt, unit] = pickOne([
+        [`Lớp 3A có ${q * b} học sinh. Cô giáo chia đều thành ${b} tổ. Hỏi mỗi tổ có bao nhiêu học sinh?`, 'học sinh'],
+        [`Bác Hoa mang ${q * b} quả trứng gà ra chợ, chia đều vào ${b} rổ. Hỏi mỗi rổ có bao nhiêu quả trứng?`, 'quả trứng'],
+      ]);
+      return { kind: 'divide', text: txt, div: { a: q * b, b }, show: `${q}`, explain: `${q * b} : ${b} = ${q} (${unit}).` };
+    }, 2],
+    // Như sách: Đúng/Sai một phép chia đã làm sẵn (lỗi hay gặp: số dư không bé hơn số chia).
+    [() => {
+      const b = rnd(3, 6), q = rnd(11, Math.floor(95 / b)), r = rnd(0, b - 1), a = q * b + r, wrong = Math.random() < 0.5 && q > 11;
+      const sq = wrong ? q - 1 : q, sr = wrong ? r + b : r;
+      return tf(`${pickOne(FRIENDS)} làm: ${a} : ${b} = ${sq}${sr ? ` (dư ${sr})` : ''}.`, !wrong, wrong ? `Số dư ${sr} không bé hơn số chia ${b} nên sai. Đúng là ${a} : ${b} = ${q}${r ? ` (dư ${r})` : ''}.` : `${b} × ${q} = ${q * b}${r ? `, ${a} − ${q * b} = ${r}` : ''}.`);
+    }, 1],
+    // Như sách: phép chia nào có số dư bằng k.
+    [() => {
+      for (;;) {
+        const k = rnd(1, 3), mk = (rr) => { const b = rnd(rr + 1, 9), q = rnd(5, Math.floor(90 / b)); return [`${q * b + rr} : ${b}`, rr]; };
+        const good = mk(k), bad = [0, 1, 2, 4].filter((x) => x !== k).slice(0, 3).map((x) => mk(x));
+        const all = [good, ...bad].map((x) => x[0]);
+        if (new Set(all).size < 4) continue;
+        return { text: `Phép chia nào có số dư là ${k}?`, choices: shuffle(all), answer: good[0], explain: `${good[0]} có số dư ${k}.` };
+      }
+    }, 1],
   ]),
   game() {
     const b = rnd(2, 9);

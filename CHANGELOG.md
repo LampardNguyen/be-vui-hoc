@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài Chia số có hai chữ số cho số có một chữ số
+
+- Tính nhẩm chia số tròn chục (60 : 2, 80 : 4…).
+- Tìm thừa số: 3 × ? = 63, ? × 4 = 84.
+- Nối phép chia với kết quả (chọn đáp án).
+- Bài toán lời văn (chia tổ, chia trứng vào rổ) có đặt tính.
+- Đúng/Sai phép chia làm sẵn (số dư phải bé hơn số chia); chọn phép chia có số dư k.
+
 ## 2026-11-15 — Thêm dạng bài theo sách cho chương Tam giác, tứ giác, chữ nhật, vuông
 
 - Hình có chữ: chọn đúng các đỉnh / các cạnh của tam giác, tứ giác.
