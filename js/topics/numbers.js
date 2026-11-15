@@ -606,6 +606,34 @@ const gapMayLan = {
       const a = rnd(2, 9), k = rnd(2, 6), plus = Math.random() < 0.5, shown = plus ? a + k : a * k;
       return tf(`${a} gấp lên ${k} lần được ${shown}. Đúng hay sai?`, !plus || a + k === a * k, `Gấp lên ${k} lần là nhân: ${a} × ${k} = ${a * k} (không phải cộng).`);
     }, 1],
+    // ----- So sánh số lớn gấp mấy lần số bé (như sách) -----
+    [() => {
+      const b = rnd(2, 5), k = rnd(2, 5), [n1, n2] = pickOne([['Bút chì', 'bút sáp'], ['Bút chì', 'cái ghim'], ['Thước kẻ', 'cục tẩy']]);
+      return { text: `📏 ${n1} dài ${b * k} cm, ${n2} dài ${b} cm. ${n1} dài gấp mấy lần ${n2}?`, max: 1, answer: String(k), explain: `${b * k} : ${b} = ${k} (lần).` };
+    }, 1],
+    [() => {
+      const r = rnd(2, 4), c = r * rnd(2, 3), e = pickOne(['⚽', '🏀', '🎾']);
+      let body = '';
+      for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) body += label(20 + j * 30, 20 + i * 30, e, 24);
+      return { kind: 'steps', text: `Có ${r * c} quả bóng xếp thành các hàng, các cột:`, svg: svg(body, `0 0 ${c * 30 + 10} ${r * 30 + 10}`),
+        steps: [
+          { text: 'Mỗi hàng có mấy quả bóng?', max: 2, answer: String(c) },
+          { text: 'Mỗi cột có mấy quả bóng?', max: 1, answer: String(r) },
+          { text: 'Số bóng trong một hàng gấp mấy lần số bóng trong một cột?', max: 1, answer: String(c / r), explain: `${c} : ${r} = ${c / r} (lần)` },
+        ], explain: `Hàng ${c} quả, cột ${r} quả, ${c} : ${r} = ${c / r}.` };
+    }, 1],
+    [() => {
+      const b = rnd(3, 9), k = rnd(2, 6), [big, small, what] = pickOne([['Thuyền lớn', 'thuyền nhỏ', 'khách du lịch'], ['Xe to', 'xe nhỏ', 'thùng hàng'], ['Giỏ to', 'giỏ nhỏ', 'quả cam']]);
+      return { kind: 'steps', text: `${big} chở ${b * k} ${what}, ${small} chở ${b} ${what}.`,
+        steps: [
+          { text: `${big} nhiều hơn ${small} bao nhiêu ${what}?`, max: 2, answer: String(b * k - b), explain: `${b * k} − ${b} = ${b * k - b}` },
+          { text: `Số ${what} ở ${big.toLowerCase()} gấp mấy lần ở ${small}?`, max: 1, answer: String(k), explain: `${b * k} : ${b} = ${k} (lần)` },
+        ], explain: '"Nhiều hơn bao nhiêu" → trừ; "gấp mấy lần" → chia.' };
+    }, 2],
+    [() => {
+      const b = rnd(2, 9), k = rnd(2, 9), [a1, a2] = pickOne([['con gà 🐔', 'con vịt 🦆'], ['cây cam 🍊', 'cây bưởi'], ['bạn nam', 'bạn nữ']]);
+      return { text: `Trên sân có ${b * k} ${a1} và ${b} ${a2}. Số ${a1.split(' ').slice(0, 2).join(' ')} gấp mấy lần số ${a2.split(' ').slice(0, 2).join(' ')}?`, max: 1, answer: String(k), explain: `${b * k} : ${b} = ${k} (lần).` };
+    }, 1],
     // ----- Gấp một số lên một số lần (như sách) -----
     [() => {
       const a = rnd(3, 15), k = rnd(2, 8), mul = Math.random() < 0.5;

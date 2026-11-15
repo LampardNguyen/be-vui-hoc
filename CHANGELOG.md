@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài So sánh số lớn gấp mấy lần số bé
+
+- Bút chì dài gấp mấy lần bút sáp / cái ghim.
+- Bóng xếp hàng, cột: mỗi hàng, mỗi cột, hàng gấp cột mấy lần (có hình).
+- Thuyền lớn – thuyền nhỏ: nhiều hơn bao nhiêu (trừ) và gấp mấy lần (chia).
+- Gà – vịt trên sân: số gà gấp mấy lần số vịt.
+
 ## 2026-11-15 — Thêm dạng bài theo sách cho chương Biểu thức số
 
 - Dạng biểu thức mới (`expr2`): nhân chia từ trái sang phải (30 : 5 × 2), ngoặc ở sau (32 − (25 + 4), 40 : (11 − 3)),
