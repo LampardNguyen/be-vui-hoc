@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài Giảm một số đi một số lần
+
+- Chương đổi tên: "Gấp mấy lần, giảm một số lần", thêm mẹo "giảm k lần là chia k".
+- Mũi tên giảm k lần; chuỗi gấp rồi giảm (hoặc giảm rồi gấp).
+- Bài toán lời văn: còn lại so với lúc đầu giảm đi k lần (nhãn vở, bút màu…).
+- Đúng/Sai phân biệt "giảm k lần" (chia) với "bớt k" (trừ).
+- Rô-bốt chọn đường gồm 2 phép gấp/giảm để có đúng số đồng vàng.
+
 ## 2026-11-15 — Thêm dạng bài theo sách cho chương Góc vuông
 
 - Góc có chữ: hỏi đỉnh, hai cạnh, góc đỉnh … là góc vuông hay không vuông.

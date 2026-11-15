@@ -386,11 +386,12 @@ function tapeSvg(b, k) {
   return svg(`<rect x="20" y="20" width="${u}" height="26" fill="#ffd166" stroke="#3a3f58" stroke-width="2"/>${label(20 + u + 30, 33, `${b} cm`, 14)}${big}${label(20 + (k * u) / 2, 112, `? cm`, 14)}`, '0 0 300 125');
 }
 const gapMayLan = {
-  id: 'gap-may-lan', title: 'Số lớn gấp mấy lần số bé', emoji: '📊',
+  id: 'gap-may-lan', title: 'Gấp mấy lần, giảm một số lần', emoji: '📊',
   tips: [
     'Muốn biết số lớn gấp mấy lần số bé: lấy số lớn chia cho số bé.',
     'Ví dụ 12 gấp 3 mấy lần? 12 : 3 = 4 → gấp 4 lần.',
     '"Gấp lên 3 lần" là nhân 3, khác với "thêm 3" là cộng 3 nhé!',
+    'Giảm một số đi 3 lần: lấy số đó chia 3. Ví dụ 27 giảm 3 lần còn 9.',
   ],
   make: mix([
     [() => {
@@ -411,6 +412,41 @@ const gapMayLan = {
       const a = rnd(2, 9), k = rnd(2, 6), plus = Math.random() < 0.5, shown = plus ? a + k : a * k;
       return tf(`${a} gấp lên ${k} lần được ${shown}. Đúng hay sai?`, !plus || a + k === a * k, `Gấp lên ${k} lần là nhân: ${a} × ${k} = ${a * k} (không phải cộng).`);
     }, 1],
+    // ----- Giảm một số đi một số lần (như sách) -----
+    [() => {
+      const k = rnd(2, 9), r = rnd(2, 9), n = r * k;
+      return { text: `${n} → giảm ${k} lần → ?`, max: 2, answer: String(r), explain: `Giảm ${k} lần là chia ${k}: ${n} : ${k} = ${r}.` };
+    }, 2],
+    [() => {
+      const up = Math.random() < 0.5, k1 = rnd(2, 7), k2 = rnd(2, 5);
+      let a = rnd(2, 14), mid, end;
+      if (up) { while ((a * k1) % k2) a = rnd(2, 14); mid = a * k1; end = mid / k2; }
+      else { mid = rnd(2, 13); a = mid * k1; end = mid * k2; }
+      const t = up ? `${a} → gấp ${k1} lần → ? → giảm ${k2} lần → ?` : `${a} → giảm ${k1} lần → ? → gấp ${k2} lần → ?`;
+      return { text: `${t} Số cuối cùng là mấy?`, max: 3, answer: String(end), explain: up ? `${a} × ${k1} = ${mid}, rồi ${mid} : ${k2} = ${end}.` : `${a} : ${k1} = ${mid}, rồi ${mid} × ${k2} = ${end}.` };
+    }, 2],
+    [() => {
+      const f = pickOne(FRIENDS), k = rnd(2, 6), r = rnd(3, 16), n = r * k;
+      const [what, before] = pickOne([['nhãn vở', 'Sau khi cho các bạn một số nhãn vở'], ['cây bút màu', 'Sau khoá học vẽ'], ['viên bi', 'Sau khi chơi'], ['quả cam', 'Sau khi đem biếu ông bà']]);
+      return { text: `${f} có ${n} ${what}. ${before}, số ${what} còn lại so với lúc đầu giảm đi ${k} lần. Hỏi ${f} còn lại bao nhiêu ${what}?`, max: 2, answer: String(r), explain: `Giảm đi ${k} lần: ${n} : ${k} = ${r} (${what}).` };
+    }, 2],
+    [() => {
+      const k = rnd(2, 6), r = rnd(2, 9), n = r * k, minus = Math.random() < 0.5;
+      return tf(`${n} giảm đi ${k} lần được ${minus ? n - k : r}.`, !minus || n - k === r, `Giảm ${k} lần là chia: ${n} : ${k} = ${r} (khác với "bớt đi ${k}" là trừ).`);
+    }, 1],
+    // Rô-bốt chọn đường: mỗi đường gồm 2 phép gấp/giảm.
+    [() => {
+      for (;;) {
+        const s = pickOne([12, 18, 24, 30, 36, 40, 48]), ops = shuffle([['gấp', 2], ['gấp', 3], ['gấp', 4], ['giảm', 2], ['giảm', 3], ['giảm', 4], ['giảm', 5], ['giảm', 6]]);
+        const ap = (x, [o, k]) => (o === 'gấp' ? x * k : x / k);
+        const paths = [[ops[0], ops[1]], [ops[2], ops[3]], [ops[4], ops[5]]].map((p) => ({ p, v: ap(ap(s, p[0]), p[1]) }));
+        if (!paths.every((x) => Number.isInteger(x.v) && Number.isInteger(ap(s, x.p[0])))) continue;
+        if (new Set(paths.map((x) => x.v)).size < 3) continue;
+        const name = (p) => `${p[0][0]} ${p[0][1]} lần rồi ${p[1][0]} ${p[1][1]} lần`;
+        return { text: `Rô-bốt có ${s} đồng vàng 🤖. Đi đường nào để có ${paths[0].v} đồng vàng?`, choices: shuffle(paths.map((x) => name(x.p))), answer: name(paths[0].p),
+          explain: `${s} ${paths[0].p[0][0] === 'gấp' ? '×' : ':'} ${paths[0].p[0][1]} = ${ap(s, paths[0].p[0])}, rồi ${paths[0].p[1][0] === 'gấp' ? '×' : ':'} ${paths[0].p[1][1]} = ${paths[0].v}.` };
+      }
+    }, 2],
   ]),
   game() {
     const b = rnd(2, 9), k = rnd(2, 9);
