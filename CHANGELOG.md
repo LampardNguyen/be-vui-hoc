@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài Phép chia hết, phép chia có dư
+
+- Bông hoa → chậu: phép chia có số dư là mấy.
+- Chia theo nhóm (mỗi rổ k con cá…) được mấy rổ, có đặt tính.
+- Chọn phép chia có số chia b và số dư r.
+
 ## 2026-11-15 — Thêm dạng bài Chia số có hai chữ số cho số có một chữ số
 
 - Tính nhẩm chia số tròn chục (60 : 2, 80 : 4…).

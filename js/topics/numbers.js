@@ -359,6 +359,27 @@ const chiaDu = {
       const bad = [want ? rem() : exact(), want ? rem() : exact(), want ? rem() : exact()];
       return { text: `Phép chia nào là phép chia ${want ? 'HẾT' : 'CÓ DƯ'}?`, choices: shuffle([...new Set([good, ...bad])]), answer: good, explain: `${good} là phép chia ${want ? 'hết (dư 0)' : 'có dư'}.` };
     }, 1],
+    // Như sách: bông hoa → chậu "Dư mấy".
+    [() => {
+      const b = rnd(2, 8), q = rnd(1, 9), r = rnd(1, b - 1), a = b * q + r;
+      return { text: `🌼 ${a} : ${b} có số dư là mấy?`, max: 1, answer: String(r), explain: `${b} × ${q} = ${b * q}, ${a} − ${b * q} = ${r}. Vậy ${a} : ${b} = ${q} (dư ${r}).` };
+    }, 2],
+    // Như sách: chia theo nhóm (mỗi rổ k con) → được mấy rổ.
+    [() => {
+      const k = rnd(3, 9), n = rnd(3, 9), [what, box, e] = pickOne([['con cá', 'rổ', '🐟'], ['quả táo', 'đĩa', '🍎'], ['quyển vở', 'chồng', '📒'], ['bông hoa', 'bó', '🌸']]);
+      return { kind: 'divide', text: `Rô-bốt chia ${n * k} ${what} ${e} vào các ${box}, mỗi ${box} ${k} ${what}. Hỏi được bao nhiêu ${box}?`, div: { a: n * k, b: k }, show: `${n}`, explain: `${n * k} : ${k} = ${n} (${box}).` };
+    }, 2],
+    // Như sách: viết một phép chia có số chia b và số dư r.
+    [() => {
+      for (;;) {
+        const b = rnd(4, 9), r = rnd(1, b - 1), q = rnd(1, 9), good = `${b * q + r} : ${b}`;
+        const bad = shuffle([`${b * q + ((r + 1) % b)} : ${b}`, `${b * q + r} : ${b === 9 ? 8 : b + 1}`, `${b * q} : ${b}`]).slice(0, 2);
+        const all = [good, ...bad];
+        const ok = (s) => { const [x, y] = s.split(' : ').map(Number); return y === b && x % y === r; };
+        if (new Set(all).size < 3 || all.filter(ok).length !== 1) continue;
+        return { text: `Phép chia nào có số chia là ${b} và số dư là ${r}?`, choices: shuffle(all), answer: good, explain: `${good} = ${q} (dư ${r}).` };
+      }
+    }, 1],
   ]),
   game() {
     const b = rnd(2, 9), q = rnd(2, 9), r = rnd(1, b - 1), a = b * q + r;
