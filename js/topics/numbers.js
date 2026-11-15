@@ -325,6 +325,47 @@ const nhanChiaLon = {
       const b = pickOne([2, 4]), a = rnd(51, Math.floor(499 / b)) * 2, p = a * b;
       return { text: `${a} × ${b} = ${p}. Vậy ${a / 2} × ? = ${p}`, max: 1, answer: String(b * 2), explain: `Thừa số thứ nhất giảm 2 lần thì thừa số kia gấp 2 lần: ${a / 2} × ${b * 2} = ${p}.` };
     }, 1],
+    // ----- Chia số có 3 chữ số cho số có 1 chữ số (như sách) -----
+    [() => {
+      const b = pickOne([2, 3, 4]), q = rnd(1, Math.floor(9 / b)) * 100;
+      return { text: `Tính nhẩm: ${q * b} : ${b} = ?`, max: 3, answer: String(q), explain: `${q * b / 100} trăm : ${b} = ${q / 100} trăm = ${q}.` };
+    }, 1],
+    [() => {
+      const [u, e] = pickOne([['m', '🧀'], ['phút', '⏱️'], ['ml', '🥛'], ['g', '⚖️']]), b = rnd(3, 8), q = rnd(21, Math.floor(999 / b));
+      return { text: `${e} ${q * b} ${u} → giảm ${b} lần → ? ${u}`, max: 3, unit: u, answer: String(q), explain: `Giảm ${b} lần là chia: ${q * b} : ${b} = ${q} (${u}).` };
+    }, 1],
+    [() => {
+      const k = rnd(0, 1);
+      if (k === 0) { const b = rnd(2, 4), q = rnd(101, Math.floor(999 / b)); return { kind: 'divide', text: `Rô-bốt 🤖 vừa chạy ${q * b} m. Quãng đường của Rô-bốt dài gấp ${b} lần quãng đường của Việt. Việt chạy bao nhiêu mét?`, div: { a: q * b, b }, show: `${q}`, explain: `${q * b} : ${b} = ${q} (m).` }; }
+      const b = rnd(3, 6), q = rnd(101, Math.floor(999 / b)); return { kind: 'divide', text: `Cửa hàng nướng được ${q * b} cái bánh 🥐, xếp vào hộp, mỗi hộp ${b} cái. Hỏi xếp được bao nhiêu hộp?`, div: { a: q * b, b }, show: `${q}`, explain: `${q * b} : ${b} = ${q} (hộp).` };
+    }, 2],
+    [() => {
+      const b = rnd(3, 6), q = rnd(51, Math.floor(990 / b)), r = rnd(1, b - 1), n = q * b + r;
+      return { kind: 'steps', text: `Cửa hàng nhập ${n} chiếc bút chì ✏️, đóng mỗi hộp ${b} chiếc. Hỏi đóng được bao nhiêu hộp và còn thừa mấy chiếc?`,
+        steps: [
+          { text: 'Đóng được bao nhiêu hộp?', max: 3, answer: String(q), explain: `${n} : ${b} = ${q} (dư ${r})` },
+          { text: 'Còn thừa mấy chiếc bút chì?', max: 1, answer: String(r), explain: `Số dư là ${r}` },
+        ], explain: `${n} : ${b} = ${q} (dư ${r}).` };
+    }, 1],
+    // Như sách: Đúng/Sai — lỗi hay gặp là quên chữ số 0 ở thương.
+    [() => {
+      const b = rnd(3, 9), t = rnd(1, Math.floor(9 / b)) || 1, u = rnd(1, 9), r = rnd(0, b - 1), q = t * 100 + u, n = q * b + r;
+      const wrong = Math.random() < 0.5, sq = wrong ? t * 10 + u : q;
+      if (Math.floor(n / b) !== q) return nhanChiaLon.make();
+      return tf(`${pickOne(FRIENDS)} làm: ${n} : ${b} = ${sq}${r ? ` (dư ${r})` : ''}.`, !wrong, wrong ? `Sai rồi: chia lần hai được 0, phải viết 0 vào thương. Đúng là ${n} : ${b} = ${q}${r ? ` (dư ${r})` : ''}.` : `${b} × ${q} = ${q * b}${r ? `, dư ${r}` : ''}.`);
+    }, 1],
+    [() => {
+      const n = pickOne([3, 4, 5, 6]), w = rnd(21, Math.floor(990 / n)) ;
+      return { text: `Cân thăng bằng: Rô-bốt 🤖 nặng ${w * n} g, bên kia là ${n} khối ru-bích giống nhau 🧊. Mỗi khối nặng bao nhiêu gam?`, max: 3, unit: 'g', answer: String(w), explain: `${w * n} : ${n} = ${w} (g).` };
+    }, 1],
+    [() => {
+      const one = rnd(5, 30), two = rnd(30, 120), tot = one + two * 2;
+      return { kind: 'steps', text: `Trang trại có ${one} con lạc đà 1 bướu 🐪, còn lại là lạc đà 2 bướu 🐫. Tất cả có ${tot} cái bướu. Có bao nhiêu con lạc đà 2 bướu?`,
+        steps: [
+          { text: `Bước 1: Số bướu của lạc đà 2 bướu: ${tot} − ${one} = ?`, max: 3, answer: String(tot - one), explain: `${tot} − ${one} = ${tot - one}` },
+          { text: `Bước 2: Số con lạc đà 2 bướu: ${tot - one} : 2 = ?`, max: 3, answer: String(two), explain: `${tot - one} : 2 = ${two}` },
+        ], explain: `Đáp số: ${two} con.` };
+    }, 1],
     // ----- Chia số có 2 chữ số cho số có 1 chữ số (như sách) -----
     [() => {
       const b = rnd(2, 9), q = rnd(1, Math.floor(9 / b)) * 10;

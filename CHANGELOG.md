@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài Chia số có ba chữ số cho số có một chữ số
+
+- Tính nhẩm chia số tròn trăm (600 : 3…); giảm k lần với m, phút, ml, g (bài chú chuột và miếng phô mai).
+- Bài toán có đặt tính: quãng đường Rô-bốt gấp 3 lần của Việt, xếp bánh vào hộp.
+- Đóng bút chì vào hộp: được mấy hộp, thừa mấy chiếc (chia có dư).
+- Đúng/Sai phép chia làm sẵn — lỗi quên viết 0 ở thương (808 : 8 = 11).
+- Rô-bốt cân bằng các khối ru-bích; lạc đà 1 bướu – 2 bướu (hai bước).
+
 ## 2026-11-15 — Thêm dạng bài Nhân số có ba chữ số với số có một chữ số
 
 - Tính nhẩm số tròn trăm (300 × 3…), tìm tích từ hai thừa số.
