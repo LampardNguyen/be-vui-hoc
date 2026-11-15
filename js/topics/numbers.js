@@ -279,6 +279,24 @@ const nhanChiaLon = {
       const b = rnd(2, 9), a = rnd(12, Math.floor(999 / b)), right = a * b, shown = Math.random() < 0.5 ? right : slip('×', a, b);
       return tf(`${pickOne(FRIENDS)} tính: ${a} × ${b} = ${shown}. Đúng hay sai? 🤔`, shown === right, `${a} × ${b} = ${right}.`);
     }, 1],
+    // ----- Nhân số có 2 chữ số với số có 1 chữ số (như sách) -----
+    [() => {
+      const t = rnd(1, 4), k = rnd(2, Math.floor(9 / t));
+      return { text: `Tính nhẩm: ${t * 10} × ${k} = ?`, max: 2, answer: String(t * 10 * k), explain: `${t} chục × ${k} = ${t * k} chục, nên ${t * 10} × ${k} = ${t * 10 * k}.` };
+    }, 1],
+    [() => {
+      const b = rnd(2, 4), a = rnd(11, Math.floor(99 / b)), v = a * b;
+      const opts = shuffle([...new Set([v, v + 10, v - b, a + b])]).slice(0, 4);
+      if (!opts.includes(v)) opts[0] = v;
+      return { text: `Nối phép tính với kết quả: ${a} × ${b} = ?`, choices: shuffle(opts), answer: v, explain: `${a} × ${b} = ${v}.` };
+    }, 1],
+    [() => {
+      const b = rnd(2, 4), a = rnd(11, Math.floor(99 / b)), [txt, unit] = pickOne([
+        [`Bác Nam có ${b} chuồng gà, mỗi chuồng có ${a} con gà 🐔. Hỏi bác Nam có bao nhiêu con gà?`, 'con gà'],
+        [`Có ${b} bình nước. Quạ phải thả ${a} viên sỏi vào mỗi bình 🐦‍⬛. Hỏi quạ phải thả tất cả bao nhiêu viên sỏi?`, 'viên sỏi'],
+      ]);
+      return { kind: 'column', text: txt, col: { op: '×', a, b }, show: a * b, explain: `${a} × ${b} = ${a * b} (${unit}).` };
+    }, 2],
     // ----- Chia số có 2 chữ số cho số có 1 chữ số (như sách) -----
     [() => {
       const b = rnd(2, 9), q = rnd(1, Math.floor(9 / b)) * 10;
@@ -784,4 +802,85 @@ const tpNhanChia = {
   },
 };
 
-export const NUMBER_TOPICS = [soSanh, congTru, nhanChiaLon, chiaDu, bieuThuc, gapMayLan, tpCongTru, tpNhanChia];
+// ---------- Bài toán giải bằng hai bước tính ----------
+// Sơ đồ tóm tắt: 2 đoạn thẳng, đoạn trên a, đoạn dưới gấp k lần hoặc hơn/kém d, ngoặc "? " bên phải.
+function twoBars(n1, n2, a, rel, total) {
+  const W = 165, ua = rel.k ? W / rel.k : rel.more ? W * 0.6 : W, ub = rel.k ? W : rel.more ? W : W * 0.6;
+  let b = `${label(62, 40, n1, 13)}${label(62, 82, n2, 13)}<line x1="128" y1="40" x2="${128 + ua}" y2="40" stroke="${INK}" stroke-width="3"/><line x1="128" y1="82" x2="${128 + ub}" y2="82" stroke="${INK}" stroke-width="3"/>`;
+  b += label(128 + ua / 2, 24, a, 14);
+  if (rel.k) for (let i = 1; i < rel.k; i++) b += `<line x1="${128 + i * ua}" y1="76" x2="${128 + i * ua}" y2="88" stroke="${INK}" stroke-width="2"/>`;
+  else b += `<line x1="${128 + Math.min(ua, ub)}" y1="34" x2="${128 + Math.min(ua, ub)}" y2="90" stroke="${INK}" stroke-width="1.5" stroke-dasharray="4 3"/>${label(128 + (ua + ub) / 2, rel.more ? 98 : 54, rel.d, 13)}`;
+  if (total) b += `<path d="M300 34 q8 0 8 12 v10 l6 4 l-6 4 v10 q0 12 -8 12" fill="none" stroke="${INK}" stroke-width="2"/>${label(330, 62, '?', 16)}`;
+  return svg(b, '0 0 345 108');
+}
+const twoStep = {
+  id: 'hai-buoc', title: 'Bài toán giải bằng hai bước tính', emoji: '🪜',
+  tips: [
+    'Bước 1: tìm số chưa biết ở giữa (ví dụ can thứ hai). Bước 2: dùng số đó để trả lời câu hỏi.',
+    'Đọc kĩ: "gấp 3 lần" → nhân; "nhiều hơn 3" → cộng; "ít hơn 3" → trừ.',
+    'Vẽ sơ đồ tóm tắt giúp con thấy bài toán dễ hơn.',
+  ],
+  make: mix([
+    // Như sách: can thứ hai gấp k lần can thứ nhất, cả hai can?
+    [() => {
+      const a = rnd(2, 9), k = rnd(2, 5), [what, u, c1, c2] = pickOne([['nước mắm', 'l', 'Can thứ nhất', 'Can thứ hai'], ['dầu', 'l', 'Thùng thứ nhất', 'Thùng thứ hai'], ['gạo', 'kg', 'Bao bé', 'Bao to']]);
+      return { kind: 'steps', text: `${c1} đựng ${a} ${u} ${what}, ${c2.toLowerCase()} đựng gấp ${k} lần ${c1.toLowerCase()}. Hỏi cả hai đựng bao nhiêu ${u} ${what}?`, svg: twoBars(c1, c2, `${a} ${u}`, { k }, true),
+        steps: [
+          { text: `Bước 1: ${c2} đựng: ${a} × ${k} = ?`, max: 2, unit: u, answer: String(a * k), explain: `${a} × ${k} = ${a * k} (${u})` },
+          { text: `Bước 2: Cả hai đựng: ${a} + ${a * k} = ?`, max: 2, unit: u, answer: String(a + a * k), explain: `${a} + ${a * k} = ${a + a * k} (${u})` },
+        ], explain: `Đáp số: ${a + a * k} ${u} ${what}.` };
+    }, 3],
+    // Như sách: Nam gấp ít hơn / nhiều hơn Mai d cái, cả hai?
+    [() => {
+      const [f1, f2] = shuffle(FRIENDS).slice(0, 2), a = rnd(8, 40), d = rnd(2, 7), more = Math.random() < 0.5, b = more ? a + d : a - d;
+      const [e, name] = pickOne([['⛵', 'cái thuyền'], ['🌟', 'ngôi sao'], ['🐦', 'con hạc giấy'], ['🌸', 'bông hoa']]);
+      return { kind: 'steps', text: `${f1} gấp được ${a} ${name} ${e}, ${f2} gấp được ${more ? 'nhiều' : 'ít'} hơn ${f1} ${d} ${name}. Hỏi cả hai bạn gấp được bao nhiêu ${name}?`,
+        steps: [
+          { text: `Bước 1: ${f2} gấp được: ${a} ${more ? '+' : '−'} ${d} = ?`, max: 2, answer: String(b), explain: `${a} ${more ? '+' : '−'} ${d} = ${b}` },
+          { text: `Bước 2: Cả hai bạn: ${a} + ${b} = ?`, max: 2, answer: String(a + b), explain: `${a} + ${b} = ${a + b}` },
+        ], explain: `Đáp số: ${a + b} ${name}.` };
+    }, 3],
+    // Như sách: bao ngô 30 kg, bao gạo hơn 10 kg, cả hai?
+    [() => {
+      const a = rnd(2, 6) * 10, d = rnd(1, 3) * 5, more = Math.random() < 0.6, b = more ? a + d : a - d;
+      return { kind: 'steps', text: `Bao ngô nặng ${a} kg, bao gạo nặng ${more ? 'hơn' : 'kém'} bao ngô ${d} kg. Hỏi cả hai bao nặng bao nhiêu ki-lô-gam?`, svg: twoBars('Bao ngô', 'Bao gạo', `${a} kg`, { more, d: `${d} kg` }, true),
+        steps: [
+          { text: `Bước 1: Bao gạo nặng: ${a} ${more ? '+' : '−'} ${d} = ?`, max: 2, unit: 'kg', answer: String(b), explain: `${a} ${more ? '+' : '−'} ${d} = ${b} (kg)` },
+          { text: `Bước 2: Cả hai bao: ${a} + ${b} = ?`, max: 3, unit: 'kg', answer: String(a + b), explain: `${a} + ${b} = ${a + b} (kg)` },
+        ], explain: `Đáp số: ${a + b} kg.` };
+    }, 2],
+    // Như sách: cửa hàng bán sáng, bán chiều, còn lại?
+    [() => {
+      const s1 = rnd(8, 25), s2 = rnd(5, 20), n = s1 + s2 + rnd(3, 30), [what, e] = pickOne([['cái quạt điện', '🌀'], ['quyển sách', '📚'], ['chiếc bánh', '🥐'], ['quả dưa', '🍉']]);
+      const way = Math.random() < 0.5;
+      return { kind: 'steps', text: `Cửa hàng có ${n} ${what} ${e}. Buổi sáng bán được ${s1}, buổi chiều bán được ${s2}. Hỏi cửa hàng còn lại bao nhiêu ${what}?`,
+        steps: way ? [
+          { text: `Bước 1: Cả hai buổi bán: ${s1} + ${s2} = ?`, max: 2, answer: String(s1 + s2), explain: `${s1} + ${s2} = ${s1 + s2}` },
+          { text: `Bước 2: Còn lại: ${n} − ${s1 + s2} = ?`, max: 2, answer: String(n - s1 - s2), explain: `${n} − ${s1 + s2} = ${n - s1 - s2}` },
+        ] : [
+          { text: `Bước 1: Sau buổi sáng còn: ${n} − ${s1} = ?`, max: 2, answer: String(n - s1), explain: `${n} − ${s1} = ${n - s1}` },
+          { text: `Bước 2: Sau buổi chiều còn: ${n - s1} − ${s2} = ?`, max: 2, answer: String(n - s1 - s2), explain: `${n - s1} − ${s2} = ${n - s1 - s2}` },
+        ], explain: `Đáp số: ${n - s1 - s2} ${what}.` };
+    }, 3],
+    // Có k hộp, mỗi hộp m cái, cho đi d cái, còn lại?
+    [() => {
+      const k = rnd(2, 6), m = rnd(4, 9), d = rnd(2, k * m - 2), [e, name, box] = pickOne([['🖍️', 'bút chì màu', 'hộp'], ['🥚', 'quả trứng', 'khay'], ['🍪', 'cái bánh', 'túi']]);
+      return { kind: 'steps', text: `Có ${k} ${box}, mỗi ${box} có ${m} ${name} ${e}. Đã dùng hết ${d} ${name}. Hỏi còn lại bao nhiêu ${name}?`,
+        steps: [
+          { text: `Bước 1: Tất cả có: ${m} × ${k} = ?`, max: 2, answer: String(m * k), explain: `${m} × ${k} = ${m * k}` },
+          { text: `Bước 2: Còn lại: ${m * k} − ${d} = ?`, max: 2, answer: String(m * k - d), explain: `${m * k} − ${d} = ${m * k - d}` },
+        ], explain: `Đáp số: ${m * k - d} ${name}.` };
+    }, 2],
+    // Chọn phép tính đúng cho bước 1.
+    [() => {
+      const a = rnd(3, 9), k = rnd(2, 5), opts = [`${a} × ${k}`, `${a} + ${k}`, `${a} : ${k}`];
+      return { text: `Can thứ nhất có ${a} l, can thứ hai gấp ${k} lần can thứ nhất. Để tìm số lít ở can thứ hai, con làm phép tính nào?`, choices: shuffle(opts), answer: opts[0], explain: `Gấp ${k} lần là nhân: ${a} × ${k} = ${a * k} (l).` };
+    }, 1],
+  ]),
+  game() {
+    const a = rnd(2, 9), k = rnd(2, 4);
+    return gq(`${a} và gấp ${k} lần`, a + a * k, [1, a, k], `Thùng 1 có ${a} l, thùng 2 gấp ${k} lần. Cả hai có mấy lít?`, `${a} × ${k} = ${a * k}; ${a} + ${a * k} = ${a + a * k}`);
+  },
+};
+
+export const NUMBER_TOPICS = [soSanh, congTru, nhanChiaLon, chiaDu, bieuThuc, twoStep, gapMayLan, tpCongTru, tpNhanChia];

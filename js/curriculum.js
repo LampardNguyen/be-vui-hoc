@@ -13,6 +13,7 @@ export const GRADES = [
             { id: 'nhan-chia-lon', name: 'Nhân, chia số 2–3 chữ số với 1 chữ số', emoji: '🧮', href: '#/topic/nhan-chia-lon' },
             { id: 'chia-du', name: 'Phép chia hết và có dư', emoji: '🍬', href: '#/topic/chia-du' },
             { id: 'bieu-thuc', name: 'Biểu thức số', emoji: '🧾', href: '#/topic/bieu-thuc' },
+            { id: 'hai-buoc', name: 'Bài toán giải bằng hai bước tính', emoji: '🪜', href: '#/topic/hai-buoc' },
             { id: 'gap-may-lan', name: 'Gấp mấy lần, giảm một số lần', emoji: '📊', href: '#/topic/gap-may-lan' },
           ] },
           { name: '🧩 Tìm thành phần', topics: [

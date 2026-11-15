@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Chương mới Bài toán giải bằng hai bước tính; thêm dạng Nhân số có hai chữ số
+
+- Chương mới `hai-buoc` (nhóm Số và phép tính): sơ đồ tóm tắt hai đoạn thẳng, làm theo Bước 1 → Bước 2.
+  Dạng: gấp k lần rồi tính tổng (can nước mắm), nhiều/ít hơn rồi tính tổng (gấp thuyền), bao ngô – bao gạo,
+  bán sáng – bán chiều còn lại, nhân rồi trừ, chọn phép tính cho bước 1.
+- Nhân 2 chữ số × 1 chữ số: tính nhẩm số tròn chục, nối phép tính với kết quả, bài toán chuồng gà / quạ thả sỏi (đặt tính).
+
 ## 2026-11-15 — Thêm dạng bài Phép chia hết, phép chia có dư
 
 - Bông hoa → chậu: phép chia có số dư là mấy.
