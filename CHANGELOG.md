@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài theo sách cho chương Hình tròn
+
+- Hình tròn có chữ: hỏi tâm là điểm nào, đoạn nào là bán kính / đường kính (có dây cung gây nhiễu).
+- Các hình tròn bằng nhau xếp hàng: tính độ dài đường gấp khúc ABCD, hoặc dài bằng mấy bán kính.
+- Đúng/Sai: các bán kính của một hình tròn dài bằng nhau.
+
 ## 2026-11-12 — Thêm dạng bài theo sách: Một phần mấy
 
 - Đ/S: "Đã tô màu 1/m hình tròn / hình chữ nhật" với hình chia n phần.

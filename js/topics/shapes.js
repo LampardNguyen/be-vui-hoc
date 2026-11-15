@@ -210,6 +210,53 @@ const hinhTron = {
       const r = rnd(2, 9), d = Math.random() < 0.5 ? r * 2 : pickOne([r + 2, r * 3, r]);
       return tf(`Hình tròn tâm O có bán kính ${r} cm thì đường kính dài ${d} cm.`, d === r * 2, `Đường kính = 2 × ${r} = ${r * 2} cm.`);
     }, 1],
+    // Như sách: hình tròn có chữ, hỏi tâm / bán kính / đường kính là đoạn nào.
+    [() => {
+      const L = shuffle(['A', 'B', 'C', 'D', 'M', 'N', 'P', 'Q', 'E', 'K']), c = pickOne(['O', 'I']);
+      const R = 75, O = [150, 105], base = rnd(0, 359);
+      const pt = (d) => [O[0] + R * Math.cos(rad(d)), O[1] + R * Math.sin(rad(d))];
+      const d1 = pt(base), d2 = pt(base + 180), r1 = pt(base + rnd(60, 120)), ch = [pt(base + 200), pt(base + 300)];
+      const withChord = Math.random() < 0.5;
+      const [a, b, p, x, y] = L, lab = (q, t) => { const k = 1.22; return label(O[0] + (q[0] - O[0]) * k, O[1] + (q[1] - O[1]) * k, t); };
+      let body = `<circle cx="${O[0]}" cy="${O[1]}" r="${R}" fill="${SOFT}" stroke="${INK}" stroke-width="3"/>`
+        + `<line x1="${d1[0]}" y1="${d1[1]}" x2="${d2[0]}" y2="${d2[1]}" stroke="${INK}" stroke-width="3"/>`
+        + `<line x1="${O[0]}" y1="${O[1]}" x2="${r1[0]}" y2="${r1[1]}" stroke="${INK}" stroke-width="3"/>`
+        + lab(d1, a) + lab(d2, b) + lab(r1, p) + dot(O[0], O[1], c, 14, 14);
+      if (withChord) body += `<line x1="${ch[0][0]}" y1="${ch[0][1]}" x2="${ch[1][0]}" y2="${ch[1][1]}" stroke="${INK}" stroke-width="3"/>` + lab(ch[0], x) + lab(ch[1], y);
+      const pic = svg(body, '0 0 300 210');
+      const ask = pickOne(['tam', 'ban', 'duong']);
+      if (ask === 'tam') return { text: 'Tâm của hình tròn là điểm nào?', choices: shuffle([c, a, p, b]), answer: c, svg: pic, explain: `Tâm là điểm chính giữa: ${c}.` };
+      if (ask === 'duong') {
+        const opts = shuffle([a + b, c + p, ...(withChord ? [x + y] : [c + a])]);
+        return { text: 'Đường kính của hình tròn là đoạn nào?', choices: opts, answer: a + b, svg: pic, explain: `Đường kính đi qua tâm ${c}: ${a}${b}.` };
+      }
+      const good = shuffle([c + a, c + b, c + p]), right = good[0];
+      const opts = shuffle([right, a + b, ...(withChord ? [x + y] : [a + p])]);
+      return { text: 'Đoạn nào là một bán kính của hình tròn?', choices: opts, answer: right, svg: pic, explain: `Bán kính nối tâm ${c} với đường tròn: ${c}${a}, ${c}${b}, ${c}${p}.` };
+    }, 3],
+    // Như sách: các hình tròn bằng nhau xếp hàng, đường gấp khúc ABCD.
+    [() => {
+      const n = rnd(2, 3), r = rnd(3, 9), R = n === 2 ? 60 : 45, y = 120;
+      const cx = (i) => 15 + R + i * 2 * R, W = 30 + 2 * R * n;
+      let body = '';
+      for (let i = 0; i < n; i++) body += `<circle cx="${cx(i)}" cy="${y}" r="${R}" fill="${SOFT}" stroke="${INK}" stroke-width="3"/>${dot(cx(i), y, '')}`;
+      const B = cx(0), C = cx(n - 1);
+      body += `<polyline points="${B},${y - R} ${B},${y} ${C},${y} ${C},${y - R}" fill="none" stroke="${HI}" stroke-width="4"/>`
+        + label(B, y - R - 14, 'A') + label(B - 14, y + 16, 'B') + label(C + 14, y + 16, 'C') + label(C, y - R - 14, 'D')
+        + label(B + 22, y - R / 2, `${r} cm`, 15);
+      const pic = svg(body, `0 0 ${W} ${y + R + 10}`);
+      const nr = 2 + (n - 1) * 2, total = nr * r;
+      return Math.random() < 0.6
+        ? { text: `${n} hình tròn bằng nhau, mỗi hình có bán kính ${r} cm. Bọ ngựa bò theo đường gấp khúc ABCD (A, D trên đường tròn; B, C là tâm). Bọ ngựa bò tất cả mấy cm? 🐞`, max: 3, unit: 'cm', answer: String(total), svg: pic,
+          explain: `AB = ${r} cm, BC = ${n - 1} × 2 × ${r} = ${(n - 1) * 2 * r} cm, CD = ${r} cm. Tổng = ${total} cm.` }
+        : { text: `Đường gấp khúc ABCD dài bằng mấy bán kính? (A, D trên đường tròn; B, C là tâm)`, max: 2, answer: String(nr), svg: pic,
+          explain: `AB, CD mỗi đoạn 1 bán kính; BC gồm ${n - 1} đường kính = ${(n - 1) * 2} bán kính. Tổng ${nr} bán kính.` };
+    }, 2],
+    // Bán kính các hình tròn bằng nhau.
+    [() => {
+      const r = rnd(2, 9), v = pickOne([r, r, r * 2, r + 1]);
+      return tf(`Hình tròn tâm O có bán kính OA = ${r} cm. Bán kính OB = ${v} cm.`, v === r, `Các bán kính của một hình tròn dài bằng nhau: OB = OA = ${r} cm.`);
+    }, 1],
   ]),
   game() {
     const r = rnd(2, 20);
