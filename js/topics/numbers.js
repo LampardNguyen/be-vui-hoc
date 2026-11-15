@@ -475,6 +475,15 @@ const chiaDu = {
 };
 
 // ---------- Biểu thức số ----------
+function expr2() {
+  const k = rnd(0, 4);
+  if (k === 0) { const b = rnd(2, 9), q = rnd(2, 9), c = rnd(2, 5); return { e: `${b * q} : ${b} × ${c}`, first: `${b * q} : ${b}`, mid: q, v: q * c, rule: 'Chỉ có nhân, chia: tính từ trái sang phải.' }; }
+  if (k === 1) { const b = rnd(5, 30), c = rnd(2, 9), a = rnd(b + c + 1, 90); return { e: `${a} − (${b} + ${c})`, first: `${b} + ${c}`, mid: b + c, v: a - b - c, rule: 'Tính trong ngoặc trước.' }; }
+  if (k === 2) { const c = rnd(1, 8), d = rnd(2, 9), b = c + d, q = rnd(2, 9); return { e: `${d * q} : (${b} − ${c})`, first: `${b} − ${c}`, mid: d, v: q, rule: 'Tính trong ngoặc trước.' }; }
+  if (k === 3) { const a = rnd(101, 300), b = rnd(1, 9) * 10, c = 100 - b; return { e: `${a} + ${b} + ${c}`, first: `${b} + ${c}`, mid: 100, v: a + 100, rule: 'Cộng hai số tròn chục thành 100 trước cho dễ: ' + `${b} + ${c} = 100.` }; }
+  const c = rnd(2, 5), q = rnd(5, 20), a = rnd(1, q * c - 1), b = q * c - a; return { e: `(${a} + ${b}) : ${c}`, first: `${a} + ${b}`, mid: q * c, v: q, rule: 'Tính trong ngoặc trước.' };
+}
+
 function expr() {
   const k = rnd(0, 4);
   if (k === 0) { const a = rnd(20, 90), b = rnd(10, 60), c = rnd(5, a + b - 5); return { e: `${a} + ${b} − ${c}`, first: `${a} + ${b}`, mid: a + b, v: a + b - c, rule: 'Chỉ có cộng, trừ: tính từ trái sang phải.', opts: [`${a} + ${b}`, `${b} − ${c}`] }; }
@@ -515,6 +524,45 @@ const bieuThuc = {
         : cmp(`(${a} + ${b}) × ${c}`, l, `${a} + ${b} × ${c}`, r, `Có ngoặc: ${l}. Không ngoặc: ${r}. Dấu ngoặc làm thay đổi kết quả!`);
     }, 1],
     [() => { const x = expr(); return { text: `${x.e} = ?`, max: 3, answer: String(x.v), explain: `${x.rule} ${x.first} = ${x.mid}, rồi ra ${x.v}.` }; }, 1],
+    // ----- Như sách -----
+    // Các dạng biểu thức thêm: nhân chia từ trái sang phải, ngoặc ở sau, cộng ba số tròn chục.
+    [() => {
+      const x = expr2();
+      return { kind: 'steps', text: `Tính giá trị biểu thức: ${x.e}`, steps: [
+        { text: `Bước 1: ${x.first} = ?`, max: 3, answer: String(x.mid), explain: x.rule },
+        { text: `Bước 2: ${x.e} = ?`, max: 3, answer: String(x.v) },
+      ], explain: x.rule };
+    }, 3],
+    // Nối biểu thức với giá trị (chiếc thuyền A, B, C, D).
+    [() => {
+      for (;;) {
+        const xs = [expr2(), expr2(), expr2(), expr2()];
+        if (new Set(xs.map((x) => x.v)).size < 4) continue;
+        const L = ['A', 'B', 'C', 'D'], k = rnd(0, 3);
+        return { text: `⛵ ${xs.map((x, i) => `${L[i]}: ${x.e}`).join("; ")}. Biểu thức nào có giá trị bằng ${xs[k].v}?`, choices: L, answer: L[k], explain: xs.map((x, i) => `${L[i]} = ${x.v}`).join(', ') + '.' };
+      }
+    }, 2],
+    // Khoanh biểu thức lớn nhất / bé nhất.
+    [() => {
+      for (;;) {
+        const a = rnd(3, 9), b = rnd(4, 8), c = rnd(1, b - 1), d = rnd(2, 6) * 4, e = rnd(2, 6) * 4;
+        const xs = [[`${a} × (${b} − ${c})`, a * (b - c)], [`${a} × ${b} − ${c}`, a * b - c], [`(${d} + ${e}) : 4`, (d + e) / 4], [`${d} + ${e} : 4`, d + e / 4]];
+        const vs = xs.map((x) => x[1]), big = Math.random() < 0.5, t = big ? Math.max(...vs) : Math.min(...vs);
+        if (vs.filter((v) => v === t).length > 1) continue;
+        return { text: `Biểu thức nào có giá trị ${big ? 'LỚN' : 'BÉ'} nhất?`, choices: shuffle(xs.map((x) => x[0])), answer: xs[vs.indexOf(t)][0], explain: xs.map((x) => `${x[0]} = ${x[1]}`).join('; ') + '.' };
+      }
+    }, 2],
+    // So sánh A: a − b × c và B: (a − b) × c.
+    [() => {
+      const b = rnd(2, 9), c = rnd(2, 5), a = rnd(b * c + 1, 60), A = a - b * c, B = (a - b) * c;
+      const ans = A > B ? 'A lớn hơn B' : A < B ? 'B lớn hơn A' : 'Bằng nhau';
+      return { text: `Cho (A): ${a} − ${b} × ${c} và (B): (${a} − ${b}) × ${c}. So sánh giá trị hai biểu thức:`, choices: ['A lớn hơn B', 'B lớn hơn A', 'Bằng nhau'], answer: ans, explain: `A = ${a} − ${b * c} = ${A}; B = ${a - b} × ${c} = ${B}.` };
+    }, 1],
+    // Mai có k hộp bút, cho đi m hộp, mỗi hộp n chiếc.
+    [() => {
+      const k = rnd(4, 9), m = rnd(1, k - 2), n = pickOne([5, 6, 8, 10, 12]), f = pickOne(FRIENDS);
+      return { text: `${f} có ${k} hộp bút màu 🖍️, cho bạn ${m} hộp. Mỗi hộp có ${n} chiếc. Hỏi ${f} còn lại bao nhiêu chiếc bút màu?`, max: 3, answer: String((k - m) * n), explain: `(${k} − ${m}) × ${n} = ${k - m} × ${n} = ${(k - m) * n} (chiếc).` };
+    }, 1],
   ]),
   game() { const x = expr(); return gq(x.e, x.v, [1, 2, 10]); },
 };

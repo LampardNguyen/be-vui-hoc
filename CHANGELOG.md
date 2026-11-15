@@ -1,5 +1,14 @@
 # Nhật ký thay đổi
 
+## 2026-11-15 — Thêm dạng bài theo sách cho chương Biểu thức số
+
+- Dạng biểu thức mới (`expr2`): nhân chia từ trái sang phải (30 : 5 × 2), ngoặc ở sau (32 − (25 + 4), 40 : (11 − 3)),
+  (15 + 5) : 5, cộng thuận tiện ba số (123 + 80 + 20) — làm theo Bước 1 → Bước 2.
+- Nối biểu thức với giá trị (thuyền A, B, C, D).
+- Chọn biểu thức có giá trị lớn nhất / bé nhất (5 × (6 − 2), 5 × 6 − 2, …).
+- So sánh A: 35 − 5 × 2 và B: (35 − 5) × 2.
+- Bài toán: có k hộp bút, cho m hộp, mỗi hộp n chiếc.
+
 ## 2026-11-15 — Thêm dạng bài Chia số có ba chữ số cho số có một chữ số
 
 - Tính nhẩm chia số tròn trăm (600 : 3…); giảm k lần với m, phút, ml, g (bài chú chuột và miếng phô mai).
