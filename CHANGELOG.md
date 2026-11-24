@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Chế độ dev xem lần lượt các dạng câu hỏi
+- Bật bằng `?dev=1`, tắt bằng `?dev=0` (nhớ trong localStorage khóa `be-vui-hoc-dev`), có nhãn 🛠 DEV góc màn hình.
+- Mỗi chương có nút "🛠 Xem các dạng" (`#/dev/<id>`): duyệt từng dạng không lặp, hiện sẵn đáp án, giải thích, kiểu nhập; nút Trước / Số khác / Tiếp; không ghi tiến độ.
+- `mix()` gắn thêm `.types` (danh sách hàm dạng). CLAUDE.md thêm quy tắc câu luyện tập ưu tiên trắc nghiệm.
+
 ## 2026-11-24 — Câu không cần đặt tính tự thành trắc nghiệm
 
 - `renderKind` (`js/ui/kinds.js`): câu nhập số không có nút ✍️ Đặt tính → tự đổi thành 4 lựa chọn (kèm đơn vị) qua `numChoice`.

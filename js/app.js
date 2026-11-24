@@ -14,6 +14,7 @@ import { memoryScreen } from './games/memory.js';
 import { bossScreen } from './games/boss.js';
 import { raceScreen } from './games/race.js';
 import { frogScreen } from './games/frog.js';
+import { devScreen, isDev, initDev } from './screens/dev.js';
 
 // Điều hướng bằng #hash: #/subject/toan3, #/topic/cuu-chuong, #/table/3, #/learn/3, #/practice/mix, #/games/3, #/balloon/3, #/rewards, #/parent
 const routes = {
@@ -33,6 +34,7 @@ const routes = {
   race: raceScreen,
   frog: frogScreen,
   parent: parentScreen,
+  dev: (p) => (isDev() && Object.hasOwn(TOPICS, p || '') ? devScreen(p) : homeScreen()),
 };
 
 function render() {
@@ -44,6 +46,7 @@ function render() {
   window.scrollTo(0, 0);
 }
 
+initDev();
 addEventListener('hashchange', render);
 render();
 

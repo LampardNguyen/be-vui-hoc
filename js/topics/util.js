@@ -40,10 +40,12 @@ export const gq = (text, answer, spread, ask = `${text} = ?`, reveal = `${text} 
 // túi có w lá cho mỗi dạng, xáo lên rồi rút hết mới xáo túi mới → các dạng/phần ra đều nhau.
 export function mix(list) {
   let bag = [];
-  return () => {
+  const next = () => {
     if (!bag.length) bag = shuffle(list.flatMap(([fn, w]) => Array(w).fill(fn)));
     return bag.pop()();
   };
+  next.types = list.map(([fn]) => fn);   // Chế độ dev duyệt lần lượt từng dạng (js/screens/dev.js).
+  return next;
 }
 
 // Nhân vật & đồ vật cho toán có lời văn.

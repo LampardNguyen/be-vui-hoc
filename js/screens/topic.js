@@ -6,6 +6,7 @@ import { state, save } from '../storage.js';
 import { play } from '../sound.js';
 import { TOPICS } from '../topics/index.js';
 import { randomGameHash } from '../games/index.js';
+import { isDev } from './dev.js';
 
 const PRAISE = ['Giỏi quá!', 'Tuyệt vời!', 'Chính xác!', 'Siêu đỉnh!', 'Hay lắm!', 'Con thông minh quá!'];
 const RUNNERS = ['🐰', '🐢', '🦊', '🐼', '🐥', '🦄'];
@@ -33,6 +34,7 @@ export function topicScreen(id) {
     h('div', { class: 'acts' },
       act(`#/quiz/${id}`, '🎯', t.parts ? 'Luyện trộn' : 'Luyện tập', t.parts ? '10 câu, trộn mọi phần' : '10 câu, nhiều kiểu bài'),
       act(`#/games/t-${id}`, '🎮', 'Trò chơi', 'Bóng bay, đua xe, ếch…'),
+      isDev() ? act(`#/dev/${id}`, '🛠', 'Xem các dạng', 'Chế độ dev') : null,
     ),
     t.parts ? h('h2', { class: 'section-title' }, '🎯 Luyện từng phần') : null,
     t.parts ? h('div', { class: 'acts parts' }, t.parts.map((p) => act(`#/quiz/${id}.${p.id}`, p.emoji, p.title, starsText(topicStars(`${id}.${p.id}`))))) : null,

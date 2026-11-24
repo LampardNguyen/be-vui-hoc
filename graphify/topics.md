@@ -34,3 +34,8 @@
 
 ## Liên quan
 [[curriculum]] · [[games]] · [[routing]] · [[storage]] · [[practice-learn]]
+
+## Chế độ dev (xem các dạng)
+- `js/screens/dev.js`: `?dev=1` bật / `?dev=0` tắt (localStorage `be-vui-hoc-dev`, tách khỏi `state`), `initDev()` gọi trong `js/app.js`, route `#/dev/<id>`.
+- Lấy danh sách dạng từ `make.types` do `mix()` gắn; chương có `parts` thì nối dạng của từng phần.
+- Không gọi `answer()`/không lưu sao. Bẫy: dạng không qua `mix()` sẽ chỉ hiện như 1 dạng.

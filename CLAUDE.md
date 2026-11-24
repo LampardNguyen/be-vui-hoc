@@ -48,6 +48,9 @@
   thêm vào `GAMES` (`js/games/index.js`), route trong `js/app.js`, `FILES` trong `sw.js`,
   sticker kỷ lục trong `js/screens/rewards.js` nếu cần. Xem [[games]] trong graphify.
 - **Sticker mới**: thêm vào `STICKERS` (điều kiện tính từ `state` sẵn có, không thêm trường mới nếu tránh được).
+- **Câu hỏi luyện tập**: tạo dạng **trắc nghiệm là chính** (`choices`, có thể dùng `numChoice()` trong `js/topics/util.js`).
+  Chỉ câu cần tính toán/đặt tính mới hiện bàn phím nhập số (`renderKind` tự đổi câu số không có đặt tính sang trắc nghiệm;
+  `keypad: true` để giữ bàn phím, `calc: []` để bỏ nút Đặt tính).
 - Câu trả lời của bé phải đi qua `answer()` (`js/leitner.js`) để cập nhật mức thuộc.
 
 ## 6. Bản đồ tri thức `graphify/`
