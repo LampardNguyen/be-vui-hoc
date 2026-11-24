@@ -15,6 +15,7 @@
   `column` (`col: { op: '+'|'-'|'×', a, b }`) · `divide` (`div: { a, b }`) · `pick` (svg có `data-k`, `pick: { multi, correct }`) ·
   `paint` (svg có `data-k` + `.part`, `paint: { need }`) · `order` (`order: { items, asc }`) · `steps` (`steps: [câu con choice/num]`).
   Không ghi `kind` thì tự suy: có `choices` → choice, không → num.
+  **Câu `num` không có phép đặt tính tự đổi thành choice 4 lựa chọn** (`autoChoice` trong `renderKind`); muốn giữ bàn phím ghi `keypad: true`, muốn tắt nút đặt tính ghi `calc: []`.
 - `numbers.js` có `readNum(n)` (đọc số 100–999 bằng chữ: linh, mốt, tư, lăm) và `digits(n)` → [trăm, chục, đơn vị]; dạng bài bám theo sách giáo khoa (dãy số, chum chạm chọn, chuỗi mũi tên, toán 2 bước).
 - **Nháp đặt tính** (`withScratch` trong `kinds.js`): câu `choice`/`num`/`pick` có phép + − (từ `q.calc`, hoặc `q.calcText ?? q.text`; bỏ qua nếu có ×, :, ngoặc, "nhẩm", "gọi là gì") có nút ✍️ Đặt tính. Chuỗi a + b − c → đặt tính lần lượt, dùng kết quả trước. Nháp dùng `makePad` riêng; đóng nháp thì `el.remount()` tạo lại bàn phím của câu `num`.
 - **Phần (parts)**: chương có `parts: [{ id, title, emoji, make }]` (vd Đo lường: do-dai, khoi-luong, dung-tich, nhiet-do, dong-ho, ngay-thang) → `topicScreen` hiện nút "Luyện từng phần" tới `#/quiz/<id>.<phần>`; `make` của chương trộn mọi phần. Sao lưu `state.topics['<id>.<phần>']` và nâng `state.topics[id]`. `measure.js` có `clock(h, m)` (đồng hồ kim), cân đồng hồ, can dầu; phần Ngày-tháng-thứ có `calendar(y, mo, hl)` (tờ lịch thật theo năm hiện tại), `twoWeeks`, `dayStrip`.

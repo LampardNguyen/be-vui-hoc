@@ -2,6 +2,7 @@
 // done(ok, { corrected }) — corrected: bé đã tự sửa đúng ngay trong bài (đặt tính, sắp xếp, nhiều bước).
 import { h, wait } from './widgets.js';
 import { play } from '../sound.js';
+import { numChoice } from '../topics/util.js';
 
 // Hình SVG do app tự tạo (không chứa dữ liệu người dùng) nên gán innerHTML an toàn.
 export function picture(svgText, cls = 'topic-pic') {
@@ -346,8 +347,16 @@ function withScratch(kind, q, done, makePad, ops) {
   return h('div', {}, notes, h('div', { class: 'center' }, btn), panel, el);
 }
 
+// Câu nhập số không có phép đặt tính → tự đổi thành trắc nghiệm 4 lựa chọn cho bé bấm nhanh.
+// Câu cần rèn viết số thì ghi keypad: true để giữ bàn phím.
+function autoChoice(q) {
+  const n = +q.answer, spread = n < 10 ? [1, 2] : n < 100 ? [1, 2, 10] : n < 1000 ? [1, 10, 100] : [10, 100, 1000];
+  return { ...q, ...numChoice(n, spread, q.unit) };
+}
+
 export function renderKind(q, done, makePad) {
-  const kind = q.kind || (q.choices ? 'choice' : 'num');
+  let kind = q.kind || (q.choices ? 'choice' : 'num');
   const ops = ['choice', 'num', 'pick'].includes(kind) ? findOps(q) : [];
+  if (kind === 'num' && !ops.length && !q.keypad) { q = autoChoice(q); kind = 'choice'; }
   return ops.length ? withScratch(kind, q, done, makePad, ops) : KINDS[kind](q, done, makePad);
 }

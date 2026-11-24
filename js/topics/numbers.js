@@ -109,13 +109,13 @@ const soSanh = {
         if (opts.size < 4 && m >= 100 && m !== n) opts.add(readNum(m));
       }
       if (Math.random() < 0.6) return { text: `Số ${n} đọc là gì? 🗣️`, choices: shuffle([...opts]), answer: readNum(n), explain: `${n}: ${readNum(n)}.` };
-      return { text: `Viết số: "${readNum(n)}" ✏️`, max: 3, answer: String(n), explain: `${readNum(n)}: ${n}.` };
+      return { text: `Viết số: "${readNum(n)}" ✏️`, keypad: true, max: 3, answer: String(n), explain: `${readNum(n)}: ${n}.` };
     }, 2],
     [() => {
       const n = rnd(101, 999), [h, t, u] = digits(n);
       if (!t || !u) return { text: `Viết ${n} thành tổng các trăm, chục, đơn vị. Số trăm là bao nhiêu?`, max: 3, answer: String(h * 100), explain: `${n} = ${[h * 100, t * 10, u].filter((v) => v).join(' + ')}.` };
       const k = rnd(0, 2), parts = [h * 100, t * 10, u], shown = parts.map((v, i) => (i === k ? '❓' : v)).join(' + ');
-      return { text: `${n} = ${shown}. Số ❓ là bao nhiêu?`, max: 3, answer: String(parts[k]), explain: `${n} = ${parts.join(' + ')}.` };
+      return { text: `${n} = ${shown}. Số ❓ là bao nhiêu?`, calc: [], max: 3, answer: String(parts[k]), explain: `${n} = ${parts.join(' + ')}.` };
     }, 1],
     [() => {
       // Ba số liên tiếp, có thể đếm xuôi hoặc ngược.

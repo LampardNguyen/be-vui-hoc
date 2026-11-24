@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Câu không cần đặt tính tự thành trắc nghiệm
+
+- `renderKind` (`js/ui/kinds.js`): câu nhập số không có nút ✍️ Đặt tính → tự đổi thành 4 lựa chọn (kèm đơn vị) qua `numChoice`.
+- Giữ bàn phím số cho câu có đặt tính (cộng/trừ số lớn) và câu "Viết số" (`keypad: true`).
+- Câu "347 = 300 + 40 + ❓" bỏ nút đặt tính thừa (`calc: []`) nên cũng thành trắc nghiệm.
+
 ## 2026-11-24 — Câu không cần tính chuyển sang trắc nghiệm
 
 - Thêm `numChoice(ans, spread, unit, wrong)` trong `js/topics/util.js`: đổi câu đáp án số thành 4 lựa chọn.
