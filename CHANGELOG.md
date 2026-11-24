@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Luyện nhân/chia 2–9 thành trắc nghiệm
+- `js/screens/practice.js`: bỏ bàn phím số, thay bằng 4 nút đáp án (2×2), chạm là chấm.
+- Đáp án nhiễu dễ nhầm: lệch một hàng trong bảng hoặc ±1 (nhân), thương lân cận (chia).
+- Sai: nút đỏ, nút đúng xanh, ẩn lựa chọn và hiện hình minh hoạ như cũ.
+
 ## 2026-11-24 — Chế độ dev xem lần lượt các dạng câu hỏi
 - Chỉ bật khi URL có `?dev=1` (mặc định tắt, không nhớ lại), có nhãn 🛠 DEV góc màn hình.
 - Mỗi chương có nút "🛠 Xem các dạng" (`#/dev/<id>`): duyệt từng dạng không lặp, hiện sẵn đáp án, giải thích, kiểu nhập; nút Trước / Số khác / Tiếp; không ghi tiến độ.

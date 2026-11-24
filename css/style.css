@@ -661,3 +661,4 @@ a { text-decoration: none; }
 .dev-kind { color: #888; font-size: 13px; }
 .dev-nav { display: flex; gap: 8px; justify-content: center; margin: 12px 0 24px; }
 .dev-nav .btn-secondary { flex: 1; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
+.practice-choices { max-width: 520px; margin: 18px auto 0; }

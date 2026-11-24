@@ -1,5 +1,5 @@
 import { h, topBar, dotArray, confetti, starsText, wait, leave } from '../ui/widgets.js';
-import { numpad } from '../ui/numpad.js';
+import { shuffle, pickOne } from '../topics/util.js';
 import { pick, poolFor, answer, FAST_MS } from '../leitner.js';
 import { state, save } from '../storage.js';
 import { sayFact } from '../speech.js';
@@ -15,6 +15,14 @@ function titleFor(key) {
   return key.endsWith('m') ? `✖️ Luyện nhân ${t}` : key.endsWith('d') ? `➗ Luyện chia ${t}` : `Luyện bảng ${t}`;
 }
 
+// 3 đáp án nhiễu dễ nhầm: lệch một hàng trong bảng (nhân) hoặc thương lân cận (chia), không âm, không trùng.
+function distractors(q) {
+  const near = q.type === 'm' ? [q.answer - q.a, q.answer + q.a, q.answer - 1, q.answer + 1] : [q.answer - 1, q.answer + 1, q.answer + 2, q.answer - 2];
+  const set = new Set(shuffle(near).filter((v) => v > 0 && v !== q.answer));
+  while (set.size < 3) set.add(q.answer + pickOne([1, 2, 3, 4, 5]) * set.size + set.size);
+  return [...set].slice(0, 3);
+}
+
 export function practiceScreen(key = 'mix') {
   const back = key === 'mix' ? '#/topic/cuu-chuong' : `#/table/${parseInt(key, 10)}`;
   const queue = pick(poolFor(key), QUESTIONS);
@@ -28,9 +36,9 @@ export function practiceScreen(key = 'mix') {
   const question = h('div', { class: 'question' });
   const answerBox = h('span', { class: 'answer-box' });
   const feedback = h('div', { class: 'feedback' });
-  const pad = numpad({ onChange: (v) => { answerBox.textContent = v || '?'; }, onSubmit: submit });
+  const pad = h('div', { class: 'choices practice-choices' });
 
-  const stage = h('div', { class: 'stage' }, question, feedback, pad.el);
+  const stage = h('div', { class: 'stage' }, question, feedback, pad);
   const root = h('div', { class: 'screen practice' },
     topBar(titleFor(key), back),
     h('div', { class: 'progress' }, h('span', { class: 'bar' }, bar), counter),
@@ -43,18 +51,24 @@ export function practiceScreen(key = 'mix') {
     counter.textContent = `${Math.min(done + 1, total)}/${total}`;
     bar.style.width = `${(done / total) * 100}%`;
     answerBox.className = 'answer-box';
+    answerBox.textContent = '?';
     question.replaceChildren(h('span', {}, `${q.text} = `), answerBox);
     question.classList.remove('pop-in'); void question.offsetWidth; question.classList.add('pop-in');
     feedback.replaceChildren();
-    pad.clear();
-    pad.setEnabled(true);
+    pad.replaceChildren(...shuffle([q.answer, ...distractors(q)]).map((v) =>
+      h('button', { class: 'choice', onclick: (e) => submit(v, e.currentTarget) }, v)));
     start = performance.now();
   }
 
-  async function submit(v) {
+  async function submit(v, btn) {
     const ms = performance.now() - start;
-    const correct = +v === q.answer;
-    pad.setEnabled(false);
+    const correct = v === q.answer;
+    pad.querySelectorAll('.choice').forEach((b) => {
+      b.disabled = true;
+      if (+b.textContent === q.answer) b.classList.add('right');
+    });
+    if (!correct) btn.classList.add('wrong');
+    answerBox.textContent = q.answer;
     answer(q, correct, ms);
 
     if (correct) {
@@ -77,6 +91,7 @@ export function practiceScreen(key = 'mix') {
     retries[q.id] = (retries[q.id] || 0) + 1;
     if (retries[q.id] <= 2) queue.splice(Math.min(i + 3, queue.length), 0, q);
     answerBox.classList.add('wrong');
+    pad.replaceChildren();   // Ẩn nút lựa chọn để bé tập trung xem lại hình.
     sayFact(q);
     feedback.replaceChildren(h('div', { class: 'oops' },
       h('p', {}, 'Chưa đúng rồi, mình cùng xem lại nhé!'),
