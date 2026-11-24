@@ -50,9 +50,9 @@ const soSanh = {
       const rv = lv + pickOne([0, rnd(1, 9), -rnd(1, 9), rnd(10, 40), -rnd(10, 40)]);
       return cmp(lt, lv, String(rv), rv, `${lt} = ${lv}, mà ${lv} ${sign(lv, rv)} ${rv}.`);
     }, 3],
-    [() => {
+    [function retry() {
       const a = rnd(50, 400), b = rnd(50, 400), c = rnd(50, 400), d = a + b - c + pickOne([0, 0, rnd(1, 20), -rnd(1, 20)]);
-      if (d < 0) return soSanh.make();
+      if (d < 0) return retry();
       return cmp(`${a} + ${b}`, a + b, `${c} + ${d}`, c + d, `Bên trái ${a + b}, bên phải ${c + d}.`);
     }, 2],
     [() => {
@@ -348,10 +348,10 @@ const nhanChiaLon = {
         ], explain: `${n} : ${b} = ${q} (dư ${r}).` };
     }, 1],
     // Như sách: Đúng/Sai — lỗi hay gặp là quên chữ số 0 ở thương.
-    [() => {
+    [function retry() {
       const b = rnd(3, 9), t = rnd(1, Math.floor(9 / b)) || 1, u = rnd(1, 9), r = rnd(0, b - 1), q = t * 100 + u, n = q * b + r;
       const wrong = Math.random() < 0.5, sq = wrong ? t * 10 + u : q;
-      if (Math.floor(n / b) !== q) return nhanChiaLon.make();
+      if (Math.floor(n / b) !== q) return retry();
       return tf(`${pickOne(FRIENDS)} làm: ${n} : ${b} = ${sq}${r ? ` (dư ${r})` : ''}.`, !wrong, wrong ? `Sai rồi: chia lần hai được 0, phải viết 0 vào thương. Đúng là ${n} : ${b} = ${q}${r ? ` (dư ${r})` : ''}.` : `${b} × ${q} = ${q * b}${r ? `, dư ${r}` : ''}.`);
     }, 1],
     [() => {

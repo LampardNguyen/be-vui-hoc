@@ -329,9 +329,9 @@ const nhietDo = {
       const a = rnd(18, 30), d = rnd(2, 9), up = Math.random() < 0.5;
       return { text: `Buổi sáng trời ${a}°C. Đến trưa nhiệt độ ${up ? 'tăng thêm' : 'giảm đi'} ${d}°C. Buổi trưa trời bao nhiêu độ C? ☀️`, max: 2, unit: '°C', answer: String(up ? a + d : a - d), explain: `${a} ${up ? '+' : '−'} ${d} = ${up ? a + d : a - d} (°C).` };
     }, 2],
-    [() => {
+    [function retry() {
       const a = rnd(2, 19) * 5, b = rnd(2, 19) * 5;
-      if (a === b) return nhietDo.make();
+      if (a === b) return retry();
       return { text: `Nhiệt kế A chỉ ${a}°C, nhiệt kế B chỉ ${b}°C. Nơi nào nóng hơn? 🔥`, choices: ['A', 'B'], answer: a > b ? 'A' : 'B', explain: `${Math.max(a, b)}°C > ${Math.min(a, b)}°C.` };
     }, 1],
     // ----- Như sách: bảng nhiệt độ ba địa phương -----

@@ -1,5 +1,8 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Sửa dạng câu tự nhảy sang dạng khác
+- So sánh số dưới 1000 (dạng tổng = tổng), Nhân chia số lớn (Đúng/Sai thương có 0), Nhiệt độ (so 2 nhiệt kế): khi số không hợp lệ thì tạo lại chính dạng đó thay vì rút ngẫu nhiên cả chương (chế độ dev bị nhảy dạng).
+
 ## 2026-11-24 — Luyện nhân/chia 2–9 thành trắc nghiệm
 - `js/screens/practice.js`: bỏ bàn phím số, thay bằng 4 nút đáp án (2×2), chạm là chấm.
 - Đáp án nhiễu dễ nhầm: lệch một hàng trong bảng hoặc ±1 (nhân), thương lân cận (chia).
