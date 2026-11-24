@@ -1,5 +1,8 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — So sánh số dưới 1000: gộp 3 dạng cái cân
+- Phép tính – số, tổng – tổng, trăm + chục + đơn vị – số giờ là một dạng (chọn ngẫu nhiên kiểu đặt lên cân), tần suất như cũ. Chương còn 10 dạng.
+
 ## 2026-11-24 — Sửa dạng câu tự nhảy sang dạng khác
 - So sánh số dưới 1000 (dạng tổng = tổng), Nhân chia số lớn (Đúng/Sai thương có 0), Nhiệt độ (so 2 nhiệt kế): khi số không hợp lệ thì tạo lại chính dạng đó thay vì rút ngẫu nhiên cả chương (chế độ dev bị nhảy dạng).
 

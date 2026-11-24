@@ -36,6 +36,27 @@ function readNum(n) {
 const digits = (n) => [Math.floor(n / 100), Math.floor(n / 10) % 10, n % 10];
 
 // ---------- So sánh số dưới 1000 ----------
+// Dạng cái cân: 3 kiểu đặt lên cân (phép tính – số, tổng – tổng, trăm + chục + đơn vị – số), chung một dạng.
+function canCalc() {
+  const a = rnd(100, 700), b = rnd(10, 250), s = a + b, op = Math.random() < 0.5;
+  const lv = op ? s : a, lt = op ? `${a} + ${b}` : `${s} − ${b}`;
+  const rv = lv + pickOne([0, rnd(1, 9), -rnd(1, 9), rnd(10, 40), -rnd(10, 40)]);
+  return cmp(lt, lv, String(rv), rv, `${lt} = ${lv}, mà ${lv} ${sign(lv, rv)} ${rv}.`);
+}
+function canSums() {
+  const a = rnd(50, 400), b = rnd(50, 400), c = rnd(50, 400), d = a + b - c + pickOne([0, 0, rnd(1, 20), -rnd(1, 20)]);
+  if (d < 0) return canSums();
+  return cmp(`${a} + ${b}`, a + b, `${c} + ${d}`, c + d, `Bên trái ${a + b}, bên phải ${c + d}.`);
+}
+function canPlace() {
+  // Tổng các trăm, chục, đơn vị so với một số.
+  const n = rnd(101, 989), [h, t, u] = digits(n), lt = [h * 100, t * 10, u].filter((v) => v).join(' + ');
+  const rv = pickOne([n, n, h * 100 + u * 10 + t, n + pickOne([1, -1, 10, -10])]);
+  return Math.random() < 0.5 ? cmp(lt, n, String(rv), rv, `${lt} = ${n}, mà ${n} ${sign(n, rv)} ${rv}.`)
+    : cmp(String(rv), rv, lt, n, `${lt} = ${n}, mà ${rv} ${sign(rv, n)} ${n}.`);
+}
+const canDang = () => pickOne([canCalc, canCalc, canCalc, canSums, canSums, canPlace, canPlace])();
+
 const soSanh = {
   id: 'so-sanh-1000', title: 'So sánh số dưới 1000', emoji: '⚖️',
   tips: [
@@ -44,17 +65,7 @@ const soSanh = {
     'Dấu > và < luôn "há miệng" về phía số lớn hơn 🐊.',
   ],
   make: mix([
-    [() => {
-      const a = rnd(100, 700), b = rnd(10, 250), s = a + b, op = Math.random() < 0.5;
-      const lv = op ? s : a, lt = op ? `${a} + ${b}` : `${s} − ${b}`;
-      const rv = lv + pickOne([0, rnd(1, 9), -rnd(1, 9), rnd(10, 40), -rnd(10, 40)]);
-      return cmp(lt, lv, String(rv), rv, `${lt} = ${lv}, mà ${lv} ${sign(lv, rv)} ${rv}.`);
-    }, 3],
-    [function retry() {
-      const a = rnd(50, 400), b = rnd(50, 400), c = rnd(50, 400), d = a + b - c + pickOne([0, 0, rnd(1, 20), -rnd(1, 20)]);
-      if (d < 0) return retry();
-      return cmp(`${a} + ${b}`, a + b, `${c} + ${d}`, c + d, `Bên trái ${a + b}, bên phải ${c + d}.`);
-    }, 2],
+    [canDang, 7],
     [() => {
       // Các số gần nhau, có số đảo chữ số cho bé phải so kĩ từng hàng.
       const h1 = rnd(1, 8), t1 = rnd(0, 9), u1 = rnd(0, 9), set = new Set([h1 * 100 + t1 * 10 + u1]);
@@ -73,13 +84,6 @@ const soSanh = {
       const n = rnd(101, 998), after = Math.random() < 0.5;
       return { text: `Số liền ${after ? 'sau' : 'trước'} của ${n} là số nào?`, ...numChoice(after ? n + 1 : n - 1, [1, 2, 10]), explain: `Số liền ${after ? 'sau thì thêm' : 'trước thì bớt'} 1.` };
     }, 1],
-    [() => {
-      // Tổng các trăm, chục, đơn vị so với một số.
-      const n = rnd(101, 989), [h, t, u] = digits(n), lt = [h * 100, t * 10, u].filter((v) => v).join(' + ');
-      const rv = pickOne([n, n, h * 100 + u * 10 + t, n + pickOne([1, -1, 10, -10])]);
-      return Math.random() < 0.5 ? cmp(lt, n, String(rv), rv, `${lt} = ${n}, mà ${n} ${sign(n, rv)} ${rv}.`)
-        : cmp(String(rv), rv, lt, n, `${lt} = ${n}, mà ${rv} ${sign(rv, n)} ${n}.`);
-    }, 2],
     [() => {
       // Dãy số đếm thêm / bớt 1, điền các ô trống.
       const up = Math.random() < 0.5, len = 7, start = up ? rnd(100, 990) : rnd(108, 1000);
