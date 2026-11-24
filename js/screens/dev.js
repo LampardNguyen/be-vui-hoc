@@ -1,19 +1,14 @@
 // Chế độ dev: duyệt lần lượt mọi dạng câu hỏi của một chương, hiện sẵn đáp án, không ghi tiến độ.
-// Bật bằng ?dev=1, tắt bằng ?dev=0 (nhớ trong localStorage, khóa riêng không đụng `state`).
+// Chỉ bật khi URL có ?dev=1 (không nhớ lại, mặc định tắt).
 import { h, topBar } from '../ui/widgets.js';
 import { numpad } from '../ui/numpad.js';
 import { renderKind, picture } from '../ui/kinds.js';
 import { TOPICS } from '../topics/index.js';
 
-const KEY = 'be-vui-hoc-dev';
-
-export function isDev() {
-  try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
-}
+export const isDev = () => new URLSearchParams(location.search).get('dev') === '1';
 
 export function initDev() {
-  const v = new URLSearchParams(location.search).get('dev');
-  try { if (v === '1') localStorage.setItem(KEY, '1'); else if (v === '0') localStorage.removeItem(KEY); } catch { /* bỏ qua */ }
+  try { localStorage.removeItem('be-vui-hoc-dev'); } catch { /* bỏ cờ cũ đã lưu */ }
   if (isDev()) document.body.append(h('div', { class: 'dev-badge' }, '🛠 DEV'));
 }
 

@@ -1,7 +1,7 @@
 # Nhật ký thay đổi
 
 ## 2026-11-24 — Chế độ dev xem lần lượt các dạng câu hỏi
-- Bật bằng `?dev=1`, tắt bằng `?dev=0` (nhớ trong localStorage khóa `be-vui-hoc-dev`), có nhãn 🛠 DEV góc màn hình.
+- Chỉ bật khi URL có `?dev=1` (mặc định tắt, không nhớ lại), có nhãn 🛠 DEV góc màn hình.
 - Mỗi chương có nút "🛠 Xem các dạng" (`#/dev/<id>`): duyệt từng dạng không lặp, hiện sẵn đáp án, giải thích, kiểu nhập; nút Trước / Số khác / Tiếp; không ghi tiến độ.
 - `mix()` gắn thêm `.types` (danh sách hàm dạng). CLAUDE.md thêm quy tắc câu luyện tập ưu tiên trắc nghiệm.
 
