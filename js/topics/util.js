@@ -30,13 +30,13 @@ export function wrongNums(ans, spread = [1, 2, 10]) {
 export const gq = (text, answer, spread, ask = `${text} = ?`, reveal = `${text} = ${answer}`) =>
   ({ text, ask, answer, wrong: wrongNums(answer, spread), reveal });
 
-// Chọn ngẫu nhiên 1 trong các hàm tạo câu hỏi (có trọng số [fn, w]).
+// Chọn lần lượt các hàm tạo câu hỏi (có trọng số nguyên [fn, w]) theo kiểu "rút thăm trong túi":
+// túi có w lá cho mỗi dạng, xáo lên rồi rút hết mới xáo túi mới → các dạng/phần ra đều nhau.
 export function mix(list) {
-  const total = list.reduce((s, [, w]) => s + w, 0);
+  let bag = [];
   return () => {
-    let x = Math.random() * total;
-    for (const [fn, w] of list) if ((x -= w) < 0) return fn();
-    return list[0][0]();
+    if (!bag.length) bag = shuffle(list.flatMap(([fn, w]) => Array(w).fill(fn)));
+    return bag.pop()();
   };
 }
 

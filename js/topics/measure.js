@@ -79,6 +79,53 @@ export function clock(h, m) {
 const timeText = (h, m) => (m ? `${h} giờ ${m} phút` : `${h} giờ`);
 const DAYS = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ nhật'];   // tuần bắt đầu Thứ Hai
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const SHORT = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+const dayOpts = (a) => shuffle([a, (a + 1) % 7, (a + 6) % 7, (a + 2) % 7]).map((w) => DAYS[w]);
+const firstDow = (y, mo) => (new Date(y, mo - 1, 1).getDay() + 6) % 7;   // 0 = Thứ Hai
+const daysIn = (y, mo) => new Date(y, mo, 0).getDate();
+
+// Tờ lịch tháng (cột T2 → CN), tô vàng ngày hl nếu có.
+function calendar(y, mo, hl) {
+  const f = firstDow(y, mo), n = daysIn(y, mo), rows = Math.ceil((f + n) / 7), W = 40, H = 34, x0 = 10, y0 = 68;
+  let t = `<rect x="4" y="4" width="292" height="${y0 + rows * H}" rx="12" fill="#fff" stroke="#4cc9f0" stroke-width="4"/>`;
+  t += `<rect x="4" y="4" width="292" height="36" rx="12" fill="#4cc9f0"/>${label(150, 23, `Tháng ${mo}`, 19, '#fff')}`;
+  SHORT.forEach((s, i) => { t += label(x0 + i * W + W / 2, 54, s, 14, i === 6 ? HI : INK); });
+  for (let d = 1; d <= n; d++) {
+    const k = f + d - 1, c = k % 7, cx = x0 + c * W + W / 2, cy = y0 + Math.floor(k / 7) * H + H / 2;
+    if (d === hl) t += `<circle cx="${cx}" cy="${cy}" r="15" fill="#ffd166"/>`;
+    t += label(cx, cy, d, 16, c === 6 ? HI : INK);
+  }
+  return svg(t, `0 0 300 ${y0 + rows * H + 8}`);
+}
+
+// Hai hàng tuần, cột col có 2 ô: vals[0] ở hàng trên, vals[1] ở hàng dưới.
+function twoWeeks(col, names, vals) {
+  const x0 = 76, W = 32;
+  let t = '';
+  SHORT.forEach((s, i) => { t += label(x0 + i * W + 15, 14, s, 13, i === 6 ? HI : INK); });
+  names.forEach((nm, r) => {
+    const y = 28 + r * 42;
+    t += label(38, y + 17, nm, 12);
+    for (let i = 0; i < 7; i++) {
+      const on = i === col, v = on ? vals[r] : '';
+      t += `<rect x="${x0 + i * W}" y="${y}" width="30" height="34" rx="6" fill="${on ? (v === '?' ? '#bde0fe' : '#ffd166') : '#fff'}" stroke="${INK}" stroke-width="1.5"/>`;
+      if (v !== '') t += label(x0 + i * W + 15, y + 18, v, 15);
+    }
+  });
+  return svg(t, '0 0 310 116');
+}
+
+// Dải ô từ ngày d1 tới d1 + gap: ô đầu ghi thứ, ô cuối dấu "?".
+function dayStrip(d1, gap, w1) {
+  const n = gap + 1, W = 62, x0 = (300 - n * W) / 2;
+  let t = '';
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * W, last = i === n - 1;
+    t += `<rect x="${x + 3}" y="6" width="56" height="74" rx="10" fill="${i === 0 ? '#ffd166' : last ? '#bde0fe' : '#fff'}" stroke="${INK}" stroke-width="2"/>`;
+    t += label(x + 31, 30, d1 + i, 20) + label(x + 31, 60, i === 0 ? SHORT[w1] : last ? '?' : '', 16, i === 0 ? INK : HI);
+  }
+  return svg(t, '0 0 300 86');
+}
 
 // Thước 0–4 cm có vạch mm, đoạn AB từ a mm tới b mm.
 function mmRuler(a, b) {
@@ -353,17 +400,43 @@ const ngayThang = {
   id: 'ngay-thang', title: 'Ngày, tháng, thứ', emoji: '📅',
   make: mix([
     [() => {
-      // Như sách: ngày 4 tháng 10 là thứ Ba thì ngày 10 tháng 10 là thứ mấy?
-      const d1 = rnd(1, 20), w1 = rnd(0, 6), d2 = d1 + rnd(2, 10), w2 = (w1 + d2 - d1) % 7, mo = rnd(1, 12);
-      const opts = shuffle([...new Set([w2, (w2 + 1) % 7, (w2 + 6) % 7, (w2 + 2) % 7])]).map((w) => DAYS[w]);
-      return { text: `Nếu ngày ${d1} tháng ${mo} là ${DAYS[w1]} thì ngày ${d2} tháng ${mo} là thứ mấy? 📅`, choices: opts, answer: DAYS[w2], calcText: `${d2} − ${d1}`, explain: `Từ ngày ${d1} đến ngày ${d2} cách ${d2 - d1} ngày${d2 - d1 >= 7 ? ` (= 1 tuần + ${d2 - d1 - 7} ngày)` : ''}, đếm tiếp từ ${DAYS[w1]} được ${DAYS[w2]}.` };
+      // Bậc 1: hôm qua, ngày mai, hôm kia, ngày kia.
+      const [word, k] = pickOne([['Ngày mai', 1], ['Hôm qua', -1], ['Ngày kia', 2], ['Hôm kia', -2]]);
+      const w = rnd(0, 6), a = (w + k + 7) % 7;
+      const chain = [w, ...Array.from({ length: Math.abs(k) }, (_, i) => (w + Math.sign(k) * (i + 1) + 7) % 7)].map((x) => DAYS[x]);
+      return { text: `Hôm nay là ${DAYS[w]} 🌞. ${word} là thứ mấy?`, choices: dayOpts(a), answer: DAYS[a], explain: `${word} là ${Math.abs(k)} ngày ${k > 0 ? 'sau' : 'trước'} hôm nay, ${k > 0 ? 'đếm tiếp' : 'đếm lùi'}: ${chain.join(' → ')}.` };
+    }, 2],
+    [() => {
+      const [t, a, e] = pickOne([
+        ['Con đi học từ Thứ Hai đến Thứ Sáu. Mỗi tuần con đi học mấy ngày? 🎒', 5, 'Thứ Hai, Thứ Ba, Thứ Tư, Thứ Năm, Thứ Sáu: 5 ngày.'],
+        ['Thứ Bảy và Chủ nhật được nghỉ học. Mỗi tuần con được nghỉ mấy ngày? 🏖️', 2, 'Thứ Bảy và Chủ nhật: 2 ngày.'],
+      ]);
+      return { text: t, max: 1, answer: String(a), explain: e };
+    }, 1],
+    [() => {
+      // Bậc 2 (như sách): xem tờ lịch, tìm thứ của một ngày.
+      const y = new Date().getFullYear(), mo = rnd(1, 12), d = rnd(1, daysIn(y, mo)), w = (firstDow(y, mo) + d - 1) % 7;
+      return { text: `Xem tờ lịch: ngày ${d} tháng ${mo} là thứ mấy? 🗓️`, svg: calendar(y, mo, d), choices: dayOpts(w), answer: DAYS[w], explain: `Tìm ô số ${d} (tô vàng) rồi dò lên đầu cột: cột ${SHORT[w]} là ${DAYS[w]}.` };
     }, 3],
     [() => {
-      // Thứ X tuần này là ngày d thì thứ Y tuần sau là ngày?
-      const ia = rnd(0, 6), ib = rnd(0, 6), d = rnd(1, 15), d2 = d + 7 - ia + ib, mo = rnd(1, 12);
-      const opts = shuffle([...new Set([d2, d2 - 1, d2 + 1, d2 - 7])]);
-      return { text: `Nếu ${DAYS[ia]} tuần này là ngày ${d} tháng ${mo} thì ${DAYS[ib]} tuần sau là ngày nào?`, choices: opts.map((v) => `${v} tháng ${mo}`), answer: `${d2} tháng ${mo}`, explain: `${DAYS[ia]} tuần sau là ngày ${d + 7}, ${ib >= ia ? 'đếm thêm' : 'đếm lùi'} ${Math.abs(ib - ia)} ngày được ngày ${d2}.` };
-    }, 2],
+      const y = new Date().getFullYear(), mo = rnd(1, 12), f = firstDow(y, mo), n = daysIn(y, mo), wd = rnd(0, 6);
+      const first = (wd - f + 7) % 7 + 1, days = [];
+      for (let d = first; d <= n; d += 7) days.push(d);
+      if (Math.random() < 0.5) return { text: `Xem tờ lịch: tháng ${mo} có mấy ngày ${DAYS[wd]}?`, svg: calendar(y, mo), max: 1, answer: String(days.length), explain: `Đếm các số trong cột ${SHORT[wd]}: ${days.join(', ')} → ${days.length} ngày.` };
+      return { text: `Xem tờ lịch: ${DAYS[wd]} đầu tiên của tháng ${mo} là ngày nào?`, svg: calendar(y, mo), max: 2, answer: String(first), explain: `Số đầu tiên trong cột ${SHORT[wd]} là ${first}.` };
+    }, 1],
+    [() => {
+      // Bậc 3: cùng thứ thì cách nhau đúng 7 ngày.
+      const col = rnd(0, 6), back = Math.random() < 0.5, d = back ? rnd(8, 24) : rnd(1, 21), ans = back ? d - 7 : d + 7;
+      const op = back ? `${d} − 7` : `${d} + 7`;
+      return { text: `${DAYS[col]} tuần này là ngày ${d}. ${DAYS[col]} tuần ${back ? 'trước' : 'sau'} là ngày mấy?`, svg: twoWeeks(col, back ? ['Tuần trước', 'Tuần này'] : ['Tuần này', 'Tuần sau'], back ? ['?', d] : [d, '?']), max: 2, answer: String(ans), calcText: op, explain: `Cùng là ${DAYS[col]} thì cách nhau đúng 7 ngày (1 tuần): ${op} = ${ans}.` };
+    }, 1],
+    [() => {
+      // Như sách nhưng nhẹ hơn: cách 1–3 ngày, có dải ô để đếm.
+      const d1 = rnd(1, 25), gap = rnd(1, 3), w1 = rnd(0, 6), w2 = (w1 + gap) % 7;
+      const chain = Array.from({ length: gap + 1 }, (_, i) => `${d1 + i} (${DAYS[(w1 + i) % 7]})`);
+      return { text: `Ngày ${d1} là ${DAYS[w1]}. Ngày ${d1 + gap} là thứ mấy?`, svg: dayStrip(d1, gap, w1), choices: dayOpts(w2), answer: DAYS[w2], explain: `Đếm tiếp từng ngày: ${chain.join(' → ')}.` };
+    }, 1],
     [() => {
       const mo = rnd(1, 12), n = MONTH_DAYS[mo - 1];
       return { text: `Tháng ${mo} có bao nhiêu ngày? 🗓️ (năm thường)`, choices: ['28', '30', '31'], answer: String(n), explain: 'Tháng 1, 3, 5, 7, 8, 10, 12 có 31 ngày; tháng 4, 6, 9, 11 có 30 ngày; tháng 2 có 28 hoặc 29 ngày. (Nắm tay đếm khớp xương nhé ✊)' };

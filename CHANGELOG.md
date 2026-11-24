@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Ngày, tháng, thứ dễ hiểu hơn + chia đều dạng bài
+
+- `mix()` (`js/topics/util.js`) đổi sang rút thăm theo túi: các dạng/phần ra đều nhau trong 10 câu, không còn dạng này nhiều dạng kia ít.
+- Ngày, tháng, thứ: bỏ dạng tính thứ khi cách nhau tới 10 ngày và dạng "Thứ X tuần này → Thứ Y tuần sau".
+- Thêm dạng: hôm qua/ngày mai/hôm kia/ngày kia, số ngày đi học/nghỉ, xem tờ lịch tìm thứ, đếm thứ trên lịch,
+  cùng thứ tuần trước/tuần sau (±7, có hình 2 hàng tuần), đếm tiếp 1–3 ngày (có dải ô).
+- Hình SVG mới: `calendar`, `twoWeeks`, `dayStrip` trong `js/topics/measure.js`.
+
 ## 2026-11-15 — Thêm dạng bài So sánh số lớn gấp mấy lần số bé
 
 - Bút chì dài gấp mấy lần bút sáp / cái ghim.
