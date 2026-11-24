@@ -177,19 +177,18 @@ const congTru = {
       const right = add ? a + b : a - b, wrongV = slip(add ? '+' : '-', a, b), shown = Math.random() < 0.5 ? right : wrongV;
       return tf(`${pickOne(FRIENDS)} tính: ${a} ${add ? '+' : '−'} ${b} = ${shown}. Bạn ấy tính đúng hay sai? 🤔`, shown === right, `${a} ${add ? '+' : '−'} ${b} = ${right}.`);
     }, 2],
-    [() => {
+    // Tính nhẩm: cộng trừ tròn trăm, hoặc tròn chục / tròn trăm đủ 100, 1000 (chung một dạng).
+    [() => pickOne([() => {
       const a = rnd(1, 8) * 100, b = rnd(1, 9 - a / 100) * 100, add = Math.random() < 0.5;
       return add ? { text: `Tính nhẩm: ${a} + ${b} = ?`, max: 3, answer: String(a + b), explain: `${a / 100} trăm + ${b / 100} trăm = ${(a + b) / 100} trăm.` }
         : { text: `Tính nhẩm: ${a + b} − ${b} = ?`, max: 3, answer: String(a), explain: `${(a + b) / 100} trăm − ${b / 100} trăm = ${a / 100} trăm.` };
-    }, 1],
-    [() => {
-      // Tính nhẩm tròn chục / tròn trăm, có cả 100 và 1000.
+    }, () => {
       const big = Math.random() < 0.5, u = big ? 100 : 10, x = rnd(1, 9) * u, tot = 10 * u;
       return pickOne([
         { text: `Tính nhẩm: ${x} + ${tot - x} = ?`, max: 4, answer: String(tot), explain: `${x / u} ${big ? 'trăm' : 'chục'} + ${10 - x / u} ${big ? 'trăm' : 'chục'} = 10 ${big ? 'trăm = 1000' : 'chục = 100'}.` },
         { text: `Tính nhẩm: ${tot} − ${x} = ?`, max: 3, answer: String(tot - x), explain: `${tot} − ${x} = ${tot - x}.` },
       ]);
-    }, 1],
+    }])(), 2],
     [() => {
       // Gọi đúng tên thành phần: số hạng, tổng, số bị trừ, số trừ, hiệu.
       if (Math.random() < 0.5) { const a = rnd(20, 600), b = rnd(10, 999 - a); return { kind: 'column', text: `Số hạng là ${a} và ${b}. Tìm tổng ✍️`, col: { op: '+', a, b }, show: a + b }; }

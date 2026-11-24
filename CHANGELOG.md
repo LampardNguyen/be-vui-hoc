@@ -1,5 +1,8 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Cộng trừ dưới 1000: gộp 2 dạng tính nhẩm
+- Tính nhẩm tròn trăm và tính nhẩm đủ 100 / 1000 giờ là một dạng, tần suất như cũ. Chương còn 9 dạng.
+
 ## 2026-11-24 — So sánh số dưới 1000: gộp 3 dạng cái cân
 - Phép tính – số, tổng – tổng, trăm + chục + đơn vị – số giờ là một dạng (chọn ngẫu nhiên kiểu đặt lên cân), tần suất như cũ. Chương còn 10 dạng.
 
