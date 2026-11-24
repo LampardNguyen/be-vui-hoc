@@ -1,5 +1,5 @@
 // Chương Đo lường: mỗi loại đơn vị là một phần luyện riêng (parts), "Luyện tập" chung thì trộn tất cả.
-import { rnd, pickOne, shuffle, fmt, gq, mix, FRIENDS } from './util.js';
+import { rnd, pickOne, shuffle, fmt, gq, mix, numChoice, FRIENDS } from './util.js';
 import { INK, HI, svg, label, balance, ruler, thermometer, weights } from './draw.js';
 
 const sign = (a, b) => (a > b ? '>' : a < b ? '<' : '=');
@@ -166,7 +166,7 @@ const doDai = {
       const k = rnd(0, 3), n = rnd(1, 9);
       if (k === 0) return { text: `${n} cm = ? mm`, max: 2, unit: 'mm', answer: String(n * 10), explain: `1 cm = 10 mm, nên ${n} cm = ${n * 10} mm.` };
       if (k === 1) return { text: `${n * 10} mm = ? cm`, max: 1, unit: 'cm', answer: String(n), explain: `10 mm = 1 cm, nên ${n * 10} mm = ${n} cm.` };
-      if (k === 2) return { text: `1 m = ? mm`, max: 4, unit: 'mm', answer: '1000', explain: '1 m = 100 cm = 1000 mm.' };
+      if (k === 2) return { text: `1 m = ? mm`, ...numChoice(1000, 0, 'mm', [10, 100, 10000]), explain: '1 m = 100 cm = 1000 mm.' };
       const m = rnd(1, 9);
       return { text: `${n} cm ${m} mm = ? mm`, max: 2, unit: 'mm', answer: String(n * 10 + m), explain: `${n} cm = ${n * 10} mm, thêm ${m} mm là ${n * 10 + m} mm.` };
     }, 2],
@@ -212,7 +212,7 @@ const khoiLuong = {
     }, 2],
     [() => {
       const v = rnd(1, 9), e = pickOne(['🍉', '🎃', '🍍', '🥥', '🍈']);
-      return { text: 'Kim cân đồng hồ chỉ số mấy? Vật nặng bao nhiêu ki-lô-gam?', svg: svg(dialScale(v, e), '0 0 150 180'), max: 2, unit: 'kg', answer: String(v), explain: `Kim đỏ chỉ số ${v} → ${v} kg.` };
+      return { text: 'Kim cân đồng hồ chỉ số mấy? Vật nặng bao nhiêu ki-lô-gam?', svg: svg(dialScale(v, e), '0 0 150 180'), ...numChoice(v, [1, 2], 'kg'), explain: `Kim đỏ chỉ số ${v} → ${v} kg.` };
     }, 2],
     [() => {
       // Như sách: quả mít và quả dưa hấu trên 2 cân đồng hồ.
@@ -234,7 +234,7 @@ const khoiLuong = {
     // ----- Gam (như sách) -----
     [() => {
       const v = pickOne([250, 500, 750, 100, 200, 300, 400, 600, 700, 800, 900, 150, 350, 450]), e = pickOne(['🍎', '🧈', '🍬', '🥕', '🍇']);
-      return { text: 'Cân đồng hồ 1 kg (mỗi vạch nhỏ 50 g). Vật nặng bao nhiêu gam?', svg: svg(gramScale(v, e), '0 0 150 180'), max: 3, unit: 'g', answer: String(v), explain: `Kim chỉ ${v} g.` };
+      return { text: 'Cân đồng hồ 1 kg (mỗi vạch nhỏ 50 g). Vật nặng bao nhiêu gam?', svg: svg(gramScale(v, e), '0 0 150 180'), ...numChoice(v, [50, 100], 'g'), explain: `Kim chỉ ${v} g.` };
     }, 2],
     [() => {
       const a = pickOne([600, 700, 800, 900, 750]), b = pickOne([250, 300, 400, 500].filter((x) => x < a));
@@ -323,7 +323,7 @@ const dungTich = {
 const nhietDo = {
   id: 'nhiet-do', title: 'Nhiệt độ', emoji: '🌡️',
   make: mix([
-    [() => { const v = rnd(0, 20) * 5; return { text: 'Nhiệt kế chỉ bao nhiêu độ C? 🌡️', svg: thermometer(v), max: 3, unit: '°C', answer: String(v), explain: `Mỗi vạch dài là 10°C, vạch ngắn ở giữa là 5°C. Cột đỏ tới ${v}°C.` }; }, 3],
+    [() => { const v = rnd(0, 20) * 5; return { text: 'Nhiệt kế chỉ bao nhiêu độ C? 🌡️', svg: thermometer(v), ...numChoice(v, [5, 10], '°C'), explain: `Mỗi vạch dài là 10°C, vạch ngắn ở giữa là 5°C. Cột đỏ tới ${v}°C.` }; }, 3],
     [() => { const [t, v] = pickOne(TEMPS); return { text: `🌡️ ${t} có nhiệt độ khoảng bao nhiêu?`, choices: shuffle(['0°C', '37°C', '35°C', '100°C']), answer: `${v}°C`, explain: `${t}: khoảng ${v}°C.` }; }, 2],
     [() => {
       const a = rnd(18, 30), d = rnd(2, 9), up = Math.random() < 0.5;
@@ -351,7 +351,7 @@ const nhietDo = {
     // Như sách: đọc số đo bằng chữ; so sánh nhiệt độ cơ thể với 37°C.
     [() => {
       const W = { 36: 'ba mươi sáu', 37: 'ba mươi bảy', 38: 'ba mươi tám', 39: 'ba mươi chín', 40: 'bốn mươi' }, v = rnd(36, 40), f = pickOne(FRIENDS);
-      return { text: `Nhiệt độ cơ thể của ${f} là ${W[v]} độ xê. Viết bằng số:`, max: 2, unit: '°C', answer: String(v), explain: `${W[v]} độ xê = ${v}°C.` };
+      return { text: `Nhiệt độ cơ thể của ${f} là ${W[v]} độ xê. Viết bằng số:`, ...numChoice(v, [1, 2, 10], '°C'), explain: `${W[v]} độ xê = ${v}°C.` };
     }, 1],
     [() => {
       const pick = rnd(38, 40), vals = shuffle([37, 36, pick]);
@@ -411,7 +411,7 @@ const ngayThang = {
         ['Con đi học từ Thứ Hai đến Thứ Sáu. Mỗi tuần con đi học mấy ngày? 🎒', 5, 'Thứ Hai, Thứ Ba, Thứ Tư, Thứ Năm, Thứ Sáu: 5 ngày.'],
         ['Thứ Bảy và Chủ nhật được nghỉ học. Mỗi tuần con được nghỉ mấy ngày? 🏖️', 2, 'Thứ Bảy và Chủ nhật: 2 ngày.'],
       ]);
-      return { text: t, max: 1, answer: String(a), explain: e };
+      return { text: t, ...numChoice(a, 0, '', a === 5 ? [4, 6, 7] : [1, 3, 4]), explain: e };
     }, 1],
     [() => {
       // Bậc 2 (như sách): xem tờ lịch, tìm thứ của một ngày.
@@ -422,8 +422,8 @@ const ngayThang = {
       const y = new Date().getFullYear(), mo = rnd(1, 12), f = firstDow(y, mo), n = daysIn(y, mo), wd = rnd(0, 6);
       const first = (wd - f + 7) % 7 + 1, days = [];
       for (let d = first; d <= n; d += 7) days.push(d);
-      if (Math.random() < 0.5) return { text: `Xem tờ lịch: tháng ${mo} có mấy ngày ${DAYS[wd]}?`, svg: calendar(y, mo), max: 1, answer: String(days.length), explain: `Đếm các số trong cột ${SHORT[wd]}: ${days.join(', ')} → ${days.length} ngày.` };
-      return { text: `Xem tờ lịch: ${DAYS[wd]} đầu tiên của tháng ${mo} là ngày nào?`, svg: calendar(y, mo), max: 2, answer: String(first), explain: `Số đầu tiên trong cột ${SHORT[wd]} là ${first}.` };
+      if (Math.random() < 0.5) return { text: `Xem tờ lịch: tháng ${mo} có mấy ngày ${DAYS[wd]}?`, svg: calendar(y, mo), ...numChoice(days.length, 0, '', [3, 9 - days.length, 6]), explain: `Đếm các số trong cột ${SHORT[wd]}: ${days.join(', ')} → ${days.length} ngày.` };
+      return { text: `Xem tờ lịch: ${DAYS[wd]} đầu tiên của tháng ${mo} là ngày nào?`, svg: calendar(y, mo), ...numChoice(first, 0, '', [first + 7, first + 1, first > 1 ? first - 1 : first + 2]), explain: `Số đầu tiên trong cột ${SHORT[wd]} là ${first}.` };
     }, 1],
     [() => {
       // Bậc 3: cùng thứ thì cách nhau đúng 7 ngày.
@@ -443,7 +443,7 @@ const ngayThang = {
     }, 2],
     [() => {
       const [t, a] = pickOne([['1 tuần lễ có bao nhiêu ngày?', 7], ['1 ngày có bao nhiêu giờ?', 24], ['1 giờ có bao nhiêu phút?', 60], ['1 năm có bao nhiêu tháng?', 12]]);
-      return { text: t, max: 2, answer: String(a), explain: `${t.replace(' có bao nhiêu', ' có').replace('?', '')} ${a}.` };
+      return { text: t, ...numChoice(a, 0, '', shuffle([7, 10, 12, 24, 30, 60, 100].filter((x) => x !== a))), explain: `${t.replace(' có bao nhiêu', ' có').replace('?', '')} ${a}.` };
     }, 1],
     [() => { const w = rnd(2, 5); return { text: `${w} tuần lễ có bao nhiêu ngày?`, max: 2, answer: String(w * 7), explain: `1 tuần có 7 ngày: 7 × ${w} = ${w * 7} ngày.` }; }, 1],
     [() => {

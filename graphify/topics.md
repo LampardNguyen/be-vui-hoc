@@ -4,7 +4,7 @@
 
 **File chính:**
 - `js/topics/numbers.js`, `js/topics/measure.js` (Đo lường), `js/topics/shapes.js`: định nghĩa chương. `js/topics/index.js`: `TOPICS` theo id.
-- `js/topics/util.js`: `rnd`, `pickOne`, `shuffle`, `fmt`, `mix([[fn, trọng số nguyên]])` (rút thăm theo túi: mỗi dạng w lá, rút hết mới xáo lại → các dạng/phần ra đều), `gq()` (câu trò chơi), `wrongNums`, `FRIENDS`, `THINGS`.
+- `js/topics/util.js`: `rnd`, `pickOne`, `shuffle`, `fmt`, `mix([[fn, trọng số nguyên]])` (rút thăm theo túi: mỗi dạng w lá, rút hết mới xáo lại → các dạng/phần ra đều), `gq()` (câu trò chơi), `numChoice()` (câu đáp án số → 4 lựa chọn; dùng cho câu ghi nhớ/đọc hình/đếm, câu cần tính thì giữ `max`), `wrongNums`, `FRIENDS`, `THINGS`.
 - `js/topics/draw.js`: SVG dạng chuỗi — `balance`, `ruler`, `thermometer`, `weights`, `shape`, `shapeField`, `polygonPick` (tự tính góc vuông), `place`, `cubeStack`, `box`, `fracShape`, `itemGrid`, `shareSvg`, `tapLine`, `tapDot`.
 - `js/ui/kinds.js`: `renderKind(q, done, makePad)`, `colSteps`, `divSteps`, `picture`.
 - `js/screens/topic.js`: `topicScreen` (`#/topic/<id>`), `quizScreen` (`#/quiz/<id>`), `topicStars`.

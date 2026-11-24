@@ -1,5 +1,5 @@
 // Chương Phân số và Hình học — hình vẽ ngẫu nhiên (js/topics/draw.js).
-import { rnd, pickOne, shuffle, gq, mix, FRIENDS } from './util.js';
+import { rnd, pickOne, shuffle, gq, mix, numChoice, FRIENDS } from './util.js';
 import {
   INK, SOFT, HI, COLORS, rad, svg, label, dot, tapLine, tapDot,
   shape, shapeField, polygonPick, place, cubeStack, box, fracShape, itemGrid,
@@ -295,7 +295,7 @@ const goc = {
     }, 3],
     [() => {
       const p = polygonPick(place(pickOne(POLYS)()));
-      return { text: 'Hình này có mấy góc vuông? (dùng ê ke tưởng tượng nhé)', svg: p.svg, max: 1, answer: String(p.right.length), explain: p.right.length ? `Góc vuông ở đỉnh ${p.right.join(', ')}.` : 'Không có góc nào vuông.' };
+      return { text: 'Hình này có mấy góc vuông? (dùng ê ke tưởng tượng nhé)', svg: p.svg, ...numChoice(p.right.length, 0, '', shuffle([0, 1, 2, 3, 4].filter((x) => x !== p.right.length))), explain: p.right.length ? `Góc vuông ở đỉnh ${p.right.join(', ')}.` : 'Không có góc nào vuông.' };
     }, 2],
     [() => {
       const base = rnd(0, 359), degs = [90, ...shuffle([rnd(30, 65), rnd(115, 150), rnd(70, 78)]).slice(0, 2)];
@@ -364,7 +364,7 @@ const hinhPhang = {
     [() => {
       const target = pickOne(['tri', 'square', 'rect', 'circle']), types = field(target);
       const cnt = types.filter((t) => t === target).length;
-      return { text: `Có bao nhiêu ${SH[target]}? 🔢`, svg: shapeField(types), max: 1, answer: String(cnt), explain: `Đếm kĩ: có ${cnt} ${SH[target]}.` };
+      return { text: `Có bao nhiêu ${SH[target]}? 🔢`, svg: shapeField(types), ...numChoice(cnt, [1, 2]), explain: `Đếm kĩ: có ${cnt} ${SH[target]}.` };
     }, 2],
     [() => {
       const t = pickOne(['tri', 'square', 'rect', 'quad']);
@@ -397,8 +397,8 @@ const hinhPhang = {
     [() => {
       const [A, B, C, D, E] = shuffle(['A', 'B', 'C', 'D', 'E', 'M', 'N', 'P', 'Q']).slice(0, 5), isTri = Math.random() < 0.5;
       const pic = svg(`<polygon points="70,30 230,30 280,170 20,170" fill="${SOFT}" stroke="${INK}" stroke-width="3"/><polyline points="70,30 150,170 230,30" fill="none" stroke="${INK}" stroke-width="3"/>${label(62, 18, A)}${label(238, 18, B)}${label(150, 186, C)}${label(12, 182, D)}${label(288, 182, E)}`, '0 0 300 195');
-      return isTri ? { text: 'Trong hình bên có mấy hình tam giác? 🔺', svg: pic, max: 1, answer: '3', explain: `3 hình tam giác: ${A}${C}${D}, ${A}${B}${C}, ${C}${B}${E}.` }
-        : { text: 'Trong hình bên có mấy hình tứ giác? (kể cả hình to)', svg: pic, max: 1, answer: '3', explain: `3 hình tứ giác: ${A}${B}${C}${D}, ${A}${B}${E}${C}, ${A}${B}${E}${D}.` };
+      return isTri ? { text: 'Trong hình bên có mấy hình tam giác? 🔺', svg: pic, ...numChoice(3, 0, '', [2, 4, 5]), explain: `3 hình tam giác: ${A}${C}${D}, ${A}${B}${C}, ${C}${B}${E}.` }
+        : { text: 'Trong hình bên có mấy hình tứ giác? (kể cả hình to)', svg: pic, ...numChoice(3, 0, '', [2, 4, 5]), explain: `3 hình tứ giác: ${A}${B}${C}${D}, ${A}${B}${E}${C}, ${A}${B}${E}${D}.` };
     }, 2],
     // Như sách: cắt hình chữ nhật theo một đoạn thẳng.
     [() => {

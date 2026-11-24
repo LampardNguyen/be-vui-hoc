@@ -1,6 +1,6 @@
 // Chương nhóm "Số và phép tính" và "Tìm thành phần".
 // Chương: { id, title, emoji, tips, make() → câu luyện (xem js/ui/kinds.js), game() → câu trò chơi (đáp án số) }.
-import { rnd, pickOne, shuffle, gq, mix, FRIENDS, THINGS } from './util.js';
+import { rnd, pickOne, shuffle, gq, mix, numChoice, FRIENDS, THINGS } from './util.js';
 import { balance, svg, label, shareSvg, INK } from './draw.js';
 import { colSteps } from '../ui/kinds.js';
 
@@ -71,7 +71,7 @@ const soSanh = {
     }, 1],
     [() => {
       const n = rnd(101, 998), after = Math.random() < 0.5;
-      return { text: `Số liền ${after ? 'sau' : 'trước'} của ${n} là số nào?`, max: 3, answer: String(after ? n + 1 : n - 1), explain: `Số liền ${after ? 'sau thì thêm' : 'trước thì bớt'} 1.` };
+      return { text: `Số liền ${after ? 'sau' : 'trước'} của ${n} là số nào?`, ...numChoice(after ? n + 1 : n - 1, [1, 2, 10]), explain: `Số liền ${after ? 'sau thì thêm' : 'trước thì bớt'} 1.` };
     }, 1],
     [() => {
       // Tổng các trăm, chục, đơn vị so với một số.
@@ -94,7 +94,7 @@ const soSanh = {
     }, 2],
     [() => {
       const n = rnd(100, 999), [h, t, u] = digits(n);
-      if (Math.random() < 0.5) return { text: `Số gồm ${h} trăm, ${t} chục và ${u} đơn vị là số nào?`, max: 3, answer: String(n), explain: `${h * 100} + ${t * 10} + ${u} = ${n}.` };
+      if (Math.random() < 0.5) return { text: `Số gồm ${h} trăm, ${t} chục và ${u} đơn vị là số nào?`, ...numChoice(n, 0, '', [...new Set([h * 100 + u * 10 + t, t * 100 + h * 10 + u, u * 100 + t * 10 + h, n + 10, n + 100, n + 1])].filter((v) => v !== n && v >= 100)), explain: `${h * 100} + ${t * 10} + ${u} = ${n}.` };
       return {
         kind: 'steps', text: `Số ${n} gồm mấy trăm, mấy chục, mấy đơn vị? 🧱`,
         steps: [['trăm', h], ['chục', t], ['đơn vị', u]].map(([w, v]) => ({ text: `Số ${w}?`, max: 1, answer: String(v) })),

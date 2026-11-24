@@ -26,6 +26,12 @@ export function wrongNums(ans, spread = [1, 2, 10]) {
   return [...set];
 }
 
+// Đổi câu đáp án số thành trắc nghiệm 4 lựa chọn (đáp án + 3 số nhiễu), có thể kèm đơn vị.
+export function numChoice(ans, spread, unit = '', wrong = wrongNums(ans, spread)) {
+  const f = (v) => (!unit ? String(v) : unit[0] === '°' ? `${v}${unit}` : `${v} ${unit}`);
+  return { choices: shuffle([ans, ...wrong.slice(0, 3)]).map(f), answer: f(ans) };
+}
+
 // Câu hỏi trò chơi (đáp án là số).
 export const gq = (text, answer, spread, ask = `${text} = ?`, reveal = `${text} = ${answer}`) =>
   ({ text, ask, answer, wrong: wrongNums(answer, spread), reveal });

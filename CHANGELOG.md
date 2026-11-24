@@ -1,5 +1,13 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Câu không cần tính chuyển sang trắc nghiệm
+
+- Thêm `numChoice(ans, spread, unit, wrong)` trong `js/topics/util.js`: đổi câu đáp án số thành 4 lựa chọn.
+- Đổi sang trắc nghiệm các câu ghi nhớ / đọc số trên hình / đếm hình: 1 tuần–ngày–giờ–năm, ngày đi học/nghỉ,
+  đếm thứ trên tờ lịch, 1 m = 1000 mm, đọc cân đồng hồ (kg, g), đọc nhiệt kế, nhiệt độ viết bằng số,
+  số liền trước/sau, số gồm trăm–chục–đơn vị, đếm góc vuông, đếm hình, đếm tam giác/tứ giác.
+- Câu cần tính toán và "Viết số" vẫn nhập bằng bàn phím số.
+
 ## 2026-11-24 — Ngày, tháng, thứ dễ hiểu hơn + chia đều dạng bài
 
 - `mix()` (`js/topics/util.js`) đổi sang rút thăm theo túi: các dạng/phần ra đều nhau trong 10 câu, không còn dạng này nhiều dạng kia ít.
