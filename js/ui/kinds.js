@@ -147,7 +147,9 @@ export function divSteps(a, b) {
     started = true;
     const qd = Math.floor(cur / b), r = cur - qd * b;
     const next = D[i + 1];
-    out.push({ d: qd, hint: `${cur} : ${b} được ${qd}, viết ${qd}. ${qd} × ${b} = ${qd * b}, ${cur} − ${qd * b} = ${r}${next !== undefined ? `. Hạ ${next} được ${r * 10 + next}` : ''}` });
+    // line: dòng viết dưới số bị chia (số dư rồi hạ chữ số tiếp), end: cột chữ số cuối của dòng để thẳng hàng.
+    const line = next !== undefined ? `${r}${next}` : String(r), end = next !== undefined ? i + 1 : i;
+    out.push({ d: qd, line, end, hint: `${cur} : ${b} được ${qd}, viết ${qd}. ${qd} × ${b} = ${qd * b}, ${cur} − ${qd * b} = ${r}${next !== undefined ? `. Hạ ${next} được ${r * 10 + next}` : ''}` });
     cur = r;
   });
   return { steps: out, rest: cur };
@@ -178,7 +180,10 @@ function divide(q, done, makePad) {
       play('tap');
       target.textContent = v;
       target.classList.add('filled');
-      if (i < steps.length) { work.append(h('div', {}, steps[i].hint.split('. ').slice(1).join('. '))); hint.textContent = `✔️ ${steps[i].hint}`; }
+      const row = (st) => work.append(h('div', {}, '\u2007'.repeat(st.end + 1 - st.line.length) + st.line));
+      if (i === steps.length) row(steps[i - 1]);   // Dòng số dư cuối hiện sau khi bé điền số dư.
+      else if (i < steps.length - 1) row(steps[i]);
+      if (i < steps.length) { hint.textContent = `✔️ ${steps[i].hint}`; }
       i++;
       if (i === steps.length) { restRow.hidden = false; hint.textContent = `👉 Còn lại ${rest}. Số dư là mấy?`; }
       if (i > steps.length) { pad.setEnabled(false); hint.textContent = `✔️ ${a} : ${b} = ${Math.floor(a / b)}${rest ? ` (dư ${rest})` : ''}`; done(mistakes === 0, { corrected: mistakes > 0 }); return; }

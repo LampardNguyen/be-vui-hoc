@@ -167,7 +167,8 @@ a { text-decoration: none; }
 .div-right { padding-left: 12px; }
 .div-right .div-num { border-bottom: 4px solid #3a3f58; padding-bottom: 4px; margin-bottom: 6px; }
 .div-num { font-size: 40px; font-weight: 800; letter-spacing: 4px; }
-.div-work { font-size: 15px; color: var(--muted); max-width: 220px; }
+.div-num, .div-work { font-variant-numeric: tabular-nums; }
+.div-work { font-size: 40px; font-weight: 800; letter-spacing: 4px; color: #5b6385; line-height: 1.15; }
 .div-quo { display: flex; gap: 4px; }
 .div-rest { font-size: 24px; font-weight: 800; margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 .div-rest[hidden] { display: none; }
@@ -629,7 +630,7 @@ a { text-decoration: none; }
 @media (max-width: 640px) {
   .col-cell { width: 40px; height: 48px; font-size: 32px; }
   .col-cell.slot { width: 38px; }
-  .div-num { font-size: 32px; }
+  .div-num, .div-work { font-size: 32px; }
   .order-card { min-width: 70px; font-size: 24px; }
   .topic-grid { grid-template-columns: 1fr; }
   .islands { grid-template-columns: repeat(2, 1fr); }

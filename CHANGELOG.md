@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-24 — Đặt tính chia: viết các dòng số dư như trên giấy
+
+- Bỏ dòng chữ giải thích dưới số bị chia; thay bằng các dòng số dư (số dư + hạ chữ số tiếp), thẳng cột với chữ số vừa hạ.
+- Mỗi dòng hiện khi bé điền đúng chữ số thương tương ứng; dòng số dư cuối hiện sau khi điền số dư.
+
 ## 2026-11-24 — Cộng trừ dưới 1000: gộp 2 dạng tính nhẩm
 - Tính nhẩm tròn trăm và tính nhẩm đủ 100 / 1000 giờ là một dạng, tần suất như cũ. Chương còn 9 dạng.
 
