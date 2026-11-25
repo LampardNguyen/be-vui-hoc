@@ -1,5 +1,11 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Tính từng bước cho biểu thức
+
+- Câu có biểu thức (từ 2 phép tính, có × : hoặc ngoặc) trong đề, trong đáp án hoặc trên đĩa cân có nút 🧮 Tính từng bước.
+- Bé chọn biểu thức, tính lần lượt từng phép theo thứ tự (ngoặc → nhân chia → cộng trừ), phép đang tính được tô màu kèm quy tắc; nhập bằng bàn phím số, số lớn có nút ✍️ Đặt tính.
+- Kết quả từng biểu thức hiện dưới đáp án tương ứng để bé so rồi chọn. Không bắt buộc; chọn sai mà chưa dùng thì nhắc lần sau.
+
 ## 2026-11-25 — Luôn hiện "Con cần nhớ" trong luyện tập
 
 - Màn luyện của mọi chương có khung 💡 Con cần nhớ ở cuối (tips của phần nếu có, không thì của chương).

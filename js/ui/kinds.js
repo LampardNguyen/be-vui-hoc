@@ -352,6 +352,156 @@ function withScratch(kind, q, done, makePad, ops) {
   return h('div', {}, notes, h('div', { class: 'center' }, btn), panel, el);
 }
 
+// ---------- Tính từng bước cho biểu thức (từ 2 phép tính, có × : hoặc ngoặc) ----------
+// Tách biểu thức thành token: số, phép tính, ngoặc. Sai cú pháp → null.
+function tokens(str) {
+  const t = str.replace(/-/g, '−').match(/\d+|[+−×:()]/g) || [];
+  const out = t.map((x) => (/\d/.test(x) ? +x : x));
+  let depth = 0, want = 'n';
+  for (const x of out) {
+    if (x === '(') { if (want !== 'n') return null; depth++; }
+    else if (x === ')') { if (want !== 'o' || --depth < 0) return null; }
+    else if (typeof x === 'number') { if (want !== 'n') return null; want = 'o'; }
+    else { if (want !== 'o') return null; want = 'n'; }
+  }
+  return depth === 0 && want === 'o' ? out : null;
+}
+
+const OPS = { '+': (a, b) => a + b, '−': (a, b) => a - b, '×': (a, b) => a * b, ':': (a, b) => (b && a % b === 0 ? a / b : NaN) };
+
+// Các bước tính theo thứ tự ở trường: ngoặc trong cùng trước, trong đó nhân/chia trước, cộng/trừ sau, từ trái sang phải.
+// Mỗi bước: { toks (trước bước), at (vị trí số a), a, op, b, r, rule }. Kết quả âm/chia không hết → null.
+export function exprSteps(str) {
+  let t = tokens(str);
+  if (!t || t.filter((x) => OPS[x]).length < 2) return null;
+  const steps = [];
+  while (t.length > 1) {
+    let lo = 0, hi = t.length, inParen = false;
+    const close = t.indexOf(')');
+    if (close >= 0) { lo = t.lastIndexOf('(', close) + 1; hi = close; inParen = true; }
+    const seg = t.slice(lo, hi);
+    let k = seg.findIndex((x) => x === '×' || x === ':');
+    const mixed = k >= 0 && seg.some((x) => x === '+' || x === '−');
+    if (k < 0) k = seg.findIndex((x) => x === '+' || x === '−');
+    const at = lo + k - 1, [a, op, b] = t.slice(at, at + 3), r = OPS[op](a, b);
+    if (!(r >= 0) || !Number.isInteger(r)) return null;
+    const rule = t.length === 3 ? 'Còn một phép tính nữa thôi!' : inParen ? 'Có ngoặc → tính trong ngoặc trước.' : mixed ? 'Nhân, chia trước; cộng, trừ sau.' : 'Tính lần lượt từ trái sang phải.';
+    steps.push({ toks: t, at, a, op, b, r, rule });
+    t = [...t.slice(0, at), r, ...t.slice(at + 3)];
+    if (t[at - 1] === '(' && t[at + 1] === ')') t.splice(at - 1, 3, r);
+  }
+  return steps;
+}
+
+// Tìm các biểu thức trong đề (calcText ?? text) và trong đáp án. Nhãn "A: …" trong đề thành tên biểu thức.
+function findExprs(q) {
+  const out = [], seen = new Set();
+  const add = (e, name, choice) => {
+    e = e.trim().replace(/^[^\d(]+|[^\d)]+$/g, '');
+    while (e.startsWith('(') && !tokens(e)) e = e.slice(1).trim();
+    const steps = exprSteps(e);
+    if (steps && !seen.has(e)) { seen.add(e); out.push({ e, name, choice, steps, v: steps[steps.length - 1].r }); }
+  };
+  const text = q.calcText ?? q.text ?? '';
+  for (const m of text.matchAll(/[\d(][\d()\s+−×:-]*[\d)]/g)) {
+    const lab = text.slice(0, m.index).match(/\(?([A-D])\)?\s*$/) || text.slice(0, m.index).match(/\(?([A-D])\)?:\s*$/);
+    add(m[0], lab?.[1]);
+  }
+  for (const c of q.choices || []) if (typeof c === 'string') add(c, null, c);
+  return out;
+}
+
+function withExpr(kind, q, done, makePad, exprs) {
+  let cur = -1, k = 0, pad = null, used = false;
+  const L = ['A', 'B', 'C', 'D', 'E', 'F'];
+  const pans = q.tilt != null && exprs.length === 2 ? ['Đĩa trái', 'Đĩa phải'] : null;
+  exprs.forEach((x, i) => { if (exprs.length > 1 && !x.choice) x.name = pans?.[i] ?? x.name ?? L[i]; x.done = false; });
+  const notes = h('div', { class: 'scratch-notes' });
+  const panel = h('div', { class: 'scratch' });
+  const btn = h('button', { class: 'scratch-btn', onclick: () => open(exprs.findIndex((x) => !x.done)) }, '🧮 Tính từng bước');
+  const tip = h('p', { class: 'col-hint' });
+  const el = KINDS[kind](q, (ok, info) => {
+    btn.remove(); panel.remove(); pad?.setEnabled(false);
+    if (!ok && !used) tip.textContent = '💡 Lần sau con bấm 🧮 Tính từng bước, tính ra từng biểu thức rồi mới chọn nhé!';
+    done(ok, info);
+  }, makePad);
+  const label = (x) => (x.name ? `${x.name}` : x.e);
+  // Ghi kết quả dưới đáp án tương ứng (đáp án là biểu thức hoặc là nhãn A/B/C/D).
+  function mark(x) {
+    notes.append(h('span', { class: 'scratch-note' }, `${x.name ? `${x.name}: ` : ''}${x.e} = ${x.v}`));
+    const b = [...el.querySelectorAll('.quiz-choice')].find((b) => b.dataset.v === (x.choice ?? x.name));
+    b?.append(h('small', { class: 'expr-val' }, `= ${x.v}`));
+  }
+  function close() {
+    pad?.setEnabled(false);
+    panel.replaceChildren();
+    el.style.display = '';
+    btn.style.display = exprs.some((x) => !x.done) ? '' : 'none';
+    el.remount?.();
+  }
+  function open(i) {
+    used = true;
+    cur = i; k = 0;
+    btn.style.display = 'none';
+    el.style.display = 'none';
+    render();
+  }
+  function render() {
+    const x = exprs[cur];
+    const chips = exprs.length > 1 ? h('div', { class: 'expr-chips' }, exprs.map((y, j) =>
+      h('button', { class: `expr-chip${j === cur ? ' on' : ''}${y.done ? ' ok' : ''}`, onclick: () => { if (j !== cur) open(j); } },
+        y.done ? `${label(y)} = ${y.v} ✔` : label(y)))) : null;
+    const lines = x.steps.slice(0, k).map((st, j) => h('div', { class: 'expr-line done' }, `Bước ${j + 1}: ${st.a} ${st.op} ${st.b} = ${st.r} ✔`));
+    const body = h('div', {});
+    panel.replaceChildren(
+      h('p', { class: 'scratch-title' }, '🧮 Tính từng bước', h('button', { class: 'scratch-x', onclick: close }, '✖')),
+      chips, h('div', { class: 'expr-main' }, x.name ? `${x.name}: ` : '', x.e), ...lines, body,
+    );
+    if (k >= x.steps.length) {
+      body.append(h('div', { class: 'expr-line total' }, `🎉 ${x.name ? `${x.name} = ` : `${x.e} = `}${x.v}`));
+      return;
+    }
+    const st = x.steps[k];
+    const expr = h('div', { class: 'expr-cur' }, st.toks.map((t, j) =>
+      h('span', { class: j >= st.at && j <= st.at + 2 ? 'hl' : '' }, String(t))));
+    const box = h('span', { class: 'answer-box' }, '?');
+    const hint = h('p', { class: 'col-hint' }, `💡 ${st.rule}`);
+    let wrong = 0;
+    const ok = () => { play('tap'); k++; if (k >= x.steps.length) finish(); else render(); };
+    const askPad = () => {
+      pad = makePad({ max: String(st.r).length + 1, onChange: (v) => { box.textContent = v || '?'; }, onSubmit: (v) => {
+        if (+v === st.r) { pad.setEnabled(false); ok(); return; }
+        wrong++;
+        play('bad'); shake(box); pad.clear(); box.textContent = '?';
+        hint.className = 'col-hint warn';
+        hint.textContent = wrong >= 2 ? `Gợi ý: ${st.a} ${st.op} ${st.b} = ${st.r}. Con điền ${st.r} nhé!` : 'Chưa đúng rồi, con tính lại nhé! 💪';
+      } });
+      return pad.el;
+    };
+    // Số lớn: cho đặt tính cột (cộng, trừ, nhân với số 1 chữ số, chia cho số 1 chữ số).
+    const [ca, cb] = st.op === '×' && st.a < 10 ? [st.b, st.a] : [st.a, st.b];
+    const colOk = (st.op === '+' || st.op === '−') ? Math.max(ca, cb) >= 10 : st.op === '×' ? ca >= 10 && cb < 10 : st.a >= 10 && st.b < 10;
+    const colBtn = colOk ? h('button', { class: 'scratch-btn', onclick: () => {
+      pad?.setEnabled(false);
+      const fin = () => { wait(700).then(ok); };
+      holder.replaceChildren(st.op === ':' ? divide({ div: { a: st.a, b: st.b } }, fin, (o) => (pad = makePad(o)))
+        : column({ col: { op: st.op === '−' ? '-' : st.op, a: ca, b: cb } }, fin, (o) => (pad = makePad(o))));
+    } }, '✍️ Đặt tính') : null;
+    const holder = h('div', {}, h('div', { class: 'quiz-answer' }, `Bước ${k + 1}: ${st.a} ${st.op} ${st.b} = `, box), colBtn ? h('div', { class: 'center' }, colBtn) : null, askPad());
+    body.append(expr, hint, holder);
+  }
+  async function finish() {
+    const x = exprs[cur];
+    x.done = true;
+    mark(x);
+    render();
+    await wait(1000);
+    const nx = exprs.findIndex((y) => !y.done);
+    if (nx >= 0 && panel.isConnected && panel.firstChild) open(nx); else close();
+  }
+  return h('div', {}, notes, h('div', { class: 'center' }, btn), panel, el, tip);
+}
+
 // Câu nhập số không có phép đặt tính → tự đổi thành trắc nghiệm 4 lựa chọn cho bé bấm nhanh.
 // Câu cần rèn viết số thì ghi keypad: true để giữ bàn phím.
 function autoChoice(q) {
@@ -361,7 +511,9 @@ function autoChoice(q) {
 
 export function renderKind(q, done, makePad) {
   let kind = q.kind || (q.choices ? 'choice' : 'num');
-  const ops = ['choice', 'num', 'pick'].includes(kind) ? findOps(q) : [];
+  const exprs = ['choice', 'num', 'pick'].includes(kind) && !q.calc ? findExprs(q) : [];
+  const ops = !exprs.length && ['choice', 'num', 'pick'].includes(kind) ? findOps(q) : [];
   if (kind === 'num' && !ops.length && !q.keypad) { q = autoChoice(q); kind = 'choice'; }
+  if (exprs.length) return withExpr(kind, q, done, makePad, exprs);
   return ops.length ? withScratch(kind, q, done, makePad, ops) : KINDS[kind](q, done, makePad);
 }
