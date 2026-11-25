@@ -49,6 +49,7 @@ export function quizScreen(id) {
   const topic = TOPICS[base], part = topic?.parts?.find((p) => p.id === partId);
   if (!topic || (partId && !part)) { location.hash = BACK; return h('div'); }
   const t = part || topic;
+  t.make.key = id;   // lưu túi dạng bài theo chương/phần
   const queue = Array.from({ length: QUESTIONS }, () => t.make());
   const retry = new Set();
   let i = 0, done = 0, firstTry = 0, streak = 0, best = 0, q, pad;

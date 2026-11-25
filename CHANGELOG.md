@@ -1,5 +1,9 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Lưu túi dạng bài để tắt app không mất
+
+- `mix()` lưu túi dạng bài còn lại vào `state.bags` theo chương/phần; mở lại app sẽ rút tiếp túi cũ → mỗi 35 câu (chương Nhân, chia lớn) chắc chắn đủ mọi dạng.
+
 ## 2026-11-24 — Đặt tính chia: viết các dòng số dư như trên giấy
 
 - Bỏ dòng chữ giải thích dưới số bị chia; thay bằng các dòng số dư (số dư + hạ chữ số tiếp), thẳng cột với chữ số vừa hạ.

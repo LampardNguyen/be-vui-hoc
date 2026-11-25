@@ -4,6 +4,7 @@ File: `js/storage.js`. Khóa localStorage: `be-vui-hoc-v1` (theo tên app, dùng
 
 ## Cấu trúc `state`
 - `facts`: id phép → `{ box, seen, right, wrong, ms, last }` (xem [[leitner]]).
+- `bags`: id chương/phần → túi dạng bài còn lại của `mix()` ([[topics]]).
 - `played`: số lượt theo chế độ; khóa luyện tập không có `-`, trò chơi có (`sprint-mix`).
 - `best`: kỷ lục trò chơi, khóa `${gameId}-${key}`.
 - `streak {count, last, best}`, `seenStickers`, `days['YYYY-MM-DD'] = {ms, answers}`.

@@ -1,4 +1,5 @@
 // Tiện ích tạo câu hỏi ngẫu nhiên cho các chương.
+import { state, save } from '../storage.js';
 export const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 export const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -38,11 +39,15 @@ export const gq = (text, answer, spread, ask = `${text} = ?`, reveal = `${text} 
 
 // Chọn lần lượt các hàm tạo câu hỏi (có trọng số nguyên [fn, w]) theo kiểu "rút thăm trong túi":
 // túi có w lá cho mỗi dạng, xáo lên rồi rút hết mới xáo túi mới → các dạng/phần ra đều nhau.
+// Có next.key (topic.js gán id chương/phần) thì túi lưu vào state.bags để tắt app vẫn rút tiếp túi cũ.
 export function mix(list) {
   let bag = [];
   const next = () => {
-    if (!bag.length) bag = shuffle(list.flatMap(([fn, w]) => Array(w).fill(fn)));
-    return bag.pop()();
+    if (next.key) bag = (state.bags[next.key] || []).filter((i) => i < list.length);
+    if (!bag.length) bag = shuffle(list.flatMap(([, w], i) => Array(w).fill(i)));
+    const i = bag.pop();
+    if (next.key) { state.bags[next.key] = bag; save(); }
+    return list[i][0]();
   };
   next.types = list.map(([fn]) => fn);   // Chế độ dev duyệt lần lượt từng dạng (js/screens/dev.js).
   return next;

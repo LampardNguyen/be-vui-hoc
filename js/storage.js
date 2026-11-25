@@ -10,6 +10,7 @@ function defaults() {
     best: {},                        // kỷ lục trò chơi
     topics: {},                      // id chương -> { best: sao cao nhất, played }
     streak: { count: 0, last: null, best: 0 },
+    bags: {},                        // id chương/phần -> túi dạng bài còn lại (xem mix() trong topics/util.js)
     seenStickers: [],                // sticker bé đã được thông báo
     days: {},                        // 'YYYY-MM-DD' -> { ms, answers }
     settings: { voice: true, sound: true, tables: [2, 3, 4, 5, 6, 7, 8, 9], level: 'normal' },
