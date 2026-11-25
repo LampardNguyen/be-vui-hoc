@@ -509,11 +509,32 @@ function autoChoice(q) {
   return { ...q, ...numChoice(n, spread, q.unit) };
 }
 
+// ---------- Gợi ý từng bước (q.hints) ----------
+// Mỗi lần bấm 💡 hiện thêm 1 gợi ý: { text, svg (thay hình trên đề) }.
+function withHints(q, make) {
+  let i = 0;
+  const notes = h('div', { class: 'hint-notes' });
+  const btn = h('button', { class: 'scratch-btn', onclick: () => show() });
+  const label = () => { btn.textContent = q.hints.length > 1 ? `💡 Gợi ý ${i + 1}/${q.hints.length}` : '💡 Gợi ý'; };
+  const el = make(() => btn.remove());
+  const box = h('div', {}, h('div', { class: 'center' }, btn), notes, el);
+  label();
+  function show() {
+    const ht = q.hints[i++];
+    const scope = box.closest('.screen') || document;
+    if (ht.svg) { const pic = scope.querySelector('.topic-pic'); if (pic) pic.innerHTML = ht.svg; }
+    if (ht.text) notes.append(h('p', { class: 'hint-note' }, `💡 ${ht.text}`));
+    if (i >= q.hints.length) btn.remove(); else label();
+  }
+  return box;
+}
+
 export function renderKind(q, done, makePad) {
   let kind = q.kind || (q.choices ? 'choice' : 'num');
   const exprs = ['choice', 'num', 'pick'].includes(kind) && !q.calc ? findExprs(q) : [];
   const ops = !exprs.length && ['choice', 'num', 'pick'].includes(kind) ? findOps(q) : [];
   if (kind === 'num' && !ops.length && !q.keypad) { q = autoChoice(q); kind = 'choice'; }
-  if (exprs.length) return withExpr(kind, q, done, makePad, exprs);
-  return ops.length ? withScratch(kind, q, done, makePad, ops) : KINDS[kind](q, done, makePad);
+  const build = (d) => (exprs.length ? withExpr(kind, q, d, makePad, exprs) : ops.length ? withScratch(kind, q, d, makePad, ops) : KINDS[kind](q, d, makePad));
+  if (q.hints?.length) return withHints(q, (off) => build((...a) => { off(); done(...a); }));
+  return build(done);
 }

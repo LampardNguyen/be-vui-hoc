@@ -1,5 +1,12 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Đồng hồ: nút 💡 Gợi ý cho mọi dạng
+
+- Nút 💡 Gợi ý 2 bước, đổi luôn đồng hồ trên đề: vòng số phút bên ngoài, kim ngắn tô cam, khoanh số kim dài chỉ.
+- Thêm/còn bao nhiêu phút: cung vàng đánh số từng khoảng 5 phút (qua số 12 đổi xanh), bước 2 kim chạy đến giờ mới.
+- Giờ chiều/tối: dải đổi giờ 13→1 … 22→10 rồi phép trừ 12.
+- Cơ chế `q.hints` dùng chung trong `kinds.js`, không bắt buộc, không trừ điểm.
+
 ## 2026-11-25 — Đồng hồ: thêm dạng "Còn bao nhiêu phút?"
 
 - Phần Xem đồng hồ thêm dạng tìm khoảng thời gian (5–45 phút, có thể qua giờ), 2 kiểu: theo giờ số (10:15 → 10:30) và theo kim phút (kim phút chạy đến số 6).

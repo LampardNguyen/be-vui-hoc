@@ -66,16 +66,36 @@ function can(x, l, max) {
     <rect x="${x + 8}" y="${y - 10}" width="16" height="10" fill="#1b6f8f"/><path d="M${x + 36} ${y} q10 -16 26 0" fill="none" stroke="${INK}" stroke-width="5"/>${label(x + 35, y + hgt / 2 + 6, `${l} l`, 18)}`;
 }
 // Đồng hồ kim: giờ h (1–12), phút m.
-export function clock(h, m) {
-  let nums = '';
+// Đồng hồ kim. o (gợi ý): ring — vòng số phút bên ngoài; hour — tô cam kim ngắn; minHl — khoanh số kim dài chỉ;
+// arc: [phút bắt đầu, số phút] — cung vàng chia khoảng 5 phút (đánh số, qua số 12 đổi màu); move — kim chạy hết cung.
+export function clock(h, m, o = {}) {
+  const pt = (min, r) => { const a = ((min * 6 - 90) * Math.PI) / 180; return [100 + r * Math.cos(a), 100 + r * Math.sin(a)]; };
+  let nums = '', extra = '';
   for (let k = 1; k <= 12; k++) {
-    const a = ((k * 30 - 90) * Math.PI) / 180;
-    nums += label(100 + 66 * Math.cos(a), 100 + 66 * Math.sin(a), k, 18);
+    const [x, y] = pt(k * 5, 66);
+    if (o.minHl && k === (m ? m / 5 : 12)) extra += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="#ffd166"/>`;
+    nums += label(x, y, k, 18);
+    if (o.ring) { const [rx, ry] = pt(k * 5, 106); nums += label(rx, ry, (k * 5) % 60, 12, '#1b8fb5'); }
   }
-  const hand = (deg, len, w, c) => { const a = ((deg - 90) * Math.PI) / 180; return `<line x1="100" y1="100" x2="${(100 + len * Math.cos(a)).toFixed(1)}" y2="${(100 + len * Math.sin(a)).toFixed(1)}" stroke="${c}" stroke-width="${w}"/>`; };
-  return svg(`<circle cx="100" cy="100" r="88" fill="#fff" stroke="#4cc9f0" stroke-width="8"/>${nums}
-    ${hand((h % 12) * 30 + m / 2, 42, 7, INK)}${hand(m * 6, 66, 4, HI)}<circle cx="100" cy="100" r="6" fill="${INK}"/>`, '2 2 196 196');
+  if (o.arc) {
+    const [from, gap] = o.arc;
+    for (let s = 0; s < gap / 5; s++) {
+      const a = from + s * 5, [x1, y1] = pt(a, 80), [x2, y2] = pt(a + 5, 80), [bx, by] = pt(a + 2.5, 80);
+      const col = a >= 60 ? '#90e0a0' : '#ffd166';
+      extra += `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A80 80 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${col}" stroke-width="10" fill="none"/>`
+        + `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="7" fill="#fff" stroke="${col}" stroke-width="2"/>${label(bx, by, s + 1, 9)}`;
+    }
+  }
+  const hand = (deg, len, w, c, turn) => {
+    const a = ((deg - 90) * Math.PI) / 180;
+    const line = `<line x1="100" y1="100" x2="${(100 + len * Math.cos(a)).toFixed(1)}" y2="${(100 + len * Math.sin(a)).toFixed(1)}" stroke="${c}" stroke-width="${w}"/>`;
+    return turn ? `<g>${line}<animateTransform attributeName="transform" type="rotate" from="0 100 100" to="${turn} 100 100" begin="0.4s" dur="${Math.max(1, turn / 120).toFixed(1)}s" fill="freeze"/></g>` : line;
+  };
+  const mv = o.move || 0;
+  return svg(`<circle cx="100" cy="100" r="88" fill="#fff" stroke="#4cc9f0" stroke-width="8"/>${extra}${nums}
+    ${hand((h % 12) * 30 + m / 2, 42, 7, o.hour ? '#ff8c42' : INK, mv / 2)}${hand(m * 6, 66, 4, HI, mv * 6)}<circle cx="100" cy="100" r="6" fill="${INK}"/>`, o.ring ? '-24 -24 248 248' : '2 2 196 196');
 }
+
 const timeText = (h, m) => (m ? `${h} giờ ${m} phút` : `${h} giờ`);
 const DAYS = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ nhật'];   // tuần bắt đầu Thứ Hai
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -365,6 +385,17 @@ const nhietDo = {
   ]),
 };
 
+// Gợi ý đọc đồng hồ: kim ngắn → giờ, rồi kim dài → phút (vòng số phút).
+const readHints = (h, m) => [
+  { svg: clock(h, m, { hour: true }), text: m ? `Kim ngắn (màu cam) đã qua số ${h}, chưa tới số ${h % 12 + 1} → ${h} giờ.` : `Kim ngắn (màu cam) chỉ số ${h} → ${h} giờ.` },
+  { svg: clock(h, m, { hour: true, ring: true, minHl: true }), text: m ? `Kim dài chỉ số ${m / 5}. Nhìn vòng số xanh: số ${m / 5} là ${m} phút.` : 'Kim dài chỉ số 12 → đúng giờ, 0 phút.' },
+];
+// Gợi ý đổi giờ chiều/tối: dải 13→1 … 22→10, rồi phép trừ 12.
+const pmHints = (H, h, m) => [
+  { text: `Đổi giờ: ${[...Array(10).keys()].map((i) => (i + 13 === H ? `👉 ${H}→${h}` : `${i + 13}→${i + 1}`)).join(' · ')}` },
+  { text: `${H} − 12 = ${h} → ${timeText(h, m)} ${H >= 18 ? 'tối' : 'chiều'}.` },
+];
+
 const dongHo = {
   id: 'dong-ho', title: 'Xem đồng hồ', emoji: '⏰',
   make: mix([
@@ -373,25 +404,29 @@ const dongHo = {
       const h = rnd(1, 12), m = rnd(0, 11) * 5, ans = timeText(h, m);
       const opts = new Set([ans]);
       for (const o of [timeText(m ? m / 5 : 12, (h % 12) * 5), timeText(h % 12 + 1, m), timeText(h, (m + 15) % 60), timeText(h === 1 ? 12 : h - 1, m)]) if (opts.size < 4 && o !== ans) opts.add(o);
-      return { text: 'Đồng hồ chỉ mấy giờ? ⏰ (kim ngắn chỉ giờ, kim dài màu đỏ chỉ phút)', svg: clock(h, m), choices: shuffle([...opts]), answer: ans, explain: `Kim ngắn chỉ giờ ${h}${m ? `, kim dài chỉ số ${m / 5} là ${m} phút` : ', kim dài chỉ số 12'}.` };
+      return { text: 'Đồng hồ chỉ mấy giờ? ⏰ (kim ngắn chỉ giờ, kim dài màu đỏ chỉ phút)', svg: clock(h, m), choices: shuffle([...opts]), answer: ans, explain: `Kim ngắn chỉ giờ ${h}${m ? `, kim dài chỉ số ${m / 5} là ${m} phút` : ', kim dài chỉ số 12'}.`, hints: readHints(h, m) };
     }, 3],
     [() => {
       // Giờ buổi chiều / tối: 19:15 = 7 giờ 15 phút tối.
       const H = rnd(13, 22), m = pickOne([0, 15, 30, 45]), h = H - 12;
       const wrong = [timeText(h + 1, m), timeText(H - 10, m), timeText(h, (m + 30) % 60)];
-      return { text: `Đồng hồ điện tử chỉ ${H}:${String(m).padStart(2, '0')}. Đồng hồ kim lúc đó chỉ mấy giờ?`, choices: shuffle([timeText(h, m), ...new Set(wrong.filter((w) => w !== timeText(h, m)))]).slice(0, 4), answer: timeText(h, m), explain: `${H} giờ là ${H} − 12 = ${h} giờ ${H >= 18 ? 'tối' : 'chiều'}.` };
+      return { text: `Đồng hồ điện tử chỉ ${H}:${String(m).padStart(2, '0')}. Đồng hồ kim lúc đó chỉ mấy giờ?`, choices: shuffle([timeText(h, m), ...new Set(wrong.filter((w) => w !== timeText(h, m)))]).slice(0, 4), answer: timeText(h, m), explain: `${H} giờ là ${H} − 12 = ${h} giờ ${H >= 18 ? 'tối' : 'chiều'}.`, hints: pmHints(H, h, m) };
     }, 2],
     [() => {
       // Chọn đồng hồ kim đúng với giờ điện tử.
       const H = rnd(13, 22), m = pickOne([0, 15, 30, 45]), h = H - 12;
       const fakes = [[h, (m + 30) % 60], [h % 12 + 1, m], [m ? m / 5 : 12, h * 5 % 60]].filter(([a, b]) => !(a === h && b === m));
       const opts = shuffle([[h, m], ...fakes.slice(0, 2)]).map(([a, b]) => ({ value: `${a}:${b}`, svg: clock(a, b) }));
-      return { text: `Chọn đồng hồ cùng giờ với ${H}:${String(m).padStart(2, '0')} 🕰️`, choices: opts, answer: `${h}:${m}`, show: timeText(h, m), explain: `${H}:${String(m).padStart(2, '0')} là ${timeText(h, m)} ${H >= 18 ? 'tối' : 'chiều'}.` };
+      return { text: `Chọn đồng hồ cùng giờ với ${H}:${String(m).padStart(2, '0')} 🕰️`, choices: opts, answer: `${h}:${m}`, show: timeText(h, m), explain: `${H}:${String(m).padStart(2, '0')} là ${timeText(h, m)} ${H >= 18 ? 'tối' : 'chiều'}.`, hints: pmHints(H, h, m) };
     }, 2],
     [() => {
       const h = rnd(1, 10), m = pickOne([0, 15, 30]), add = pickOne([15, 30, 60]);
       const t = h * 60 + m + add, ans = timeText(Math.floor(t / 60), t % 60);
-      return { text: `Bây giờ là ${timeText(h, m)}. ${add === 60 ? '1 giờ' : `${add} phút`} nữa là mấy giờ? ⏳`, svg: clock(h, m), choices: shuffle([ans, timeText(h, (m + add) % 60 === m ? m + 5 : (m + add) % 60), timeText(Math.floor(t / 60) + 1, t % 60), timeText(h, m + 5)].filter((v, i, a) => a.indexOf(v) === i)), answer: ans, explain: `${timeText(h, m)} thêm ${add} phút là ${ans}.` };
+      return { text: `Bây giờ là ${timeText(h, m)}. ${add === 60 ? '1 giờ' : `${add} phút`} nữa là mấy giờ? ⏳`, svg: clock(h, m), choices: shuffle([ans, timeText(h, (m + add) % 60 === m ? m + 5 : (m + add) % 60), timeText(Math.floor(t / 60) + 1, t % 60), timeText(h, m + 5)].filter((v, i, a) => a.indexOf(v) === i)), answer: ans, explain: `${timeText(h, m)} thêm ${add} phút là ${ans}.`,
+        hints: [
+          { svg: clock(h, m, { ring: true, arc: [m, add] }), text: add === 60 ? '1 giờ = 60 phút: kim phút đi đúng 1 vòng, quay về chỗ cũ; kim ngắn sang số tiếp theo.' : `Mỗi khoảng vàng là 5 phút. ${add} phút là ${add / 5} khoảng: kim phút đi từ số ${m ? m / 5 : 12} qua ${add / 5} khoảng.` },
+          { svg: clock(h, m, { ring: true, arc: [m, add], move: add }), text: `${timeText(h, m)} + ${add === 60 ? '1 giờ' : `${add} phút`} → ${ans}.` },
+        ] };
     }, 1],
     [() => {
       // Còn bao nhiêu phút: theo giờ số (10:15 → 10:30) hoặc theo kim phút (kim phút chạy đến số 6). Có thể qua giờ.
@@ -402,12 +437,16 @@ const dongHo = {
       for (const w of [gap + 5, gap - 5, m2, k, gap + 10, 60 - gap]) if (opts.size < 4 && w > 0 && w <= 60) opts.add(w);
       const choices = shuffle([...opts]).map((x) => `${x} phút`), answer = `${gap} phút`;
       const via = t > 60 ? ` Qua số 12 là sang giờ mới (${h2} giờ).` : '';
+      const hints = [
+        { svg: clock(h, m, { ring: true, arc: [m, gap] }), text: `Tô vàng từ số ${m ? m / 5 : 12} đến số ${k}. Đếm các khoảng ①②③…, mỗi khoảng 5 phút.${t > 60 ? ' Phần xanh là sau số 12 (giờ mới).' : ''}` },
+        { svg: clock(h, m, { ring: true, arc: [m, gap], move: gap }), text: `${gap / 5} khoảng × 5 phút = ${gap} phút.` },
+      ];
       if (Math.random() < 0.5) {
         return { text: `Bây giờ là ${hhmm(h, m)}. Còn bao nhiêu phút nữa đến ${hhmm(h2, m2)}? ⏳`, svg: clock(h, m), choices, answer,
-          explain: `Từ ${hhmm(h, m)} đến ${hhmm(h2, m2)}: kim phút đi ${gap / 5} số, mỗi số 5 phút → ${gap / 5} × 5 = ${gap} phút.${via}` };
+          explain: `Từ ${hhmm(h, m)} đến ${hhmm(h2, m2)}: kim phút đi ${gap / 5} số, mỗi số 5 phút → ${gap / 5} × 5 = ${gap} phút.${via}`, hints };
       }
       return { text: `Bây giờ là ${timeText(h, m)}. Kim phút chạy đến số ${k} thì đã qua bao nhiêu phút? ⏳`, svg: clock(h, m), choices, answer,
-        explain: `Kim phút đang chỉ số ${m ? m / 5 : 12}, chạy đến số ${k} là ${gap / 5} khoảng, mỗi khoảng 5 phút: ${gap / 5} × 5 = ${gap} phút.${via}` };
+        explain: `Kim phút đang chỉ số ${m ? m / 5 : 12}, chạy đến số ${k} là ${gap / 5} khoảng, mỗi khoảng 5 phút: ${gap / 5} × 5 = ${gap} phút.${via}`, hints };
     }, 2],
   ]),
 };
