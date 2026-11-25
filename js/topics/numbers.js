@@ -516,10 +516,15 @@ const bieuThuc = {
         explain: x.rule,
       };
     }, 3],
+    // Chọn biểu thức có giá trị cho trước: 4 biểu thức trộn cả hai kiểu expr() và expr2().
     [() => {
-      const x = expr(), others = [expr(), expr(), expr()].filter((y) => y.v !== x.v).map((y) => y.e);
-      return { text: `Biểu thức nào có giá trị bằng ${x.v}? 🔎`, choices: shuffle([...new Set([x.e, ...others])].slice(0, 4)), answer: x.e, explain: `${x.e} = ${x.v}. ${x.rule}` };
-    }, 2],
+      for (;;) {
+        const xs = [0, 1, 2, 3].map(() => (Math.random() < 0.5 ? expr() : expr2()));
+        if (new Set(xs.map((y) => y.v)).size < 4 || new Set(xs.map((y) => y.e)).size < 4) continue;
+        const x = xs[0];
+        return { text: `Biểu thức nào có giá trị bằng ${x.v}? 🔎`, choices: shuffle(xs.map((y) => y.e)), answer: x.e, explain: `${x.e} = ${x.v}. ${x.rule}` };
+      }
+    }, 4],
     [() => {
       const a = rnd(2, 9), b = rnd(2, 9), c = rnd(2, 6), l = (a + b) * c, r = a + b * c;
       const swap = Math.random() < 0.5;
@@ -536,15 +541,6 @@ const bieuThuc = {
         { text: `Bước 2: ${x.e} = ?`, max: 3, answer: String(x.v) },
       ], explain: x.rule };
     }, 3],
-    // Nối biểu thức với giá trị (chiếc thuyền A, B, C, D).
-    [() => {
-      for (;;) {
-        const xs = [expr2(), expr2(), expr2(), expr2()];
-        if (new Set(xs.map((x) => x.v)).size < 4) continue;
-        const L = ['A', 'B', 'C', 'D'], k = rnd(0, 3);
-        return { text: `⛵ Biểu thức nào có giá trị bằng ${xs[k].v}?`, calcText: xs.map((x, i) => `${L[i]}: ${x.e}`).join('; '), choices: xs.map((x, i) => ({ value: L[i], tag: L[i], label: x.e })), answer: L[k], explain: xs.map((x, i) => `${L[i]} = ${x.v}`).join(', ') + '.' };
-      }
-    }, 2],
     // Khoanh biểu thức lớn nhất / bé nhất.
     [() => {
       for (;;) {

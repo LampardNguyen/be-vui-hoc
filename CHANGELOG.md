@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Biểu thức số: gộp dạng ⛵ A–D vào dạng chọn biểu thức
+
+- Dạng "Biểu thức nào có giá trị bằng …?" rút 4 biểu thức trộn cả hai kiểu (`expr`, `expr2`), bỏ dạng ⛵ A–D (chương còn 8 dạng), bỏ nhãn A–D.
+- Ô đáp án là biểu thức tự thu nhỏ chữ, không xuống dòng trên điện thoại.
+
 ## 2026-11-25 — Biểu thức số: đưa biểu thức A–D vào ô đáp án
 
 - Dạng ⛵ A/B/C/D: đề chỉ còn câu hỏi ngắn, 4 biểu thức nằm trong 4 ô đáp án (lưới 2×2) có nhãn A–D nhỏ ở góc.
