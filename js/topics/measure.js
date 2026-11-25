@@ -393,6 +393,22 @@ const dongHo = {
       const t = h * 60 + m + add, ans = timeText(Math.floor(t / 60), t % 60);
       return { text: `Bây giờ là ${timeText(h, m)}. ${add === 60 ? '1 giờ' : `${add} phút`} nữa là mấy giờ? ⏳`, svg: clock(h, m), choices: shuffle([ans, timeText(h, (m + add) % 60 === m ? m + 5 : (m + add) % 60), timeText(Math.floor(t / 60) + 1, t % 60), timeText(h, m + 5)].filter((v, i, a) => a.indexOf(v) === i)), answer: ans, explain: `${timeText(h, m)} thêm ${add} phút là ${ans}.` };
     }, 1],
+    [() => {
+      // Còn bao nhiêu phút: theo giờ số (10:15 → 10:30) hoặc theo kim phút (kim phút chạy đến số 6). Có thể qua giờ.
+      const h = rnd(1, 11), m = rnd(0, 11) * 5, gap = rnd(1, 9) * 5, t = m + gap;
+      const h2 = t >= 60 ? h + 1 : h, m2 = t % 60, k = m2 ? m2 / 5 : 12;
+      const hhmm = (a, b) => `${a}:${String(b).padStart(2, '0')}`;
+      const opts = new Set([gap]);
+      for (const w of [gap + 5, gap - 5, m2, k, gap + 10, 60 - gap]) if (opts.size < 4 && w > 0 && w <= 60) opts.add(w);
+      const choices = shuffle([...opts]).map((x) => `${x} phút`), answer = `${gap} phút`;
+      const via = t > 60 ? ` Qua số 12 là sang giờ mới (${h2} giờ).` : '';
+      if (Math.random() < 0.5) {
+        return { text: `Bây giờ là ${hhmm(h, m)}. Còn bao nhiêu phút nữa đến ${hhmm(h2, m2)}? ⏳`, svg: clock(h, m), choices, answer,
+          explain: `Từ ${hhmm(h, m)} đến ${hhmm(h2, m2)}: kim phút đi ${gap / 5} số, mỗi số 5 phút → ${gap / 5} × 5 = ${gap} phút.${via}` };
+      }
+      return { text: `Bây giờ là ${timeText(h, m)}. Kim phút chạy đến số ${k} thì đã qua bao nhiêu phút? ⏳`, svg: clock(h, m), choices, answer,
+        explain: `Kim phút đang chỉ số ${m ? m / 5 : 12}, chạy đến số ${k} là ${gap / 5} khoảng, mỗi khoảng 5 phút: ${gap / 5} × 5 = ${gap} phút.${via}` };
+    }, 2],
   ]),
 };
 

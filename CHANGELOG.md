@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Đồng hồ: thêm dạng "Còn bao nhiêu phút?"
+
+- Phần Xem đồng hồ thêm dạng tìm khoảng thời gian (5–45 phút, có thể qua giờ), 2 kiểu: theo giờ số (10:15 → 10:30) và theo kim phút (kim phút chạy đến số 6).
+- Giải thích đếm số khoảng kim phút đi qua × 5 phút; đáp án nhiễu: nhầm số kim chỉ với số phút, lệch 5 phút.
+
 ## 2026-11-25 — Biểu thức số: gộp dạng ⛵ A–D vào dạng chọn biểu thức
 
 - Dạng "Biểu thức nào có giá trị bằng …?" rút 4 biểu thức trộn cả hai kiểu (`expr`, `expr2`), bỏ dạng ⛵ A–D (chương còn 8 dạng), bỏ nhãn A–D.
