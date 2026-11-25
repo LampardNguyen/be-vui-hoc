@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Biểu thức số: đưa biểu thức A–D vào ô đáp án
+
+- Dạng ⛵ A/B/C/D: đề chỉ còn câu hỏi ngắn, 4 biểu thức nằm trong 4 ô đáp án (lưới 2×2) có nhãn A–D nhỏ ở góc.
+- Ô đáp án hỗ trợ `tag` (nhãn góc); chữ tự thu nhỏ trên điện thoại để không xuống dòng.
+
 ## 2026-11-25 — Tính từng bước cho biểu thức
 
 - Câu có biểu thức (từ 2 phép tính, có × : hoặc ngoặc) trong đề, trong đáp án hoặc trên đĩa cân có nút 🧮 Tính từng bước.

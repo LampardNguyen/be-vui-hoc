@@ -19,6 +19,7 @@ function choice(q, done) {
     const v = typeof c === 'object' ? c.value : c;
     const b = h('button', { class: `quiz-choice${typeof c === 'object' && c.svg ? ' pic' : ''}`, onclick: () => pickIt(b, v) },
       typeof c === 'object' && c.svg ? picture(c.svg, 'choice-pic') : null,
+      typeof c === 'object' && c.tag ? h('span', { class: 'choice-tag' }, c.tag) : null,
       typeof c === 'object' ? c.label ?? '' : c);
     b.dataset.v = v;
     return b;

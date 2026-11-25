@@ -542,7 +542,7 @@ const bieuThuc = {
         const xs = [expr2(), expr2(), expr2(), expr2()];
         if (new Set(xs.map((x) => x.v)).size < 4) continue;
         const L = ['A', 'B', 'C', 'D'], k = rnd(0, 3);
-        return { text: `⛵ ${xs.map((x, i) => `${L[i]}: ${x.e}`).join("; ")}. Biểu thức nào có giá trị bằng ${xs[k].v}?`, choices: L, answer: L[k], explain: xs.map((x, i) => `${L[i]} = ${x.v}`).join(', ') + '.' };
+        return { text: `⛵ Biểu thức nào có giá trị bằng ${xs[k].v}?`, calcText: xs.map((x, i) => `${L[i]}: ${x.e}`).join('; '), choices: xs.map((x, i) => ({ value: L[i], tag: L[i], label: x.e })), answer: L[k], explain: xs.map((x, i) => `${L[i]} = ${x.v}`).join(', ') + '.' };
       }
     }, 2],
     // Khoanh biểu thức lớn nhất / bé nhất.

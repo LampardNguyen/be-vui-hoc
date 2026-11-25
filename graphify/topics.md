@@ -13,7 +13,7 @@
 - `make()` trả câu luyện `{ kind, text, svg?, answer, show?, explain, tilt? }`; `kind`:
   `choice` (`choices`: chuỗi hoặc `{ value, svg, label }`, `tf: true` cho Đúng/Sai) · `num` (`max`, `unit`) ·
   `column` (`col: { op: '+'|'-'|'×', a, b }`) · `divide` (`div: { a, b }`) · `pick` (svg có `data-k`, `pick: { multi, correct }`) ·
-  `paint` (svg có `data-k` + `.part`, `paint: { need }`) · `order` (`order: { items, asc }`) · `steps` (`steps: [câu con choice/num]`).
+  `paint` (svg có `data-k` + `.part`, `paint: { need }`) · `order` (`order: { items, asc }`); đáp án `choice` dạng object `{ value, label, tag }` — `tag` là nhãn nhỏ góc ô (vd A/B/C/D) · `steps` (`steps: [câu con choice/num]`).
   Không ghi `kind` thì tự suy: có `choices` → choice, không → num.
   **Câu `num` không có phép đặt tính tự đổi thành choice 4 lựa chọn** (`autoChoice` trong `renderKind`); muốn giữ bàn phím ghi `keypad: true`, muốn tắt nút đặt tính ghi `calc: []`.
 - `numbers.js` có `readNum(n)` (đọc số 100–999 bằng chữ: linh, mốt, tư, lăm) và `digits(n)` → [trăm, chục, đơn vị]; dạng bài bám theo sách giáo khoa (dãy số, chum chạm chọn, chuỗi mũi tên, toán 2 bước).
