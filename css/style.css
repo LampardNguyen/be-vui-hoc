@@ -114,6 +114,10 @@ a { text-decoration: none; }
 /* ---------- Chương học: mẹo + luyện ---------- */
 .tips { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 20px 14px 40px; margin: 0; }
 .tips li { font-size: 20px; line-height: 1.45; margin: 6px 0; }
+.quiz-tips { margin-top: 16px; }
+.quiz-tips summary { font-size: 20px; font-weight: 800; color: #5b6385; cursor: pointer; padding: 6px 4px; }
+.quiz-tips .tips { background: #fff8e1; box-shadow: none; }
+.quiz-tips .tips li { font-size: 17px; }
 .quiz-q { text-align: center; }
 .quiz-q p { font-size: clamp(24px, 4.5vw, 36px); font-weight: 800; margin: 8px 0; }
 .topic-pic svg { width: min(100%, 360px); height: auto; display: block; margin: 0 auto; }

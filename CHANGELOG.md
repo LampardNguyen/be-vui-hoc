@@ -1,5 +1,10 @@
 # Nhật ký thay đổi
 
+## 2026-11-25 — Luôn hiện "Con cần nhớ" trong luyện tập
+
+- Màn luyện của mọi chương có khung 💡 Con cần nhớ ở cuối (tips của phần nếu có, không thì của chương).
+- Bé thu gọn/mở được, app nhớ lựa chọn; lần đầu trên điện thoại thu gọn sẵn.
+
 ## 2026-11-25 — Lưu túi dạng bài để tắt app không mất
 
 - `mix()` lưu túi dạng bài còn lại vào `state.bags` theo chương/phần; mở lại app sẽ rút tiếp túi cũ → mỗi 35 câu (chương Nhân, chia lớn) chắc chắn đủ mọi dạng.

@@ -44,6 +44,16 @@ export function topicScreen(id) {
   );
 }
 
+// Khung "Con cần nhớ" ở cuối màn luyện: bé thu gọn/mở, app nhớ lựa chọn; chưa chọn thì điện thoại thu gọn sẵn.
+function tipsBox(tips) {
+  if (!tips?.length) return null;
+  const open = state.settings.tipsOpen ?? !matchMedia('(max-width: 640px)').matches;
+  return h('details', { class: 'quiz-tips', open, ontoggle: (e) => { state.settings.tipsOpen = e.target.open; save(); } },
+    h('summary', {}, '💡 Con cần nhớ'),
+    h('ul', { class: 'tips' }, tips.map((s) => h('li', {}, s))),
+  );
+}
+
 export function quizScreen(id) {
   const [base, partId] = id.split('.');
   const topic = TOPICS[base], part = topic?.parts?.find((p) => p.id === partId);
@@ -68,6 +78,7 @@ export function quizScreen(id) {
     h('div', { class: 'progress' }, h('span', { class: 'bar track' }, bar, runnerEl, h('span', { class: 'goal' }, '🏁')), counter),
     h('div', { class: 'hud' }, streakEl),
     stage,
+    tipsBox(part?.tips || topic.tips),
   );
 
   // Mỗi câu chỉ có 1 bàn phím hoạt động (bàn phím cũ bị tắt để phím máy tính không gõ nhầm).
